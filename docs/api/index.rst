@@ -6,6 +6,4 @@ FilesIndex
    :maxdepth: 2
 
 .. autoclass:: helio.src.FilesIndex
-    :members:
-    :inherited-members:
-    :undoc-members:
+    :members: indices, train_test_split, shuffle, index_merge
