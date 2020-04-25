@@ -1,0 +1,1296 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>HelioBatch &mdash; helio  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> helio
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="helio.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">helio</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>HelioBatch</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/halio_batch.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="heliobatch">
+<h1>HelioBatch<a class="headerlink" href="#heliobatch" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<dl class="class">
+<dt id="helio.src.HelioBatch">
+<em class="property">class </em><code class="sig-name descname">HelioBatch</code><span class="sig-paren">(</span><em class="sig-param">index</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batch class for solar observations processing.</p>
+<dl class="attribute">
+<dt id="helio.src.HelioBatch.index">
+<code class="sig-name descname">index</code><a class="headerlink" href="#helio.src.HelioBatch.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unique identifiers of batch items.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="idnex.html#helio.src.FilesIndex" title="helio.src.FilesIndex">FilesIndex</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.aia_intscale">
+<code class="sig-name descname">aia_intscale</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">wavelength</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.aia_intscale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.aia_intscale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjust intensity to AIA standart.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for image.</p></li>
+<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>wavelength</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Image wavelength.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with adjusted images.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a <code class="docutils literal notranslate"><span class="pre">func</span></code> to each item in <code class="docutils literal notranslate"><span class="pre">src</span></code> and write results in <code class="docutils literal notranslate"><span class="pre">dst</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for data.</p></li>
+<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>func</strong> (<em>callable</em>) – A function to apply.</p></li>
+<li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to <code class="docutils literal notranslate"><span class="pre">func</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Processed batch.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.attributes">
+<em class="property">property </em><code class="sig-name descname">attributes</code><a class="headerlink" href="#helio.src.HelioBatch.attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of data keys.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.correct_degradation">
+<code class="sig-name descname">correct_degradation</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.correct_degradation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.correct_degradation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply <code class="docutils literal notranslate"><span class="pre">correct_degradation</span></code> procedure to AIA data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for AIA map.</p></li>
+<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to dump method.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with corrected AIA maps.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.data">
+<em class="property">property </em><code class="sig-name descname">data</code><a class="headerlink" href="#helio.src.HelioBatch.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Observational data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.deepcopy">
+<code class="sig-name descname">deepcopy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.deepcopy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.deepcopy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a deep copy of batch.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.downscale_local_mean">
+<code class="sig-name descname">downscale_local_mean</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.downscale_local_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply downscale_local_mean to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.downscale_local_mean</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>factors</strong> (<em>array_like</em>) – Array containing down-sampling integer factor along each axis.</p></li>
+<li><p><strong>cval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Constant padding value if image is not perfectly divisible by the
+integer factors.</p></li>
+<li><p><strong>clip</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Unused, but kept here for API consistency with the other transforms
+in this module. (The local mean will never fall outside the range
+of values in the input image, assuming the provided <cite>cval</cite> also
+falls within that range.)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Down-sampled image with same number of dimensions as input image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.drop_empty_days">
+<code class="sig-name descname">drop_empty_days</code><span class="sig-paren">(</span><em class="sig-param">mask</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.drop_empty_days"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.drop_empty_days" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop batch items without active regions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mask</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for active regions masks.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch without empty observations.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.dtype_limits">
+<code class="sig-name descname">dtype_limits</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.dtype_limits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply dtype_limits to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.dtype_limits</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>clip_negative</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, clip the negative range (i.e. return 0 for min intensity)
+even if the image dtype allows negative values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Lower and upper intensity limits.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.dump">
+<code class="sig-name descname">dump</code><span class="sig-paren">(</span><em class="sig-param">src</em>, <em class="sig-param">path</em>, <em class="sig-param">format</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dump data in various formats.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for data to save.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path where to write output files.</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Output file format.</p></li>
+<li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to dump method.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch unchanged.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.fillna">
+<code class="sig-name descname">fillna</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">value=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.fillna"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.fillna" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace NaN with a given value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for array.</p></li>
+<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>value</strong> (<em>scalar</em>) – Value to be used to fill NaN values. Default to 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch NaN replaced.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.group_by_index">
+<code class="sig-name descname">group_by_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.group_by_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.group_by_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stack batch items according to batch index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>batch</strong> – A new batch with stacked items.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Meta will be lost.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.hough_circle">
+<code class="sig-name descname">hough_circle</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.hough_circle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply hough_circle to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.hough_circle</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>radius</strong> (<em>scalar</em><em> or </em><em>sequence of scalars</em>) – Radii at which to compute the Hough transform.
+Floats are converted to integers.</p></li>
+<li><p><strong>normalize</strong> (<em>boolean</em><em>, </em><em>optional</em><em> (</em><em>default True</em><em>)</em>) – Normalize the accumulator with the number
+of pixels used to draw the radius.</p></li>
+<li><p><strong>full_output</strong> (<em>boolean</em><em>, </em><em>optional</em><em> (</em><em>default False</em><em>)</em>) – Extend the output size by twice the largest
+radius in order to detect centers outside the
+input picture.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Hough transform accumulator for each radius.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.hough_ellipse">
+<code class="sig-name descname">hough_ellipse</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.hough_ellipse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply hough_ellipse to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.hough_ellipse</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Accumulator threshold value.</p></li>
+<li><p><strong>accuracy</strong> (<em>double</em><em>, </em><em>optional</em>) – Bin size on the minor axis used in the accumulator.</p></li>
+<li><p><strong>min_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Minimal major axis length.</p></li>
+<li><p><strong>max_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Maximal minor axis length.
+If None, the value is set to the half of the smaller
+image dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Where <code class="docutils literal notranslate"><span class="pre">(yc,</span> <span class="pre">xc)</span></code> is the center, <code class="docutils literal notranslate"><span class="pre">(a,</span> <span class="pre">b)</span></code> the major and minor</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.hough_line">
+<code class="sig-name descname">hough_line</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.hough_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply hough_line to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.hough_line</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>theta</strong> (<em>1D ndarray of double</em><em>, </em><em>optional</em>) – Angles at which to compute the transform, in radians.
+Defaults to a vector of 180 angles evenly spaced from -pi/2 to pi/2.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Hough transform accumulator.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.img_as_bool">
+<code class="sig-name descname">img_as_bool</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_bool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply img_as_bool to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.img_as_bool</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>force_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Force a copy of the data, irrespective of its current dtype.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Output image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.img_as_float">
+<code class="sig-name descname">img_as_float</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply img_as_float to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.img_as_float</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>force_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Force a copy of the data, irrespective of its current dtype.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Output image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.img_as_float32">
+<code class="sig-name descname">img_as_float32</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_float32" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply img_as_float32 to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.img_as_float32</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>force_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Force a copy of the data, irrespective of its current dtype.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Output image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.img_as_float64">
+<code class="sig-name descname">img_as_float64</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_float64" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply img_as_float64 to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.img_as_float64</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>force_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Force a copy of the data, irrespective of its current dtype.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Output image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.img_as_int">
+<code class="sig-name descname">img_as_int</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply img_as_int to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.img_as_int</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>force_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Force a copy of the data, irrespective of its current dtype.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Output image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.img_as_ubyte">
+<code class="sig-name descname">img_as_ubyte</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_ubyte" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply img_as_ubyte to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.img_as_ubyte</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>force_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Force a copy of the data, irrespective of its current dtype.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Output image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.img_as_uint">
+<code class="sig-name descname">img_as_uint</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_uint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply img_as_uint to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.img_as_uint</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>force_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Force a copy of the data, irrespective of its current dtype.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Output image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<em class="property">property </em><code class="sig-name descname">index</code></dt>
+<dd><p>Batch index.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.indices">
+<em class="property">property </em><code class="sig-name descname">indices</code><a class="headerlink" href="#helio.src.HelioBatch.indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batch items identifiers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.integral_image">
+<code class="sig-name descname">integral_image</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.integral_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply integral_image to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.integral_image</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Integral image/summed area table of same shape as input image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.load">
+<code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">src</em>, <em class="sig-param">dtype=None</em>, <em class="sig-param">meta=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load batch data from source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – Index column labels with data source specifications.</p></li>
+<li><p><strong>dtype</strong> (<em>dtype</em>) – The type of output arrays.</p></li>
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Index column label with data meta information.</p></li>
+<li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to data and meta loaders.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with loaded data.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.make_polar_plots">
+<code class="sig-name descname">make_polar_plots</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">path</em>, <em class="sig-param">figsize=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.make_polar_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.make_polar_plots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make polar projections from a synoptic map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for synoptic maps.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path where to write output files.</p></li>
+<li><p><strong>figsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a>) – Output size of figure.</p></li>
+<li><p><strong>kwargs</strong> (<em>misc</em>) – Additional positional argumets to <cite>pcolormesh</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch unchanged.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.map_to_synoptic">
+<code class="sig-name descname">map_to_synoptic</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">bins</em>, <em class="sig-param">average=None</em>, <em class="sig-param">deg=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.map_to_synoptic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.map_to_synoptic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a synoptic map from a solar disk image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for images.</p></li>
+<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>bins</strong> (<em>(</em><em>nx</em><em>, </em><em>ny</em><em>)</em>) – Longitudinal and latitudinal resolution of synoptic map.</p></li>
+<li><p><strong>average</strong> (<em>callable</em>) – Average function. Default is a mean function.</p></li>
+<li><p><strong>deg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, all angles are in degrees. Default to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with synoptic maps.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.mask_disk">
+<code class="sig-name descname">mask_disk</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">value=nan</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.mask_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.mask_disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set dummy value to pixels outside the solar disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for disk images.</p></li>
+<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>value</strong> (<em>scalar</em>) – A value to be set to pixels outside the solar disk. Default to np.nan.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with masked disk.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.match_histograms">
+<code class="sig-name descname">match_histograms</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.match_histograms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply match_histograms to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.match_histograms</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>reference</strong> (<em>ndarray</em>) – Image to match histogram of. Must have the same number of channels as
+image.</p></li>
+<li><p><strong>multichannel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Apply the matching separately for each channel.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Transformed input image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.meta">
+<em class="property">property </em><code class="sig-name descname">meta</code><a class="headerlink" href="#helio.src.HelioBatch.meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Meta information on observations.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.probabilistic_hough_line">
+<code class="sig-name descname">probabilistic_hough_line</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.probabilistic_hough_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply probabilistic_hough_line to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.probabilistic_hough_line</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Threshold</p></li>
+<li><p><strong>line_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Minimum accepted length of detected lines.
+Increase the parameter to extract longer lines.</p></li>
+<li><p><strong>line_gap</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum gap between pixels to still form a line.
+Increase the parameter to merge broken lines more aggressively.</p></li>
+<li><p><strong>theta</strong> (<em>1D ndarray</em><em>, </em><em>dtype=double</em><em>, </em><em>optional</em>) – Angles at which to compute the transform, in radians.
+If None, use a range from -pi/2 to pi/2.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Seed to initialize the random number generator.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – List of lines identified, lines in format ((x0, y0), (x1, y1)),</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.pyramid_expand">
+<code class="sig-name descname">pyramid_expand</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.pyramid_expand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply pyramid_expand to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.pyramid_expand</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>upscale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Upscale factor.</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Sigma for Gaussian filter. Default is <cite>2 * upscale / 6.0</cite> which
+corresponds to a filter mask twice the size of the scale factor that
+covers more than 99% of the Gaussian distribution.</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Order of splines used in interpolation of upsampling. See
+<cite>skimage.transform.warp</cite> for detail.</p></li>
+<li><p><strong>mode</strong> (<em>{'reflect'</em><em>, </em><em>'constant'</em><em>, </em><em>'edge'</em><em>, </em><em>'symmetric'</em><em>, </em><em>'wrap'}</em><em>, </em><em>optional</em>) – The mode parameter determines how the array borders are handled, where
+cval is the value when mode is equal to ‘constant’.</p></li>
+<li><p><strong>cval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Value to fill past edges of input if mode is ‘constant’.</p></li>
+<li><p><strong>multichannel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether the last axis of the image is to be interpreted as multiple
+channels or another spatial dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Upsampled and smoothed float image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.pyramid_gaussian">
+<code class="sig-name descname">pyramid_gaussian</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.pyramid_gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply pyramid_gaussian to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.pyramid_gaussian</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>max_layer</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of layers for the pyramid. 0th layer is the original image.
+Default is -1 which builds all possible layers.</p></li>
+<li><p><strong>downscale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Downscale factor.</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Sigma for Gaussian filter. Default is <cite>2 * downscale / 6.0</cite> which
+corresponds to a filter mask twice the size of the scale factor that
+covers more than 99% of the Gaussian distribution.</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Order of splines used in interpolation of downsampling. See
+<cite>skimage.transform.warp</cite> for detail.</p></li>
+<li><p><strong>mode</strong> (<em>{'reflect'</em><em>, </em><em>'constant'</em><em>, </em><em>'edge'</em><em>, </em><em>'symmetric'</em><em>, </em><em>'wrap'}</em><em>, </em><em>optional</em>) – The mode parameter determines how the array borders are handled, where
+cval is the value when mode is equal to ‘constant’.</p></li>
+<li><p><strong>cval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Value to fill past edges of input if mode is ‘constant’.</p></li>
+<li><p><strong>multichannel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether the last axis of the image is to be interpreted as multiple
+channels or another spatial dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Generator yielding pyramid layers as float images.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.pyramid_laplacian">
+<code class="sig-name descname">pyramid_laplacian</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.pyramid_laplacian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply pyramid_laplacian to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.pyramid_laplacian</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>max_layer</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Number of layers for the pyramid. 0th layer is the original image.
+Default is -1 which builds all possible layers.</p></li>
+<li><p><strong>downscale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Downscale factor.</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Sigma for Gaussian filter. Default is <cite>2 * downscale / 6.0</cite> which
+corresponds to a filter mask twice the size of the scale factor that
+covers more than 99% of the Gaussian distribution.</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Order of splines used in interpolation of downsampling. See
+<cite>skimage.transform.warp</cite> for detail.</p></li>
+<li><p><strong>mode</strong> (<em>{'reflect'</em><em>, </em><em>'constant'</em><em>, </em><em>'edge'</em><em>, </em><em>'symmetric'</em><em>, </em><em>'wrap'}</em><em>, </em><em>optional</em>) – The mode parameter determines how the array borders are handled, where
+cval is the value when mode is equal to ‘constant’.</p></li>
+<li><p><strong>cval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Value to fill past edges of input if mode is ‘constant’.</p></li>
+<li><p><strong>multichannel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether the last axis of the image is to be interpreted as multiple
+channels or another spatial dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Generator yielding pyramid layers as float images.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.pyramid_reduce">
+<code class="sig-name descname">pyramid_reduce</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.pyramid_reduce" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply pyramid_reduce to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.pyramid_reduce</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>downscale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Downscale factor.</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Sigma for Gaussian filter. Default is <cite>2 * downscale / 6.0</cite> which
+corresponds to a filter mask twice the size of the scale factor that
+covers more than 99% of the Gaussian distribution.</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – Order of splines used in interpolation of downsampling. See
+<cite>skimage.transform.warp</cite> for detail.</p></li>
+<li><p><strong>mode</strong> (<em>{'reflect'</em><em>, </em><em>'constant'</em><em>, </em><em>'edge'</em><em>, </em><em>'symmetric'</em><em>, </em><em>'wrap'}</em><em>, </em><em>optional</em>) – The mode parameter determines how the array borders are handled, where
+cval is the value when mode is equal to ‘constant’.</p></li>
+<li><p><strong>cval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Value to fill past edges of input if mode is ‘constant’.</p></li>
+<li><p><strong>multichannel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether the last axis of the image is to be interpreted as multiple
+channels or another spatial dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Smoothed and downsampled float image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.radon">
+<code class="sig-name descname">radon</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.radon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply radon to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.radon</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>(</strong><strong>image.shape</strong><strong>[</strong><strong>0</strong><strong>] </strong><strong>// 2</strong><strong>, </strong><strong>image.shape</strong><strong>[</strong><strong>1</strong><strong>] </strong><strong>// 2</strong><strong>)</strong><strong></strong> (<em>indices</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Radon transform (sinogram).  The tomography rotation axis will lie</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.random_flip">
+<code class="sig-name descname">random_flip</code><span class="sig-paren">(</span><em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">axis</em>, <em class="sig-param">p=0.5</em>, <em class="sig-param">meta=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.random_flip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.random_flip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply axis reversing with a given probability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for images.</p></li>
+<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Axis in array, which entries are reversed.</p></li>
+<li><p><strong>p</strong> (<em>float in</em><em> [</em><em>0</em><em>, </em><em>1</em><em>]</em>) – Probability of reversal. Default to 0.5.</p></li>
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, adjust meta to new image orientation. Default to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with flipped images.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ImageBatch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.random_rot90">
+<code class="sig-name descname">random_rot90</code><span class="sig-paren">(</span><em class="sig-param">src</em>, <em class="sig-param">dst=None</em>, <em class="sig-param">axes=(0</em>, <em class="sig-param">1)</em>, <em class="sig-param">meta=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.random_rot90"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.random_rot90" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply rotation of an image at random number of times by 90 degrees.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for images.</p></li>
+<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>axes</strong> (<em>(</em><em>2</em><em>,</em><em>) </em><em>array_like</em>) – The array is rotated in the plane defined by the axes.
+Axes must be different. Default to (0, 1).</p></li>
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, adjust meta to new image orientation. Default to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with rotated images.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.rescale">
+<code class="sig-name descname">rescale</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.rescale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply rescale to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.rescale</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>scale</strong> (<em>{float</em><em>, </em><em>tuple of floats}</em>) – Scale factors. Separate scale factors can be defined as
+<cite>(rows, cols[, …][, dim])</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Scaled version of the input.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.resize">
+<code class="sig-name descname">resize</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.resize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply resize to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.resize</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>output_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em> or </em><em>ndarray</em>) – Size of the generated output image <cite>(rows, cols[, …][, dim])</cite>. If
+<cite>dim</cite> is not provided, the number of channels is preserved. In case the
+number of input channels does not equal the number of output channels a
+n-dimensional interpolation is applied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Resized version of the input.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.rotate">
+<code class="sig-name descname">rotate</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.rotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply rotate to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.rotate</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Rotation angle in degrees in counter-clockwise direction.</p></li>
+<li><p><strong>resize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Determine whether the shape of the output image will be automatically
+calculated, so the complete rotated image exactly fits. Default is
+False.</p></li>
+<li><p><strong>center</strong> (<em>iterable of length 2</em>) – The rotation center. If <code class="docutils literal notranslate"><span class="pre">center=None</span></code>, the image is rotated around
+its center, i.e. <code class="docutils literal notranslate"><span class="pre">center=(cols</span> <span class="pre">/</span> <span class="pre">2</span> <span class="pre">-</span> <span class="pre">0.5,</span> <span class="pre">rows</span> <span class="pre">/</span> <span class="pre">2</span> <span class="pre">-</span> <span class="pre">0.5)</span></code>.  Please
+note that this parameter is (cols, rows), contrary to normal skimage
+ordering.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Rotated version of the input.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.safe_resize">
+<code class="sig-name descname">safe_resize</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">output_shape</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.safe_resize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.safe_resize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reduce image size to traget size and adjust meta.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for images.</p></li>
+<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>output_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a>) – Shape of output images.</p></li>
+<li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to resize method.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with resized images.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.stack_synoptic_maps">
+<code class="sig-name descname">stack_synoptic_maps</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">weight_decay=None</em>, <em class="sig-param">q=0.75</em>, <em class="sig-param">deg=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.stack_synoptic_maps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.stack_synoptic_maps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stack synoptic maps corresponding to disk images into a single map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for synoptic maps corresponding to disk images.</p></li>
+<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>weight_decay</strong> (<em>callable</em>) – Function to get a pixel weight based on its distance from central meridian.
+Distance unit should be degree. Default is sigmoid(-x/5 + 10).</p></li>
+<li><p><strong>q</strong> (<em>float in</em><em> (</em><em>0</em><em>, </em><em>1</em><em>) </em><em>range.</em>) – Quantile for pixel distribution. Default to 0.75.</p></li>
+<li><p><strong>deg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, all angles are in degrees. Default to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with synoptic maps.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.swirl">
+<code class="sig-name descname">swirl</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.swirl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply swirl to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.swirl</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>center</strong> (<em>(</em><em>column</em><em>, </em><em>row</em><em>) </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em> or </em><em>(</em><em>2</em><em>,</em><em>) </em><em>ndarray</em><em>, </em><em>optional</em>) – Center coordinate of transformation.</p></li>
+<li><p><strong>strength</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The amount of swirling applied.</p></li>
+<li><p><strong>radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – The extent of the swirl in pixels.  The effect dies out
+rapidly beyond <cite>radius</cite>.</p></li>
+<li><p><strong>rotation</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Additional rotation applied to the image.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Swirled version of the input.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.warp">
+<code class="sig-name descname">warp</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.warp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply warp to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.warp</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.</p></li>
+<li><p><strong>inverse_map</strong> (transformation object, callable <code class="docutils literal notranslate"><span class="pre">cr</span> <span class="pre">=</span> <span class="pre">f(cr,</span> <span class="pre">**kwargs)</span></code>, or ndarray) – <p>Inverse coordinate map, which transforms coordinates in the output
+images into their corresponding coordinates in the input image.</p>
+<p>There are a number of different options to define this map, depending
+on the dimensionality of the input image. A 2-D image can have 2
+dimensions for gray-scale images, or 3 dimensions with color
+information.</p>
+<blockquote>
+<div><ul>
+<li><p>For 2-D images, you can directly pass a transformation object,
+e.g. <cite>skimage.transform.SimilarityTransform</cite>, or its inverse.</p></li>
+<li><p>For 2-D images, you can pass a <code class="docutils literal notranslate"><span class="pre">(3,</span> <span class="pre">3)</span></code> homogeneous
+transformation matrix, e.g.
+<cite>skimage.transform.SimilarityTransform.params</cite>.</p></li>
+<li><p>For 2-D images, a function that transforms a <code class="docutils literal notranslate"><span class="pre">(M,</span> <span class="pre">2)</span></code> array of
+<code class="docutils literal notranslate"><span class="pre">(col,</span> <span class="pre">row)</span></code> coordinates in the output image to their
+corresponding coordinates in the input image. Extra parameters to
+the function can be specified through <cite>map_args</cite>.</p></li>
+<li><p>For N-D images, you can directly pass an array of coordinates.
+The first dimension specifies the coordinates in the input image,
+while the subsequent dimensions determine the position in the
+output image. E.g. in case of 2-D images, you need to pass an array
+of shape <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">rows,</span> <span class="pre">cols)</span></code>, where <cite>rows</cite> and <cite>cols</cite> determine the
+shape of the output image, and the first dimension contains the
+<code class="docutils literal notranslate"><span class="pre">(row,</span> <span class="pre">col)</span></code> coordinate in the input image.
+See <cite>scipy.ndimage.map_coordinates</cite> for further documentation.</p></li>
+</ul>
+</div></blockquote>
+<p>Note, that a <code class="docutils literal notranslate"><span class="pre">(3,</span> <span class="pre">3)</span></code> matrix is interpreted as a homogeneous
+transformation matrix, so you cannot interpolate values from a 3-D
+input, if the output is of shape <code class="docutils literal notranslate"><span class="pre">(3,)</span></code>.</p>
+<p>See example section for usage.</p>
+</p></li>
+<li><p><strong>map_args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>, </em><em>optional</em>) – Keyword arguments passed to <cite>inverse_map</cite>.</p></li>
+<li><p><strong>output_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em> (</em><em>rows</em><em>, </em><em>cols</em><em>)</em><em>, </em><em>optional</em>) – Shape of the output image generated. By default the shape of the input
+image is preserved.  Note that, even for multi-band images, only rows
+and columns need to be specified.</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>The order of interpolation. The order has to be in the range 0-5:</dt><dd><ul>
+<li><p>0: Nearest-neighbor</p></li>
+<li><p>1: Bi-linear (default)</p></li>
+<li><p>2: Bi-quadratic</p></li>
+<li><p>3: Bi-cubic</p></li>
+<li><p>4: Bi-quartic</p></li>
+<li><p>5: Bi-quintic</p></li>
+</ul>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>mode</strong> (<em>{'constant'</em><em>, </em><em>'edge'</em><em>, </em><em>'symmetric'</em><em>, </em><em>'reflect'</em><em>, </em><em>'wrap'}</em><em>, </em><em>optional</em>) – Points outside the boundaries of the input are filled according
+to the given mode.  Modes match the behaviour of <cite>numpy.pad</cite>.</p></li>
+<li><p><strong>cval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Used in conjunction with mode ‘constant’, the value outside
+the image boundaries.</p></li>
+<li><p><strong>clip</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to clip the output to the range of values of the input image.
+This is enabled by default, since higher order interpolation may
+produce values outside the given input range.</p></li>
+<li><p><strong>preserve_range</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to keep the original range of values. Otherwise, the input
+image is converted according to the conventions of <cite>img_as_float</cite>.
+Also see
+<a class="reference external" href="https://scikit-image.org/docs/dev/user_guide/data_types.html">https://scikit-image.org/docs/dev/user_guide/data_types.html</a></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – The warped input image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.src.HelioBatch.warp_polar">
+<code class="sig-name descname">warp_polar</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.warp_polar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply warp_polar to batch data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Attribute to get data from. Data from this attribute will be passed to
+the first argument of <code class="docutils literal notranslate"><span class="pre">skimage.transform.warp_polar</span></code>.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Attribute to put data in. Will be same as input if not specified.
+<cite>multichannel=True</cite>, 3-D arrays are accepted and the last axis is
+interpreted as multiple channels.</p></li>
+<li><p><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em> (</em><em>row</em><em>, </em><em>col</em><em>)</em><em>, </em><em>optional</em>) – Point in image that represents the center of the transformation (i.e.,
+the origin in cartesian space). Values can be of type <cite>float</cite>.
+If no value is given, the center is assumed to be the center point
+of the image.</p></li>
+<li><p><strong>radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Radius of the circle that bounds the area to be transformed.</p></li>
+<li><p><strong>output_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em> (</em><em>row</em><em>, </em><em>col</em><em>)</em><em>, </em><em>optional</em>) – </p></li>
+<li><p><strong>scaling</strong> (<em>{'linear'</em><em>, </em><em>'log'}</em><em>, </em><em>optional</em>) – Specify whether the image warp is polar or log-polar. Defaults to
+‘linear’.</p></li>
+<li><p><strong>multichannel</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether the image is a 3-D array in which the third axis is to be
+interpreted as multiple channels. If set to <cite>False</cite> (default), only 2-D
+arrays are accepted.</p></li>
+<li><p><strong>**kwargs</strong> (<em>keyword arguments</em>) – Passed to <cite>transform.warp</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – The polar or log-polar warped image.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, observethesun
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
