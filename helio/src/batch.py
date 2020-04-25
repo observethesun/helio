@@ -4,14 +4,14 @@ import warnings
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
+import dill
+import dateutil.parser as dparser
+from astropy.io import fits
+from aiapy.calibrate import correct_degradation
 from skimage.io import imread
 import skimage
 import skimage.transform
 from skimage.transform import resize
-import dill
-from astropy.io import fits
-import dateutil.parser as dparser
-from aiapy.calibrate import correct_degradation
 try:
     import blosc
 except ImportError:

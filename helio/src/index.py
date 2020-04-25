@@ -70,7 +70,7 @@ class BaseIndex(pd.DataFrame): #pylint: disable=abstract-method
         return self.merge(x, left_index=True, right_index=True)
 
 
-class FilesIndex(BaseIndex): #pylint: disable=abstract-method
+class FilesIndex(BaseIndex): #pylint: disable=abstract-method,too-many-ancestors
     """Index of files.
 
     Builds a DataFrame containing path to files in columns. By default

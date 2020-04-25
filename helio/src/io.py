@@ -1,9 +1,9 @@
 """IO utils."""
 import numpy as np
 import pandas as pd
-from skimage.measure import label
 from astropy.io import fits
 import sunpy
+from skimage.measure import label
 
 from .utils import detect_edges
 
