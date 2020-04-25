@@ -55,7 +55,7 @@ TEMPLATE_DOCSTRING = dedent(TEMPLATE_DOCSTRING).strip()
 
 
 def execute(how):
-    """Exectuce scheme decorator."""
+    """Execute scheme decorator."""
     def decorator(method):
         """Returned decorator."""
         @wraps(method)
