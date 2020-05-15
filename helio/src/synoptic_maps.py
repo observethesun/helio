@@ -1,8 +1,11 @@
 """Methods for synoptic map construction."""
 import numpy as np
 import pandas as pd
+from skimage.measure import label
 
 from .geometry_utils import rotate_sphere_B0, rotate_sphere_L0, sp_to_xy, xy_to_carr
+
+SOLAR_SURFACE_AREA = 6.09
 
 def map_syn_to_disk(i_cen, j_cen, rad, B0, L0, bins, deg=True):
     """Map synoptic map to solar disk.
@@ -185,3 +188,83 @@ def make_synoptic_map(img, i_cen, j_cen, rad, B0, L0, bins, average=None, deg=Tr
     syn = np.full((bins[1], bins[0]), np.nan)
     syn[unq[:, 0], unq[:, 1]] = vals
     return syn
+
+def label360(mask):
+    """Label regions in a binary sinoptic map. Takes into account connections
+    at 360 and 0 longitude."""
+    if mask.dtype != np.bool:
+        raise ValueError('Synoptic map should have bool dtype.')
+    dfi = mask.shape[1]
+    labeled = label(np.pad(mask, ((0, 0), (dfi, 0)), mode='wrap'), background=0)
+    x = np.dstack((labeled[:, :dfi], labeled[:, dfi:]))
+    unq = np.unique(x.reshape(-1, 2), axis=0)
+    split = set(unq[:, 0]).intersection(unq[:, 1]) - {0}
+    for p in split:
+        p2 = unq[:, 1][unq[:, 0] == p]
+        x[x == p2] = p
+        p2 = unq[:, 0][unq[:, 1] == p]
+        x[x == p2] = p
+    return x.min(axis=-1)
+
+def region_statistics(mask, sin, hmi=None):
+    """Calculates statistics for regions in a binary synoptic map:
+        - area ($10^{12}$ $km^2$)
+        - mean latitude (in degrees, North at $90^{\circ}$)
+        - largest Carrington longitude (in degrees)
+        - positive flux ($10^{22}$ Mx, if hmi is not None and in Gauss)
+        - negative flux ($10^{22}$ Mx, if hmi is not None and in Gauss)
+
+    Parameters
+    ----------
+    mask : boolean ndarray
+        Binary synoptic maks.
+    sin : bool
+        Sine Latitude synoptic map.
+    hmi : ndarray
+        Magnetic synoptic map for flux calculation. Same shape as mask.
+
+    Returns
+    -------
+    df : pandas.DataFrame
+        Regions statistics.
+    """
+    if sin:
+        x = np.linspace(-1, 1, mask.shape[0] + 1)
+        x = (x[:-1] + x[1:]) / 2.
+        factor = np.ones(mask.shape[0])
+    else:
+        q = np.linspace(0, np.pi, mask.shape[0] + 1)
+        q = (q[:-1] + q[1:]) / 2.
+        factor = np.sin(q)
+    factor = factor.reshape(-1, 1)
+    labeled = label360(mask)
+    ngroups = list(set(np.unique(labeled)) - {0})
+    pixel_areas = np.ones(mask.shape, dtype=float) * factor
+    pixel_areas = SOLAR_SURFACE_AREA * pixel_areas / pixel_areas.sum()
+    if hmi is not None:
+        pos_flux = np.clip(hmi, 0, None) * pixel_areas
+        neg_flux = -np.clip(-hmi, 0, None) * pixel_areas #pylint: disable=invalid-unary-operand-type
+    if sin:
+        lats = np.ones(mask.shape) * np.rad2deg(np.arcsin(-x)).reshape(-1, 1)
+    else:
+        lats = 90 - np.ones(mask.shape) * np.rad2deg(q).reshape(-1, 1)
+    res = []
+    for group_id in ngroups:
+        report = {}
+        reg_mask = labeled == group_id
+        if hmi is not None:
+            report['Flux_p'] = pos_flux[reg_mask].sum()
+            report['Flux_n'] = neg_flux[reg_mask].sum()
+        report['Area'] = pixel_areas[reg_mask].sum()
+        if sin:
+            report['Latitude'] = lats[reg_mask].mean()
+        else:
+            weights = pixel_areas[reg_mask]
+            report['Latitude'] = np.average(lats[reg_mask], weights=weights/weights.sum())
+        report['Longitude'] = max(np.where(reg_mask)[1]) * 360 / mask.shape[1]
+        res.append(report)
+    if res:
+        return pd.DataFrame(res)
+    if hmi is not None:
+        return pd.DataFrame(columns=['Area', 'Latitude', 'Longitude', 'Flux_p', 'Flux_n'])
+    return pd.DataFrame(columns=['Area', 'Latitude', 'Longitude'])

@@ -14,7 +14,7 @@ def load_fits(path, verify='fix', smap=False):
         return sunpy.map.Map(path)
     hdul = fits.open(path)
     hdul.verify(verify)
-    return hdul[1].data
+    return hdul[0].data
 
 def load_abp_mask(path, shape, sunspot_observation=False):
     """Builds segmentation mask from `abp` file.

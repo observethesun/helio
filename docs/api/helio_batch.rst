@@ -7,5 +7,4 @@ HelioBatch
 
 .. autoclass:: helio.src.HelioBatch
     :members:
-    :inherited-members:
     :undoc-members:
