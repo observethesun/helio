@@ -211,17 +211,19 @@ def region_statistics(mask, sin, hmi=None):
         - area ($10^{12}$ $km^2$)
         - mean latitude (in degrees, North at $90^{\circ}$)
         - largest Carrington longitude (in degrees)
-        - positive flux ($10^{22}$ Mx, if hmi is not None and in Gauss)
-        - negative flux ($10^{22}$ Mx, if hmi is not None and in Gauss)
+        - positive magnetic flux ($10^{22}$ Mx)
+        - negative magnetic flux ($10^{22}$ Mx)
+        - maximal positive magnetic field value ($10^{22}$ Mx)
+        - minimal negative magnetic field value ($10^{22}$ Mx)
 
     Parameters
     ----------
     mask : boolean ndarray
-        Binary synoptic maks.
+        Binary synoptic mask.
     sin : bool
-        Sine Latitude synoptic map.
+        Sine Latitude synoptic map and magnetic synoptic map.
     hmi : ndarray
-        Magnetic synoptic map for flux calculation. Same shape as mask.
+        Magnetic synoptic map for flux calculation. Should be same shape as mask.
 
     Returns
     -------
@@ -242,8 +244,10 @@ def region_statistics(mask, sin, hmi=None):
     pixel_areas = np.ones(mask.shape, dtype=float) * factor
     pixel_areas = SOLAR_SURFACE_AREA * pixel_areas / pixel_areas.sum()
     if hmi is not None:
-        pos_flux = np.clip(hmi, 0, None) * pixel_areas
-        neg_flux = -np.clip(-hmi, 0, None) * pixel_areas #pylint: disable=invalid-unary-operand-type
+        pos_field = np.clip(hmi, 0, None)
+        neg_field = -np.clip(-hmi, 0, None) #pylint: disable=invalid-unary-operand-type
+        pos_flux = pos_field * pixel_areas
+        neg_flux = neg_field * pixel_areas #pylint: disable=invalid-unary-operand-type
     if sin:
         lats = np.ones(mask.shape) * np.rad2deg(np.arcsin(-x)).reshape(-1, 1)
     else:
@@ -255,6 +259,8 @@ def region_statistics(mask, sin, hmi=None):
         if hmi is not None:
             report['Flux_p'] = pos_flux[reg_mask].sum()
             report['Flux_n'] = neg_flux[reg_mask].sum()
+            report['mx'] = pos_field[reg_mask].max()
+            report['mn'] = neg_field[reg_mask].min()
         report['Area'] = pixel_areas[reg_mask].sum()
         if sin:
             report['Latitude'] = lats[reg_mask].mean()
@@ -266,5 +272,5 @@ def region_statistics(mask, sin, hmi=None):
     if res:
         return pd.DataFrame(res)
     if hmi is not None:
-        return pd.DataFrame(columns=['Area', 'Latitude', 'Longitude', 'Flux_p', 'Flux_n'])
+        return pd.DataFrame(columns=['Area', 'Latitude', 'Longitude', 'Flux_p', 'Flux_n', 'mx', 'mn'])
     return pd.DataFrame(columns=['Area', 'Latitude', 'Longitude'])

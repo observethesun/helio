@@ -1,3 +1,3 @@
 """Init file."""
-from .src import *
+from .core import *
 from .models import *

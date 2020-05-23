@@ -20,9 +20,9 @@ except ImportError:
 
 from .decorators import execute, add_actions, extract_actions, TEMPLATE_DOCSTRING
 from .index import BaseIndex
-from .sampler import R
 from .synoptic_maps import make_synoptic_map, label360, region_statistics
-from .io import load_fits, load_abp_mask, write_syn_abp_file
+from .io import load_fits, load_abp_mask, write_syn_abp_file, write_fits
+from .utils import detect_edges
 
 def softmax(x):
     """Softmax function."""
@@ -50,6 +50,16 @@ class HelioBatch():
 
     def __getattr__(self, attr):
         return self._data[attr]
+
+    def __setattr__(self, attr, value):
+        if attr.startswith('_') or attr in dir(self):
+            return super().__setattr__(attr, value)
+        if attr in self:
+            raise KeyError('Attribute already exists.')
+        assert len(value) == len(self), 'Length mismatch.'
+        self._data[attr] = np.array(list(value) + [None])[:-1]
+        self._meta[attr] = np.array([None] * len(self))
+        return self
 
     def __contains__(self, x):
         return x in self._data
@@ -107,13 +117,15 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def apply_meta(self, i, func, src, **kwargs):
-        """Apply a ``func`` to each item in meta ``src`` inplace.
+    def apply_meta(self, i, func, src, dst, **kwargs):
+        """Apply a ``func`` to each item in meta.
 
         Parameters
         ----------
         src : str, tuple of str
             A source for meta.
+        dst : same type as src
+            A destination for results.
         func : callable
             A function to apply.
         kwargs : misc
@@ -124,9 +136,8 @@ class HelioBatch():
         batch : HelioBatch
             Processed batch.
         """
-        _ = kwargs
         meta = self.meta[src][i]
-        self.meta[src][i] = func(meta, **kwargs)
+        self.meta[dst][i] = func(meta, **kwargs)
         return self
 
     def load(self, src, dtype=None, meta=None, **kwargs):
@@ -208,8 +219,8 @@ class HelioBatch():
             hdul.verify(verify)
             hdr = hdul[1].header
             meta = dict(hdr.items())
-            meta.update(dict(i_cen=int(hdr['X0_MP']),
-                             j_cen=int(hdr['Y0_MP']),
+            meta.update(dict(i_cen=int(hdr['Y0_MP']),
+                             j_cen=int(hdr['X0_MP']),
                              r=int(hdr['R_SUN']),
                              date=dparser.parse(hdr['DATE'])))
         else:
@@ -225,6 +236,9 @@ class HelioBatch():
 
     def dump(self, src, path, format, **kwargs): #pylint: disable=redefined-builtin
         """Dump data in various formats.
+
+        Supported formats: npz, txt, binary, fits, abp, blosc and any of
+        `matplotlib.pyplot.imsave` supported formats.
 
         Parameters
         ----------
@@ -242,6 +256,8 @@ class HelioBatch():
         batch : HelioBatch
             Batch unchanged.
         """
+        if len(np.atleast_1d(src)) > 1:
+            raise ValueError('Only single attribute allowed.')
         if 'scatter' in kwargs:
             return self._dump_scatter_image(src=src, path=path, format=format, **kwargs)
         return self._dump(src=src, path=path, format=format, **kwargs)
@@ -280,6 +296,8 @@ class HelioBatch():
             data.tofile(fname)
         elif format == 'abp':
             write_syn_abp_file(fname, data)
+        elif format == 'fits':
+            write_fits(fname, data, index=self.index.iloc[[i]], **kwargs)
         else:
             plt.imsave(fname, data, format=format, **kwargs)
         return self
@@ -331,7 +349,7 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def mask_disk(self, i, src, dst, value=np.nan):
+    def mask_disk(self, i, src, dst, fill_value=np.nan):
         """Set dummy value to pixels outside the solar disk.
 
         Parameters
@@ -340,7 +358,7 @@ class HelioBatch():
             A source for disk images.
         dst : str
             A destination for results.
-        value : scalar
+        fill_value : scalar
             A value to be set to pixels outside the solar disk. Default to np.nan.
 
         Returns
@@ -354,7 +372,7 @@ class HelioBatch():
         meta = self.meta[src][i]
         ind = np.transpose(np.indices(img.shape[:2]), axes=(1, 2, 0))
         outer = np.where(np.linalg.norm(ind - np.array([meta['i_cen'], meta['j_cen']]), axis=-1) > meta['r'])
-        img[outer] = value
+        img[outer] = fill_value
         self.data[dst][i] = img
         return self
 
@@ -409,15 +427,51 @@ class HelioBatch():
         meta = self.meta[src][i]
         if src != dst:
             meta = meta.copy()
-        meta['i_cen'] /= ratio
-        meta['j_cen'] /= ratio
-        meta['r'] /= ratio
+        meta['i_cen'] = int(meta['i_cen'] / ratio)
+        meta['j_cen'] = int(meta['j_cen'] / ratio)
+        meta['r'] = int(meta['r'] / ratio)
         if src != dst:
             self.meta[dst][i] = meta
         return self
 
-    def random_flip(self, src, dst, axis, p=0.5, update_meta=True):
-        """Apply axis reversing with a given probability.
+    def show(self, i, image, mask=None, figsize=None, cmap=None, s=None, color=None, **kwargs):
+        """Show image data with optional mask countours overlayed.
+
+        Parameters
+        ----------
+        i : int
+            Integer data index.
+        image : str
+            Image data source.
+        mask : str, optional
+            Mask to be overlayed.
+        figsize : tuple, optional
+            Size of figure.
+        cmap : cmap
+            Matplotlib color map for image.
+        s : int
+            Point size for contours.
+        color : color
+            Matplotlib color for contours.
+        kwargs : misc
+            Additional imshow keywords.
+        """
+        plt.figure(figsize=figsize)
+        img = self.data[image][i]
+        plt.imshow(img, cmap=cmap, extent=(0, img.shape[1], img.shape[0], 0), **kwargs)
+        if mask is not None:
+            binary = np.rint(self.data[mask][i]) == 1
+            if binary.shape != img.shape:
+                raise ValueError('Image and mask should have equal shape.')
+            cnt = np.where(detect_edges(binary))
+            plt.scatter(cnt[1], cnt[0], s=s, color=color)
+        plt.xlim([0, img.shape[1]])
+        plt.ylim([img.shape[0], 0])
+        plt.show()
+
+    @execute(how='threads')
+    def flip(self, i, src, axis, dst=None, p=True, update_meta=False):
+        """Apply axis reversing. Accepts random parameter `p` for aurgemntation.
 
         Parameters
         ----------
@@ -427,22 +481,17 @@ class HelioBatch():
             A destination for results.
         axis : int
             Axis in array, which entries are reversed.
-        p : float in [0, 1]
-            Probability of reversal. Default to 0.5.
+        p : bool or R
+            Probabilistic parameter for augmentation, e.g. p = R('choice', a=[True, False], p=[0.5, 0.5])
+            will flip images with probability 0.5.
         update_meta : bool
-            Update meta with new image orientation. Default to True.
+            Update meta with new image orientation. Default to False.
 
         Returns
         -------
         batch : ImageBatch
             Batch with flipped images.
         """
-        p = R('choice', a=[True, False], p=[p, 1-p])
-        return self._random_flip(src, dst, axis=axis, p=p, update_meta=update_meta)
-
-    @execute(how='threads')
-    def _random_flip(self, i, src, dst, axis, p, update_meta):
-        """Apply axis reversing and adjust meta."""
         if not p:
             return self
         img = self.data[src][i]
@@ -464,8 +513,9 @@ class HelioBatch():
             self.meta[dst][i] = meta
         return self
 
-    def random_rot90(self, src, dst=None, axes=(0, 1), update_meta=True):
-        """Apply rotation of an image at random number of times by 90 degrees.
+    @execute(how='threads')
+    def rot90(self, i, src, dst, axes=(0, 1), k=1, update_meta=False):
+        """Apply rotation of an image by 90 degrees given number of times.
 
         Parameters
         ----------
@@ -473,23 +523,20 @@ class HelioBatch():
             A source for images.
         dst : same type as src
             A destination for results.
-        axes: (2,) array_like
+        axes : (2,) array_like
             The array is rotated in the plane defined by the axes.
             Axes must be different. Default to (0, 1).
+        k : int or R
+            Probabilistic parameter for augmentation, e.g. k = R('choice', a=np.arange(4))
+            will rotate images random number of times.
         update_meta : bool
-            Update meta with new image orientation. Default to True.
+            Update meta with new image orientation. Default to False.
 
         Returns
         -------
         batch : HelioBatch
             Batch with rotated images.
         """
-        k = R('choice', a=np.arange(4))
-        return self._random_rot90(src, dst, k=k, axes=axes, update_meta=update_meta)
-
-    @execute(how='threads')
-    def _random_rot90(self, i, src, dst, k, axes, update_meta):
-        """Apply rotation of an image at given number of times by 90 degrees."""
         if not k:
             return self
         img = self.data[src][i]
@@ -572,7 +619,7 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def stack_synoptic_maps(self, i, src, dst, weight_decay=None, shift=0, scale=1, deg=True):
+    def stack_synoptic_maps(self, i, src, dst, shift, scale, weight_decay=None, deg=True):
         """Stack synoptic maps corresponding to disk images into a single map.
 
         Parameters
@@ -581,9 +628,13 @@ class HelioBatch():
             A source for synoptic maps corresponding to disk images.
         dst : str
             A destination for results.
-        weight_decay: callable
+        shift : scalar
+            A parameter for pixel weights according to `weight_decay(-(dist - shift) / scale)`.
+        scale : scalar
+            A parameter for pixel weights according to `weight_decay(-(dist - shift) / scale)`.
+         weight_decay: callable
             Function to get a pixel weight based on its distance from central meridian.
-            Distance unit should be degree. Default is sigmoid(-x/5 + 10).
+            Distance unit should be degree. Default is sigmoid function.
         deg : bool
             If True, all angles are in degrees. Default to True.
 
@@ -672,7 +723,7 @@ class HelioBatch():
 
     @execute(how='threads')
     def aia_intscale(self, i, src, dst, wavelength):
-        """Adjust intensity to AIA standart.
+        """Adjust intensity to AIA standard.
 
         Parameters
         ----------

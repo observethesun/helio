@@ -1,20 +1,22 @@
 """IO utils."""
+import datetime
 import numpy as np
 import pandas as pd
 from astropy.io import fits
 import sunpy
+from sunpy.coordinates.sun import B0
 from skimage.measure import label
 
 from .utils import detect_edges
 
 
-def load_fits(path, verify='fix', smap=False):
+def load_fits(path, verify='fix', unit=0, as_smap=False):
     """Read fits file as `sunpy.map.Map` object or `ndarray`."""
-    if smap:
+    if as_smap:
         return sunpy.map.Map(path)
     hdul = fits.open(path)
     hdul.verify(verify)
-    return hdul[0].data
+    return hdul[unit].data
 
 def load_abp_mask(path, shape, sunspot_observation=False):
     """Builds segmentation mask from `abp` file.
@@ -57,27 +59,82 @@ def load_abp_mask(path, shape, sunspot_observation=False):
         tdf = df.groupby('obj_num').filter(lambda x: len(x) > 1)
         pts = tdf.loc[tdf['core_num'] == 0, 'pts']
         if not pts.empty:
-            pts = np.hstack(pts)
+            pts = np.vstack(pts)
             mask[pts[:, 0], pts[:, 1], 0] = True
         #cores
         tdf = df.groupby('obj_num').filter(lambda x: len(x) > 1)
         pts = tdf.loc[tdf['core_num'] > 0, 'pts']
         if not pts.empty:
-            pts = np.hstack(pts)
+            pts = np.vstack(pts)
             mask[pts[:, 0], pts[:, 1], 1] = True
         #pores
         pts = df.groupby('obj_num').filter(lambda x: len(x) == 1)['pts']
         if not pts.empty:
-            pts = np.hstack(pts)
+            pts = np.vstack(pts)
             mask[pts[:, 0], pts[:, 1], 2] = True
         return mask
 
     mask = np.zeros(shape, dtype='bool')
     if df.empty:
         return mask
-    pts = np.hstack(df['pts'])
+    pts = np.vstack(df['pts'])
     mask[pts[:, 0], pts[:, 1]] = True
     return mask
+
+def write_fits(fname, data, kind=None, **kwargs):
+    """Write data to FITS file."""
+    if kind is None:
+        return write_simple_fits(fname=fname, data=data, **kwargs)
+    if kind == 'synoptic':
+        return write_syn_fits(fname=fname, data=data, **kwargs)
+    raise NotImplementedError('FITS files for data of type {} are not implemented.'.format(kind))
+
+def write_syn_fits(fname, data, index, **headers):
+    """Write synoptic map to FITS file."""
+    hdr = fits.Header()
+    index = index.reset_index()
+    hdr['DATE'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    hdr['CAR_ROT'] = int(index.loc[0, 'CR'])
+    hdr['MISSVALS'] = np.isnan(data).sum()
+    a = index.loc[0, 'DateTime'][0]
+    b = index.loc[0, 'DateTime'][-1]
+    rot = a + (b - a) / 2
+    hdr['DATE-OBS'] = rot.strftime("%Y-%m-%dT%H:%M:%S")
+    hdr['T_OBS'] = rot.strftime("%Y.%m.%d_%H:%M:%S_TAI")
+    hdr['T_ROT'] = rot.strftime("%Y.%m.%d_%H:%M:%S_TAI")
+    hdr['T_START'] = a.strftime("%Y.%m.%d_%H:%M:%S_TAI")
+    hdr['T_STOP'] = b.strftime("%Y.%m.%d_%H:%M:%S_TAI")
+    hdr['B0_ROT'] = B0(rot).deg
+    hdr['B0_FIRST'] = index.loc[0, 'B0'][0]
+    hdr['B0_LAST'] = index.loc[0, 'B0'][-1]
+    hdr['CRPIX1'] = (data.shape[1] + 1.) / 2
+    hdr['CRPIX2'] = (data.shape[0] + 1.) / 2
+    hdr['CRVAL1'] = 180.
+    hdr['CRVAL2'] = 0.
+    hdr['CDELT1'] = 360. / data.shape[1]
+    hdr['CDELT2'] = 180. / data.shape[0]
+    hdr['CUNIT1'] = 'deg'
+    hdr['CUNIT2'] = 'deg'
+    hdr['CTYPE1'] = 'Carrington Longitude'
+    hdr['CTYPE2'] = 'Latitude'
+    hdr['BSCALE'] = 1.
+    hdr['BZERO'] = 0.
+    hdr['BUNIT'] = 'counts / pixel'
+    hdr['WCSNAME'] = 'Carrington Heliographic'
+    for k, v in headers.items():
+        hdr[k] = v
+    hdu = fits.PrimaryHDU(header=hdr, data=data[::-1])
+    hdul = fits.HDUList([hdu])
+    hdul.writeto(fname, overwrite=True)
+
+def write_simple_fits(fname, data, **headers):
+    """Write array to FITS file."""
+    hdr = fits.Header()
+    for k, v in headers.items():
+        hdr[k] = v
+    hdu = fits.PrimaryHDU(header=hdr, data=data)
+    hdul = fits.HDUList([hdu])
+    hdul.writeto(fname, overwrite=True)
 
 def write_syn_abp_file(fname, binary_mask, neighbors=None):
     """Write synoptic map to `abp` file."""

@@ -1,4 +1,4 @@
-"""Contains U-net model."""
+"""Conv block and U-net model."""
 import tensorflow as tf
 
 
