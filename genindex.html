@@ -26,6 +26,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -167,13 +168,15 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.aia_intscale">aia_intscale() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.aia_intscale">aia_intscale() (HelioBatch method)</a>
+</li>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.apply">apply() (HelioBatch method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.apply">apply() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.apply_meta">apply_meta() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.attributes">attributes() (HelioBatch property)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.attributes">attributes() (HelioBatch property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -181,7 +184,7 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/batch_sampler.html#helio.src.BatchSampler">BatchSampler (class in helio.src)</a>
+      <li><a href="api/batch_sampler.html#helio.core.BatchSampler">BatchSampler (class in helio.core)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -189,7 +192,7 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.correct_degradation">correct_degradation() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.correct_degradation">correct_degradation() (HelioBatch method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -197,19 +200,23 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.data">data() (HelioBatch property)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.data">data() (HelioBatch property)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.deepcopy">deepcopy() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.deepcopy">deepcopy() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.downscale_local_mean">downscale_local_mean() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.deg2sin">deg2sin() (HelioBatch method)</a>
+</li>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.disk_resize">disk_resize() (HelioBatch method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.drop_empty_days">drop_empty_days() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.downscale_local_mean">downscale_local_mean() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.dtype_limits">dtype_limits() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.drop_empty_days">drop_empty_days() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.dump">dump() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.dtype_limits">dtype_limits() (HelioBatch method)</a>
+</li>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.dump">dump() (HelioBatch method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -217,11 +224,13 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#helio.src.FilesIndex">FilesIndex (class in helio.src)</a>
+      <li><a href="api/index.html#helio.core.FilesIndex">FilesIndex (class in helio.core)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.fillna">fillna() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.fillna">fillna() (HelioBatch method)</a>
+</li>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.flip">flip() (HelioBatch method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -229,7 +238,7 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.group_by_index">group_by_index() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.group_by_index">group_by_index() (HelioBatch method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -237,15 +246,15 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch">HelioBatch (class in helio.src)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch">HelioBatch (class in helio.core)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.hough_circle">hough_circle() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.hough_circle">hough_circle() (HelioBatch method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.hough_ellipse">hough_ellipse() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.hough_ellipse">hough_ellipse() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.hough_line">hough_line() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.hough_line">hough_line() (HelioBatch method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -253,37 +262,37 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.img_as_bool">img_as_bool() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.img_as_bool">img_as_bool() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.img_as_float">img_as_float() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.img_as_float">img_as_float() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.img_as_float32">img_as_float32() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.img_as_float32">img_as_float32() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.img_as_float64">img_as_float64() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.img_as_float64">img_as_float64() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.img_as_int">img_as_int() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.img_as_int">img_as_int() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.img_as_ubyte">img_as_ubyte() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.img_as_ubyte">img_as_ubyte() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.img_as_uint">img_as_uint() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.img_as_uint">img_as_uint() (HelioBatch method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.index">index (HelioBatch attribute)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.index">index (HelioBatch attribute)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.index">index() (HelioBatch property)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.index">index() (HelioBatch property)</a>
 </li>
-      <li><a href="api/index.html#helio.src.FilesIndex.index_merge">index_merge() (FilesIndex method)</a>
+      <li><a href="api/index.html#helio.core.FilesIndex.index_merge">index_merge() (FilesIndex method)</a>
 </li>
-      <li><a href="api/batch_sampler.html#helio.src.BatchSampler.indices">indices() (BatchSampler property)</a>
+      <li><a href="api/batch_sampler.html#helio.core.BatchSampler.indices">indices() (BatchSampler property)</a>
 
       <ul>
-        <li><a href="api/index.html#helio.src.FilesIndex.indices">(FilesIndex property)</a>
+        <li><a href="api/index.html#helio.core.FilesIndex.indices">(FilesIndex property)</a>
 </li>
-        <li><a href="api/helio_batch.html#helio.src.HelioBatch.indices">(HelioBatch property)</a>
+        <li><a href="api/helio_batch.html#helio.core.HelioBatch.indices">(HelioBatch property)</a>
 </li>
       </ul></li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.integral_image">integral_image() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.integral_image">integral_image() (HelioBatch method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -291,7 +300,11 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.load">load() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.label_synoptic_map">label_synoptic_map() (HelioBatch method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.load">load() (HelioBatch method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -299,17 +312,19 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.make_polar_plots">make_polar_plots() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.make_polar_plots">make_polar_plots() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.map_to_synoptic">map_to_synoptic() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.map_to_synoptic">map_to_synoptic() (HelioBatch method)</a>
+</li>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.mask_disk">mask_disk() (HelioBatch method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.mask_disk">mask_disk() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.match_histogram">match_histogram() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.match_histograms">match_histograms() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.match_histograms">match_histograms() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.meta">meta() (HelioBatch property)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.meta">meta() (HelioBatch property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -317,25 +332,25 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/sampler.html#helio.src.R.params">params (R attribute)</a>
+      <li><a href="api/sampler.html#helio.core.R.params">params (R attribute)</a>
 </li>
-      <li><a href="api/batch_sampler.html#helio.src.BatchSampler.params">params() (BatchSampler property)</a>
+      <li><a href="api/batch_sampler.html#helio.core.BatchSampler.params">params() (BatchSampler property)</a>
 
       <ul>
-        <li><a href="api/sampler.html#helio.src.R.params">(R property)</a>
+        <li><a href="api/sampler.html#helio.core.R.params">(R property)</a>
 </li>
       </ul></li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.probabilistic_hough_line">probabilistic_hough_line() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.probabilistic_hough_line">probabilistic_hough_line() (HelioBatch method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.pyramid_expand">pyramid_expand() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.pyramid_expand">pyramid_expand() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.pyramid_gaussian">pyramid_gaussian() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.pyramid_gaussian">pyramid_gaussian() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.pyramid_laplacian">pyramid_laplacian() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.pyramid_laplacian">pyramid_laplacian() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.pyramid_reduce">pyramid_reduce() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.pyramid_reduce">pyramid_reduce() (HelioBatch method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -343,23 +358,23 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/sampler.html#helio.src.R">R (class in helio.src)</a>
+      <li><a href="api/sampler.html#helio.core.R">R (class in helio.core)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.radon">radon() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.radon">radon() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.random_flip">random_flip() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.region_statistics">region_statistics() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.random_rot90">random_rot90() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.rescale">rescale() (HelioBatch method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.rescale">rescale() (HelioBatch method)</a>
+      <li><a href="api/batch_sampler.html#helio.core.BatchSampler.reset">reset() (BatchSampler method)</a>
 </li>
-      <li><a href="api/batch_sampler.html#helio.src.BatchSampler.reset">reset() (BatchSampler method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.resize">resize() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.resize">resize() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.rot90">rot90() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.rotate">rotate() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.rotate">rotate() (HelioBatch method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -367,15 +382,17 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.safe_resize">safe_resize() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.show">show() (HelioBatch method)</a>
 </li>
-      <li><a href="api/index.html#helio.src.FilesIndex.shuffle">shuffle() (FilesIndex method)</a>
+      <li><a href="api/index.html#helio.core.FilesIndex.shuffle">shuffle() (FilesIndex method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.stack_synoptic_maps">stack_synoptic_maps() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.sin2deg">sin2deg() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.swirl">swirl() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.stack_synoptic_maps">stack_synoptic_maps() (HelioBatch method)</a>
+</li>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.swirl">swirl() (HelioBatch method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -383,7 +400,7 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#helio.src.FilesIndex.train_test_split">train_test_split() (FilesIndex method)</a>
+      <li><a href="api/index.html#helio.core.FilesIndex.train_test_split">train_test_split() (FilesIndex method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -391,11 +408,11 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.warp">warp() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.warp">warp() (HelioBatch method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.src.HelioBatch.warp_polar">warp_polar() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.warp_polar">warp_polar() (HelioBatch method)</a>
 </li>
   </ul></td>
 </tr></table>

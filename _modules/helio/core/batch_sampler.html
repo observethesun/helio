@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>helio.src.batch_sampler &mdash; helio  documentation</title>
+  <title>helio.core.batch_sampler &mdash; helio  documentation</title>
   
 
   
@@ -128,7 +128,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>helio.src.batch_sampler</li>
+      <li>helio.core.batch_sampler</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -143,42 +143,41 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for helio.src.batch_sampler</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Contains BatchGenerator class.&quot;&quot;&quot;</span>
+  <h1>Source code for helio.core.batch_sampler</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Contains BatchSampler class.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
-<div class="viewcode-block" id="BatchSampler"><a class="viewcode-back" href="../../../api/batch_sampler.html#helio.src.BatchSampler">[docs]</a><span class="k">class</span> <span class="nc">BatchSampler</span><span class="p">:</span> <span class="c1">#pylint: disable=too-many-instance-attributes</span>
-    <span class="sd">&quot;&quot;&quot;Get next batch.</span>
+<div class="viewcode-block" id="BatchSampler"><a class="viewcode-back" href="../../../api/batch_sampler.html#helio.core.BatchSampler">[docs]</a><span class="k">class</span> <span class="nc">BatchSampler</span><span class="p">:</span> <span class="c1">#pylint: disable=too-many-instance-attributes</span>
+    <span class="sd">&quot;&quot;&quot;Get next batch of indices.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        batch_size : int</span>
-<span class="sd">            Size of target batch.</span>
-<span class="sd">        n_epochs : int or None</span>
-<span class="sd">            Maximal number of epochs. If None then next_batch can be</span>
-<span class="sd">            called infinitely. Default to 1.</span>
-<span class="sd">        suffle : bool</span>
-<span class="sd">            Should the dataset be suffled after each epoch. Default to False.</span>
-<span class="sd">        drop_last : bool</span>
-<span class="sd">            Defines handling of incomplete batches in the end of epochs.</span>
-<span class="sd">            If drop_last is False we complete batch with items from the beginning</span>
-<span class="sd">            of the current epoch or return incomplete batch if current epoch</span>
-<span class="sd">            is the last epoch. If drop_last is True we go to the next epoch.</span>
-<span class="sd">            Default to False.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    batch_size : int</span>
+<span class="sd">        Size of target batch.</span>
+<span class="sd">    n_epochs : int or None</span>
+<span class="sd">        Maximal number of epochs. If None then loops are infinitely. Default to 1.</span>
+<span class="sd">    suffle : bool</span>
+<span class="sd">        Shuffle indices after each epoch. Default to False.</span>
+<span class="sd">    drop_incomplete : bool</span>
+<span class="sd">        Defines handling of incomplete batches in the end of epochs.</span>
+<span class="sd">        If drop_incomplete is False we complete the batch with items from the beginning</span>
+<span class="sd">        of the current epoch and return incomplete batch if current epoch</span>
+<span class="sd">        is the last epoch. If drop_incomplete is True we go to the next epoch.</span>
+<span class="sd">        Default to False.</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        batch : batch_class</span>
-<span class="sd">            Generated batch.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">drop_last</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    index : index</span>
+<span class="sd">        Next indices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">n_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">drop_incomplete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_epochs</span> <span class="o">=</span> <span class="n">n_epochs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span> <span class="o">=</span> <span class="n">shuffle</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_drop_last</span> <span class="o">=</span> <span class="n">drop_last</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drop_incomplete</span> <span class="o">=</span> <span class="n">drop_incomplete</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_seed</span> <span class="o">=</span> <span class="n">seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_batch_start</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_on_epoch</span> <span class="o">=</span> <span class="mi">0</span>
@@ -196,17 +195,17 @@
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_batch_size</span><span class="p">,</span>
                     <span class="n">n_epochs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_epochs</span><span class="p">,</span>
                     <span class="n">shuffle</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span><span class="p">,</span>
-                    <span class="n">drop_last</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_drop_last</span><span class="p">,</span>
+                    <span class="n">drop_incomplete</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_drop_incomplete</span><span class="p">,</span>
                     <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drop_last</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drop_incomplete</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_epochs</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_indices</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_size</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_indices</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_epochs</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_indices</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_size</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_epochs</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_indices</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BatchSampler.reset"><a class="viewcode-back" href="../../../api/batch_sampler.html#helio.src.BatchSampler.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="BatchSampler.reset"><a class="viewcode-back" href="../../../api/batch_sampler.html#helio.core.BatchSampler.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Reset epochs counter to 0.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span><span class="p">:</span>
             <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span><span class="p">)</span>
@@ -226,11 +225,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_epochs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_epoch</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_epochs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_on_epoch</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drop_last</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drop_incomplete</span><span class="p">:</span>
                     <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
                 <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_start</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drop_last</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drop_incomplete</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_on_epoch</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_batch_start</span> <span class="o">=</span> <span class="mi">0</span>
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shuffle</span><span class="p">:</span>

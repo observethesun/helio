@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>helio.src.index &mdash; helio  documentation</title>
+  <title>helio.core.index &mdash; helio  documentation</title>
   
 
   
@@ -128,7 +128,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>helio.src.index</li>
+      <li>helio.core.index</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -143,7 +143,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for helio.src.index</h1><div class="highlight"><pre>
+  <h1>Source code for helio.core.index</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Index classes.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
@@ -216,7 +216,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="FilesIndex"><a class="viewcode-back" href="../../../api/index.html#helio.src.FilesIndex">[docs]</a><span class="k">class</span> <span class="nc">FilesIndex</span><span class="p">(</span><span class="n">BaseIndex</span><span class="p">):</span> <span class="c1">#pylint: disable=abstract-method,too-many-ancestors</span>
+<div class="viewcode-block" id="FilesIndex"><a class="viewcode-back" href="../../../api/index.html#helio.core.FilesIndex">[docs]</a><span class="k">class</span> <span class="nc">FilesIndex</span><span class="p">(</span><span class="n">BaseIndex</span><span class="p">):</span> <span class="c1">#pylint: disable=abstract-method,too-many-ancestors</span>
     <span class="sd">&quot;&quot;&quot;Index of files.</span>
 
 <span class="sd">    Builds a DataFrame containing path to files in columns. By default</span>
@@ -227,7 +227,6 @@
 <span class="sd">    kwargs : dict of type {name: path}</span>
 <span class="sd">        Path to files that should be indexed and reference name for files collection.</span>
 <span class="sd">        Path can contain shell-style wildcards.</span>
-<span class="sd">    }</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="p">:</span>

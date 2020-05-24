@@ -36,7 +36,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Models" href="models.html" />
+    <link rel="next" title="FilesIndex" href="index.html" />
     <link rel="prev" title="Core" href="core.html" /> 
 </head>
 
@@ -87,6 +87,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">HelioBatch</a><ul class="simple">
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="index.html">FilesIndex</a></li>
+<li class="toctree-l3"><a class="reference internal" href="batch_sampler.html">BatchSampler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sampler.html">Randomizer</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="models.html">Models</a></li>
@@ -165,29 +168,29 @@
 <div class="toctree-wrapper compound">
 </div>
 <dl class="class">
-<dt id="helio.src.HelioBatch">
-<em class="property">class </em><code class="sig-name descname">HelioBatch</code><span class="sig-paren">(</span><em class="sig-param">index</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch">
+<em class="property">class </em><code class="sig-name descname">HelioBatch</code><span class="sig-paren">(</span><em class="sig-param">index</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch" title="Permalink to this definition">¶</a></dt>
 <dd><p>Batch class for solar observations processing.</p>
 <dl class="attribute">
-<dt id="helio.src.HelioBatch.index">
-<code class="sig-name descname">index</code><a class="headerlink" href="#helio.src.HelioBatch.index" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.index">
+<code class="sig-name descname">index</code><a class="headerlink" href="#helio.core.HelioBatch.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unique identifiers of batch items.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="idnex.html#helio.src.FilesIndex" title="helio.src.FilesIndex">FilesIndex</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="index.html#helio.core.FilesIndex" title="helio.core.FilesIndex">FilesIndex</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.aia_intscale">
-<code class="sig-name descname">aia_intscale</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">wavelength</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.aia_intscale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.aia_intscale" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adjust intensity to AIA standart.</p>
+<dt id="helio.core.HelioBatch.aia_intscale">
+<code class="sig-name descname">aia_intscale</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">wavelength</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.aia_intscale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.aia_intscale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjust intensity to AIA standard.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for image.</p></li>
-<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A destination for results.</p></li>
 <li><p><strong>wavelength</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Image wavelength.</p></li>
 </ul>
 </dd>
@@ -195,14 +198,14 @@
 <dd class="field-even"><p><strong>batch</strong> – Batch with adjusted images.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.apply">
-<code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.apply" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.apply" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply a <code class="docutils literal notranslate"><span class="pre">func</span></code> to each item in <code class="docutils literal notranslate"><span class="pre">src</span></code> and write results in <code class="docutils literal notranslate"><span class="pre">dst</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -217,26 +220,48 @@
 <dd class="field-even"><p><strong>batch</strong> – Processed batch.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.attributes">
-<em class="property">property </em><code class="sig-name descname">attributes</code><a class="headerlink" href="#helio.src.HelioBatch.attributes" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.apply_meta">
+<code class="sig-name descname">apply_meta</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.apply_meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.apply_meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a <code class="docutils literal notranslate"><span class="pre">func</span></code> to each item in meta.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for meta.</p></li>
+<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>func</strong> (<em>callable</em>) – A function to apply.</p></li>
+<li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to <code class="docutils literal notranslate"><span class="pre">func</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Processed batch.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.HelioBatch.attributes">
+<em class="property">property </em><code class="sig-name descname">attributes</code><a class="headerlink" href="#helio.core.HelioBatch.attributes" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of data keys.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.correct_degradation">
-<code class="sig-name descname">correct_degradation</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.correct_degradation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.correct_degradation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply <code class="docutils literal notranslate"><span class="pre">correct_degradation</span></code> procedure to AIA data.</p>
+<dt id="helio.core.HelioBatch.correct_degradation">
+<code class="sig-name descname">correct_degradation</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.correct_degradation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.correct_degradation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply <code class="docutils literal notranslate"><span class="pre">aiapy.calibrate.correct_degradation</span></code> procedure to AIA data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for AIA map.</p></li>
-<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for AIA map.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A destination for results.</p></li>
 <li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to dump method.</p></li>
 </ul>
 </dd>
@@ -244,26 +269,67 @@
 <dd class="field-even"><p><strong>batch</strong> – Batch with corrected AIA maps.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.data">
-<em class="property">property </em><code class="sig-name descname">data</code><a class="headerlink" href="#helio.src.HelioBatch.data" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.data">
+<em class="property">property </em><code class="sig-name descname">data</code><a class="headerlink" href="#helio.core.HelioBatch.data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Observational data.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.deepcopy">
-<code class="sig-name descname">deepcopy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.deepcopy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.deepcopy" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.deepcopy">
+<code class="sig-name descname">deepcopy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.deepcopy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.deepcopy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a deep copy of batch.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.downscale_local_mean">
-<code class="sig-name descname">downscale_local_mean</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.downscale_local_mean" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.deg2sin">
+<code class="sig-name descname">deg2sin</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.deg2sin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.deg2sin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform a Latitude synoptic map to Sine Latitude.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for synoptic map.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A destination for results.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with transformed synoptic maps.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.HelioBatch.disk_resize">
+<code class="sig-name descname">disk_resize</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">output_shape</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.disk_resize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.disk_resize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resize solar disk image and update center location and radius.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for solar disk images.</p></li>
+<li><p><strong>output_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a>) – Shape of output images. Axes ratio should be the same as for source image.</p></li>
+<li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to resize method.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with resized images and adjusted meta.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.HelioBatch.downscale_local_mean">
+<code class="sig-name descname">downscale_local_mean</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.downscale_local_mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply downscale_local_mean to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -290,8 +356,8 @@ falls within that range.)</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.drop_empty_days">
-<code class="sig-name descname">drop_empty_days</code><span class="sig-paren">(</span><em class="sig-param">mask</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.drop_empty_days"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.drop_empty_days" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.drop_empty_days">
+<code class="sig-name descname">drop_empty_days</code><span class="sig-paren">(</span><em class="sig-param">mask</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.drop_empty_days"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.drop_empty_days" title="Permalink to this definition">¶</a></dt>
 <dd><p>Drop batch items without active regions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -301,14 +367,14 @@ falls within that range.)</p></li>
 <dd class="field-even"><p><strong>batch</strong> – Batch without empty observations.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.dtype_limits">
-<code class="sig-name descname">dtype_limits</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.dtype_limits" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.dtype_limits">
+<code class="sig-name descname">dtype_limits</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.dtype_limits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply dtype_limits to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -330,13 +396,15 @@ even if the image dtype allows negative values.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.dump">
-<code class="sig-name descname">dump</code><span class="sig-paren">(</span><em class="sig-param">src</em>, <em class="sig-param">path</em>, <em class="sig-param">format</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.dump" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.dump">
+<code class="sig-name descname">dump</code><span class="sig-paren">(</span><em class="sig-param">src</em>, <em class="sig-param">path</em>, <em class="sig-param">format</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.dump" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dump data in various formats.</p>
+<p>Supported formats: npz, txt, binary, fits, abp, blosc and any of
+<cite>matplotlib.pyplot.imsave</cite> supported formats.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for data to save.</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for data to save.</p></li>
 <li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Path where to write output files.</p></li>
 <li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Output file format.</p></li>
 <li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to dump method.</p></li>
@@ -346,20 +414,20 @@ even if the image dtype allows negative values.</p></li>
 <dd class="field-even"><p><strong>batch</strong> – Batch unchanged.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.fillna">
-<code class="sig-name descname">fillna</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">value=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.fillna"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.fillna" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.fillna">
+<code class="sig-name descname">fillna</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">value=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.fillna"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.fillna" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace NaN with a given value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for array.</p></li>
-<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for array.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A destination for results.</p></li>
 <li><p><strong>value</strong> (<em>scalar</em>) – Value to be used to fill NaN values. Default to 0.</p></li>
 </ul>
 </dd>
@@ -367,21 +435,45 @@ even if the image dtype allows negative values.</p></li>
 <dd class="field-even"><p><strong>batch</strong> – Batch NaN replaced.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.group_by_index">
-<code class="sig-name descname">group_by_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.group_by_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.group_by_index" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.flip">
+<code class="sig-name descname">flip</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">axis</em>, <em class="sig-param">dst=None</em>, <em class="sig-param">p=True</em>, <em class="sig-param">update_meta=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.flip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.flip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply axis reversing. Accepts random parameter <cite>p</cite> for aurgemntation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for images.</p></li>
+<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Axis in array, which entries are reversed.</p></li>
+<li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><a class="reference internal" href="sampler.html#helio.core.R" title="helio.core.R"><em>R</em></a>) – Probabilistic parameter for augmentation, e.g. p = R(‘choice’, a=[True, False], p=[0.5, 0.5])
+will flip images with probability 0.5.</p></li>
+<li><p><strong>update_meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Update meta with new image orientation. Default to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with flipped images.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>ImageBatch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.HelioBatch.group_by_index">
+<code class="sig-name descname">group_by_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.group_by_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.group_by_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stack batch items according to batch index.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>batch</strong> – A new batch with stacked items.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+<dd class="field-even"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -389,8 +481,8 @@ even if the image dtype allows negative values.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.hough_circle">
-<code class="sig-name descname">hough_circle</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.hough_circle" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.hough_circle">
+<code class="sig-name descname">hough_circle</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.hough_circle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply hough_circle to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -417,8 +509,8 @@ input picture.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.hough_ellipse">
-<code class="sig-name descname">hough_ellipse</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.hough_ellipse" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.hough_ellipse">
+<code class="sig-name descname">hough_ellipse</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.hough_ellipse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply hough_ellipse to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -444,8 +536,8 @@ image dimension.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.hough_line">
-<code class="sig-name descname">hough_line</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.hough_line" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.hough_line">
+<code class="sig-name descname">hough_line</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.hough_line" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply hough_line to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -467,8 +559,8 @@ Defaults to a vector of 180 angles evenly spaced from -pi/2 to pi/2.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.img_as_bool">
-<code class="sig-name descname">img_as_bool</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_bool" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.img_as_bool">
+<code class="sig-name descname">img_as_bool</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.img_as_bool" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply img_as_bool to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -489,8 +581,8 @@ the first argument of <code class="docutils literal notranslate"><span class="pr
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.img_as_float">
-<code class="sig-name descname">img_as_float</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_float" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.img_as_float">
+<code class="sig-name descname">img_as_float</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.img_as_float" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply img_as_float to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -511,8 +603,8 @@ the first argument of <code class="docutils literal notranslate"><span class="pr
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.img_as_float32">
-<code class="sig-name descname">img_as_float32</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_float32" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.img_as_float32">
+<code class="sig-name descname">img_as_float32</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.img_as_float32" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply img_as_float32 to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -533,8 +625,8 @@ the first argument of <code class="docutils literal notranslate"><span class="pr
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.img_as_float64">
-<code class="sig-name descname">img_as_float64</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_float64" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.img_as_float64">
+<code class="sig-name descname">img_as_float64</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.img_as_float64" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply img_as_float64 to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -555,8 +647,8 @@ the first argument of <code class="docutils literal notranslate"><span class="pr
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.img_as_int">
-<code class="sig-name descname">img_as_int</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_int" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.img_as_int">
+<code class="sig-name descname">img_as_int</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.img_as_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply img_as_int to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -577,8 +669,8 @@ the first argument of <code class="docutils literal notranslate"><span class="pr
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.img_as_ubyte">
-<code class="sig-name descname">img_as_ubyte</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_ubyte" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.img_as_ubyte">
+<code class="sig-name descname">img_as_ubyte</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.img_as_ubyte" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply img_as_ubyte to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -599,8 +691,8 @@ the first argument of <code class="docutils literal notranslate"><span class="pr
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.img_as_uint">
-<code class="sig-name descname">img_as_uint</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.img_as_uint" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.img_as_uint">
+<code class="sig-name descname">img_as_uint</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.img_as_uint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply img_as_uint to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -627,14 +719,14 @@ the first argument of <code class="docutils literal notranslate"><span class="pr
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.indices">
-<em class="property">property </em><code class="sig-name descname">indices</code><a class="headerlink" href="#helio.src.HelioBatch.indices" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.indices">
+<em class="property">property </em><code class="sig-name descname">indices</code><a class="headerlink" href="#helio.core.HelioBatch.indices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Batch items identifiers.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.integral_image">
-<code class="sig-name descname">integral_image</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.integral_image" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.integral_image">
+<code class="sig-name descname">integral_image</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.integral_image" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply integral_image to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -654,8 +746,29 @@ the first argument of <code class="docutils literal notranslate"><span class="pr
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.load">
-<code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">src</em>, <em class="sig-param">dtype=None</em>, <em class="sig-param">meta=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.load" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.label_synoptic_map">
+<code class="sig-name descname">label_synoptic_map</code><span class="sig-paren">(</span><em class="sig-param">src</em>, <em class="sig-param">dst</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.label_synoptic_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.label_synoptic_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Label regions in a binary synoptic map. Takes into account connections
+at 360 and 0 longitude.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for binary synoptic map.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A destination for labeled map.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with labeled synoptic maps.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.HelioBatch.load">
+<code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">src</em>, <em class="sig-param">dtype=None</em>, <em class="sig-param">meta=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load batch data from source.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -670,14 +783,14 @@ the first argument of <code class="docutils literal notranslate"><span class="pr
 <dd class="field-even"><p><strong>batch</strong> – Batch with loaded data.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.make_polar_plots">
-<code class="sig-name descname">make_polar_plots</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">path</em>, <em class="sig-param">figsize=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.make_polar_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.make_polar_plots" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.make_polar_plots">
+<code class="sig-name descname">make_polar_plots</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">path</em>, <em class="sig-param">figsize=None</em>, <em class="sig-param">axes=False</em>, <em class="sig-param">labelsize=14</em>, <em class="sig-param">pad=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.make_polar_plots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.make_polar_plots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make polar projections from a synoptic map.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -692,20 +805,20 @@ the first argument of <code class="docutils literal notranslate"><span class="pr
 <dd class="field-even"><p><strong>batch</strong> – Batch unchanged.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.map_to_synoptic">
-<code class="sig-name descname">map_to_synoptic</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">bins</em>, <em class="sig-param">average=None</em>, <em class="sig-param">deg=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.map_to_synoptic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.map_to_synoptic" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.map_to_synoptic">
+<code class="sig-name descname">map_to_synoptic</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">bins</em>, <em class="sig-param">average=None</em>, <em class="sig-param">deg=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.map_to_synoptic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.map_to_synoptic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a synoptic map from a solar disk image.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for images.</p></li>
-<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for images.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A destination for results.</p></li>
 <li><p><strong>bins</strong> (<em>(</em><em>nx</em><em>, </em><em>ny</em><em>)</em>) – Longitudinal and latitudinal resolution of synoptic map.</p></li>
 <li><p><strong>average</strong> (<em>callable</em>) – Average function. Default is a mean function.</p></li>
 <li><p><strong>deg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, all angles are in degrees. Default to True.</p></li>
@@ -715,35 +828,56 @@ the first argument of <code class="docutils literal notranslate"><span class="pr
 <dd class="field-even"><p><strong>batch</strong> – Batch with synoptic maps.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.mask_disk">
-<code class="sig-name descname">mask_disk</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">value=nan</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.mask_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.mask_disk" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.mask_disk">
+<code class="sig-name descname">mask_disk</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">fill_value=nan</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.mask_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.mask_disk" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set dummy value to pixels outside the solar disk.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for disk images.</p></li>
-<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
-<li><p><strong>value</strong> (<em>scalar</em>) – A value to be set to pixels outside the solar disk. Default to np.nan.</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for disk images.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A destination for results.</p></li>
+<li><p><strong>fill_value</strong> (<em>scalar</em>) – A value to be set to pixels outside the solar disk. Default to np.nan.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>batch</strong> – Batch with masked disk.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.match_histograms">
-<code class="sig-name descname">match_histograms</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.match_histograms" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.match_histogram">
+<code class="sig-name descname">match_histogram</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">reference</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.match_histogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.match_histogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Histogram matching.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for image.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A destination for results.</p></li>
+<li><p><strong>reference</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Reference image to match histogram with.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with adjusted images.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.HelioBatch.match_histograms">
+<code class="sig-name descname">match_histograms</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.match_histograms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply match_histograms to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -766,14 +900,14 @@ image.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.meta">
-<em class="property">property </em><code class="sig-name descname">meta</code><a class="headerlink" href="#helio.src.HelioBatch.meta" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.meta">
+<em class="property">property </em><code class="sig-name descname">meta</code><a class="headerlink" href="#helio.core.HelioBatch.meta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Meta information on observations.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.probabilistic_hough_line">
-<code class="sig-name descname">probabilistic_hough_line</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.probabilistic_hough_line" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.probabilistic_hough_line">
+<code class="sig-name descname">probabilistic_hough_line</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.probabilistic_hough_line" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply probabilistic_hough_line to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -801,8 +935,8 @@ If None, use a range from -pi/2 to pi/2.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.pyramid_expand">
-<code class="sig-name descname">pyramid_expand</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.pyramid_expand" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.pyramid_expand">
+<code class="sig-name descname">pyramid_expand</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.pyramid_expand" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply pyramid_expand to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -833,8 +967,8 @@ channels or another spatial dimension.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.pyramid_gaussian">
-<code class="sig-name descname">pyramid_gaussian</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.pyramid_gaussian" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.pyramid_gaussian">
+<code class="sig-name descname">pyramid_gaussian</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.pyramid_gaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply pyramid_gaussian to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -867,8 +1001,8 @@ channels or another spatial dimension.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.pyramid_laplacian">
-<code class="sig-name descname">pyramid_laplacian</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.pyramid_laplacian" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.pyramid_laplacian">
+<code class="sig-name descname">pyramid_laplacian</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.pyramid_laplacian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply pyramid_laplacian to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -901,8 +1035,8 @@ channels or another spatial dimension.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.pyramid_reduce">
-<code class="sig-name descname">pyramid_reduce</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.pyramid_reduce" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.pyramid_reduce">
+<code class="sig-name descname">pyramid_reduce</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.pyramid_reduce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply pyramid_reduce to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -933,8 +1067,8 @@ channels or another spatial dimension.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.radon">
-<code class="sig-name descname">radon</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.radon" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.radon">
+<code class="sig-name descname">radon</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.radon" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply radon to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -955,54 +1089,39 @@ the first argument of <code class="docutils literal notranslate"><span class="pr
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.random_flip">
-<code class="sig-name descname">random_flip</code><span class="sig-paren">(</span><em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">axis</em>, <em class="sig-param">p=0.5</em>, <em class="sig-param">meta=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.random_flip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.random_flip" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply axis reversing with a given probability.</p>
+<dt id="helio.core.HelioBatch.region_statistics">
+<code class="sig-name descname">region_statistics</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">sin</em>, <em class="sig-param">hmi=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.region_statistics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.region_statistics" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Calculates statistics for regions in a binary synoptic map:</dt><dd><ul class="simple">
+<li><p>area (<span class="math notranslate nohighlight">\(10^{12}\)</span> <span class="math notranslate nohighlight">\(km^2\)</span>)</p></li>
+<li><p>mean latitude (in degrees, North at <span class="math notranslate nohighlight">\(90^{\circ}\)</span>)</p></li>
+<li><p>largest Carrington longitude (in degrees)</p></li>
+<li><p>positive flux (<span class="math notranslate nohighlight">\(10^{22}\)</span> Mx, if hmi is not None and in Gauss)</p></li>
+<li><p>negative flux (<span class="math notranslate nohighlight">\(10^{22}\)</span> Mx, if hmi is not None and in Gauss)</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for images.</p></li>
-<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
-<li><p><strong>axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Axis in array, which entries are reversed.</p></li>
-<li><p><strong>p</strong> (<em>float in</em><em> [</em><em>0</em><em>, </em><em>1</em><em>]</em>) – Probability of reversal. Default to 0.5.</p></li>
-<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, adjust meta to new image orientation. Default to True.</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for binary synoptic map.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A destination for statistics.</p></li>
+<li><p><strong>sin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Sine Latitude synoptic map.</p></li>
+<li><p><strong>hmi</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Magnetic synoptic map for flux calculation. Default to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>batch</strong> – Batch with flipped images.</p>
+<dd class="field-even"><p><strong>batch</strong> – Batch with statistics.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>ImageBatch</p>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.random_rot90">
-<code class="sig-name descname">random_rot90</code><span class="sig-paren">(</span><em class="sig-param">src</em>, <em class="sig-param">dst=None</em>, <em class="sig-param">axes=(0</em>, <em class="sig-param">1)</em>, <em class="sig-param">meta=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.random_rot90"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.random_rot90" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply rotation of an image at random number of times by 90 degrees.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for images.</p></li>
-<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
-<li><p><strong>axes</strong> (<em>(</em><em>2</em><em>,</em><em>) </em><em>array_like</em>) – The array is rotated in the plane defined by the axes.
-Axes must be different. Default to (0, 1).</p></li>
-<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, adjust meta to new image orientation. Default to True.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>batch</strong> – Batch with rotated images.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="helio.src.HelioBatch.rescale">
-<code class="sig-name descname">rescale</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.rescale" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.rescale">
+<code class="sig-name descname">rescale</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.rescale" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply rescale to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1024,8 +1143,8 @@ the first argument of <code class="docutils literal notranslate"><span class="pr
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.resize">
-<code class="sig-name descname">resize</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.resize" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.resize">
+<code class="sig-name descname">resize</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.resize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply resize to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1049,8 +1168,33 @@ n-dimensional interpolation is applied.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.rotate">
-<code class="sig-name descname">rotate</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.rotate" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.rot90">
+<code class="sig-name descname">rot90</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">axes=(0</em>, <em class="sig-param">1)</em>, <em class="sig-param">k=1</em>, <em class="sig-param">update_meta=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.rot90"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.rot90" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply rotation of an image by 90 degrees given number of times.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for images.</p></li>
+<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
+<li><p><strong>axes</strong> (<em>(</em><em>2</em><em>,</em><em>) </em><em>array_like</em>) – The array is rotated in the plane defined by the axes.
+Axes must be different. Default to (0, 1).</p></li>
+<li><p><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference internal" href="sampler.html#helio.core.R" title="helio.core.R"><em>R</em></a>) – Probabilistic parameter for augmentation, e.g. k = R(‘choice’, a=np.arange(4))
+will rotate images random number of times.</p></li>
+<li><p><strong>update_meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Update meta with new image orientation. Default to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with rotated images.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.HelioBatch.rotate">
+<code class="sig-name descname">rotate</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.rotate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply rotate to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1078,39 +1222,62 @@ ordering.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.safe_resize">
-<code class="sig-name descname">safe_resize</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">output_shape</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.safe_resize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.safe_resize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reduce image size to traget size and adjust meta.</p>
+<dt id="helio.core.HelioBatch.show">
+<code class="sig-name descname">show</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">image</em>, <em class="sig-param">mask=None</em>, <em class="sig-param">figsize=None</em>, <em class="sig-param">cmap=None</em>, <em class="sig-param">s=None</em>, <em class="sig-param">color=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show image data with optional mask countours overlayed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for images.</p></li>
-<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
-<li><p><strong>output_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a>) – Shape of output images.</p></li>
-<li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to resize method.</p></li>
+<li><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Integer data index.</p></li>
+<li><p><strong>image</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Image data source.</p></li>
+<li><p><strong>mask</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Mask to be overlayed.</p></li>
+<li><p><strong>figsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>, </em><em>optional</em>) – Size of figure.</p></li>
+<li><p><strong>cmap</strong> (<em>cmap</em>) – Matplotlib color map for image.</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Point size for contours.</p></li>
+<li><p><strong>color</strong> (<em>color</em>) – Matplotlib color for contours.</p></li>
+<li><p><strong>kwargs</strong> (<em>misc</em>) – Additional imshow keywords.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>batch</strong> – Batch with resized images.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.stack_synoptic_maps">
-<code class="sig-name descname">stack_synoptic_maps</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">weight_decay=None</em>, <em class="sig-param">q=0.75</em>, <em class="sig-param">deg=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/src/batch.html#HelioBatch.stack_synoptic_maps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.src.HelioBatch.stack_synoptic_maps" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.sin2deg">
+<code class="sig-name descname">sin2deg</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.sin2deg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.sin2deg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform a Sine Latitude synoptic map to Latitude.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for synoptic map.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A destination for results.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with transformed synoptic maps.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.HelioBatch.stack_synoptic_maps">
+<code class="sig-name descname">stack_synoptic_maps</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">shift</em>, <em class="sig-param">scale</em>, <em class="sig-param">weight_decay=None</em>, <em class="sig-param">deg=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.stack_synoptic_maps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.stack_synoptic_maps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stack synoptic maps corresponding to disk images into a single map.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>tuple of str</em>) – A source for synoptic maps corresponding to disk images.</p></li>
-<li><p><strong>dst</strong> (<em>same type as src</em>) – A destination for results.</p></li>
-<li><p><strong>weight_decay</strong> (<em>callable</em>) – Function to get a pixel weight based on its distance from central meridian.
-Distance unit should be degree. Default is sigmoid(-x/5 + 10).</p></li>
-<li><p><strong>q</strong> (<em>float in</em><em> (</em><em>0</em><em>, </em><em>1</em><em>) </em><em>range.</em>) – Quantile for pixel distribution. Default to 0.75.</p></li>
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A source for synoptic maps corresponding to disk images.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A destination for results.</p></li>
+<li><p><strong>shift</strong> (<em>scalar</em>) – A parameter for pixel weights according to <cite>weight_decay(-(dist - shift) / scale)</cite>.</p></li>
+<li><p><strong>scale</strong> (<em>scalar</em>) – <p>A parameter for pixel weights according to <cite>weight_decay(-(dist - shift) / scale)</cite>.
+weight_decay: callable</p>
+<blockquote>
+<div><p>Function to get a pixel weight based on its distance from central meridian.
+Distance unit should be degree. Default is sigmoid function.</p>
+</div></blockquote>
+</p></li>
 <li><p><strong>deg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If True, all angles are in degrees. Default to True.</p></li>
 </ul>
 </dd>
@@ -1118,14 +1285,14 @@ Distance unit should be degree. Default is sigmoid(-x/5 + 10).</p></li>
 <dd class="field-even"><p><strong>batch</strong> – Batch with synoptic maps.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#helio.src.HelioBatch" title="helio.src.HelioBatch">HelioBatch</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.swirl">
-<code class="sig-name descname">swirl</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.swirl" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.swirl">
+<code class="sig-name descname">swirl</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.swirl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply swirl to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1150,8 +1317,8 @@ rapidly beyond <cite>radius</cite>.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.warp">
-<code class="sig-name descname">warp</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.warp" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.warp">
+<code class="sig-name descname">warp</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.warp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply warp to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1230,8 +1397,8 @@ Also see
 </dd></dl>
 
 <dl class="method">
-<dt id="helio.src.HelioBatch.warp_polar">
-<code class="sig-name descname">warp_polar</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.src.HelioBatch.warp_polar" title="Permalink to this definition">¶</a></dt>
+<dt id="helio.core.HelioBatch.warp_polar">
+<code class="sig-name descname">warp_polar</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">func</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.HelioBatch.warp_polar" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply warp_polar to batch data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1276,7 +1443,7 @@ arrays are accepted.</p></li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="models.html" class="btn btn-neutral float-right" title="Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="index.html" class="btn btn-neutral float-right" title="FilesIndex" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="core.html" class="btn btn-neutral float-left" title="Core" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
