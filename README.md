@@ -9,7 +9,7 @@ Key features:
 * batch-by-batch processing of large datasets
 * implemented neural networks modules and architectures
 
-For more features see API [documentation]().
+For more features see API [documentation](http://observethesun.github.io/helio/).
 
 ## Installation
 
@@ -48,4 +48,4 @@ for ids in batch_sampler:
      .resize(src='images', output_shape=(256, 256), preserve_range=True))
 ```
 
-For more examples see [Tuturials](./tutorials).
+For more examples see [tutorials](./tutorials).
