@@ -81,7 +81,6 @@ class FilesIndex(BaseIndex): #pylint: disable=abstract-method,too-many-ancestors
     kwargs : dict of type {name: path}
         Path to files that should be indexed and reference name for files collection.
         Path can contain shell-style wildcards.
-    }
     """
     def __init__(self, *args, **kwargs):
         if not kwargs:

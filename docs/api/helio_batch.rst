@@ -5,6 +5,6 @@ HelioBatch
 .. toctree::
    :maxdepth: 2
 
-.. autoclass:: helio.src.HelioBatch
+.. autoclass:: helio.core.HelioBatch
     :members:
     :undoc-members:

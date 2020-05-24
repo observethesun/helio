@@ -81,21 +81,23 @@ def load_abp_mask(path, shape, sunspot_observation=False):
     mask[pts[:, 0], pts[:, 1]] = True
     return mask
 
-def write_fits(fname, data, kind=None, **kwargs):
+def write_fits(fname, data, index, meta, kind=None, **kwargs):
     """Write data to FITS file."""
     if kind is None:
-        return write_simple_fits(fname=fname, data=data, **kwargs)
+        return write_simple_fits(fname, data, index, meta, **kwargs)
     if kind == 'synoptic':
-        return write_syn_fits(fname=fname, data=data, **kwargs)
+        return write_syn_fits(fname, data, index, meta, **kwargs)
+    if kind == 'synoptic_mask':
+        return write_syn_mask_fits(fname, data, index, meta, **kwargs)
     raise NotImplementedError('FITS files for data of type {} are not implemented.'.format(kind))
 
-def write_syn_fits(fname, data, index, **headers):
+def write_syn_fits(fname, data, index, meta, **headers):
     """Write synoptic map to FITS file."""
+    _ = meta
     hdr = fits.Header()
     index = index.reset_index()
     hdr['DATE'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     hdr['CAR_ROT'] = int(index.loc[0, 'CR'])
-    hdr['MISSVALS'] = np.isnan(data).sum()
     a = index.loc[0, 'DateTime'][0]
     b = index.loc[0, 'DateTime'][-1]
     rot = a + (b - a) / 2
@@ -121,14 +123,45 @@ def write_syn_fits(fname, data, index, **headers):
     hdr['BZERO'] = 0.
     hdr['BUNIT'] = 'counts / pixel'
     hdr['WCSNAME'] = 'Carrington Heliographic'
+    hdr['MISSVALS'] = np.isnan(data).sum()
     for k, v in headers.items():
         hdr[k] = v
     hdu = fits.PrimaryHDU(header=hdr, data=data[::-1])
     hdul = fits.HDUList([hdu])
     hdul.writeto(fname, overwrite=True)
 
-def write_simple_fits(fname, data, **headers):
+def write_syn_mask_fits(fname, data, index, meta, **headers):
+    """Write mask for synoptic map to FITS file."""
+    _ = index
+    hdr = fits.Header()
+    hdr['DATE'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    for k in ['CAR_ROT', 'DATE-OBS', 'T_OBS', 'T_ROT', 'T_START', 'T_STOP',
+              'B0_ROT', 'B0_FIRST', 'B0_LAST']:
+        hdr[k] = meta[k]
+    hdr['CRPIX1'] = (data.shape[1] + 1.) / 2
+    hdr['CRPIX2'] = (data.shape[0] + 1.) / 2
+    hdr['CRVAL1'] = 180.
+    hdr['CRVAL2'] = 0.
+    hdr['CDELT1'] = 360. / data.shape[1]
+    hdr['CDELT2'] = 180. / data.shape[0]
+    hdr['CUNIT1'] = 'deg'
+    hdr['CUNIT2'] = 'deg'
+    hdr['CTYPE1'] = 'Carrington Longitude'
+    hdr['CTYPE2'] = 'Latitude'
+    hdr['BSCALE'] = 1.
+    hdr['BZERO'] = 0.
+    hdr['BUNIT'] = 'counts / pixel'
+    hdr['WCSNAME'] = 'Carrington Heliographic'
+    hdr['MISSVALS'] = np.isnan(data).sum()
+    for k, v in headers.items():
+        hdr[k] = v
+    hdu = fits.PrimaryHDU(header=hdr, data=data[::-1])
+    hdul = fits.HDUList([hdu])
+    hdul.writeto(fname, overwrite=True)
+
+def write_simple_fits(fname, data, index, meta, **headers):
     """Write array to FITS file."""
+    _ = index, meta
     hdr = fits.Header()
     for k, v in headers.items():
         hdr[k] = v

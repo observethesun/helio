@@ -5,7 +5,6 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import dill
-import dateutil.parser as dparser
 from astropy.io import fits
 from aiapy.calibrate import correct_degradation
 from scipy import interpolate
@@ -194,7 +193,7 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def _load_meta(self, i, src, dst, verify='fix', **kwargs):
+    def _load_meta(self, i, src, dst, verify='fix', unit=0, **kwargs):
         """Load additional meta information on observations.
         |
         i
@@ -210,19 +209,18 @@ class HelioBatch():
                 header = np.array(fread[0].split())
                 meta = dict(i_cen=int(header[1]),
                             j_cen=int(header[0]),
-                            r=int(header[2]),
-                            P=float(header[3]),
-                            B0=float(header[4]),
-                            L0=float(header[5]))
+                            r=int(header[2]))
         elif fmt in ['fts', 'fits']:
             hdul = fits.open(path)
             hdul.verify(verify)
-            hdr = hdul[1].header
+            hdr = hdul[unit].header
             meta = dict(hdr.items())
-            meta.update(dict(i_cen=int(hdr['Y0_MP']),
-                             j_cen=int(hdr['X0_MP']),
-                             r=int(hdr['R_SUN']),
-                             date=dparser.parse(hdr['DATE'])))
+            if 'X0_MP' in meta:
+                meta['j_cen'] = int(meta['X0_MP'])
+            if 'Y0_MP' in meta:
+                meta['i_cen'] = int(meta['Y0_MP'])
+            if 'R_SUN' in meta:
+                meta['r'] = int(meta['R_SUN'])
         else:
             raise NotImplementedError('Format {} is not supported.'.format(fmt))
 
@@ -297,7 +295,8 @@ class HelioBatch():
         elif format == 'abp':
             write_syn_abp_file(fname, data)
         elif format == 'fits':
-            write_fits(fname, data, index=self.index.iloc[[i]], **kwargs)
+            meta = self.meta[kwargs.pop('meta', src)][i]
+            write_fits(fname, data, index=self.index.iloc[[i]], meta=meta, **kwargs)
         else:
             plt.imsave(fname, data, format=format, **kwargs)
         return self

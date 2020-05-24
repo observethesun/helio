@@ -5,7 +5,7 @@ BatchSampler
 .. toctree::
    :maxdepth: 2
 
-.. autoclass:: helio.src.BatchSampler
+.. autoclass:: helio.core.BatchSampler
     :members:
     :inherited-members:
     :undoc-members:
