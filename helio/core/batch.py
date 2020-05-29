@@ -15,7 +15,7 @@ from skimage.transform import resize
 try:
     import blosc
 except ImportError:
-    warnings.warn('blosc module not found, this file format will be not available.', ImportWarning)
+    pass
 
 from .decorators import execute, add_actions, extract_actions, TEMPLATE_DOCSTRING
 from .index import BaseIndex
