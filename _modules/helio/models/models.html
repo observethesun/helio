@@ -1,0 +1,306 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>helio.models.models &mdash; helio  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> helio
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/helio.html">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">helio</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>helio.models.models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for helio.models.models</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Conv block and U-net model.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+
+
+<div class="viewcode-block" id="conv_block"><a class="viewcode-back" href="../../../api/models.html#helio.models.conv_block">[docs]</a><span class="k">def</span> <span class="nf">conv_block</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transpose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convolutional block.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : tensor</span>
+<span class="sd">        Input tensor.</span>
+<span class="sd">    layout : str</span>
+<span class="sd">        Layout of layers. Can contain &quot;c&quot; for convolution, &quot;a&quot; for activation, &quot;n&quot; for batchnorm,</span>
+<span class="sd">        &quot;p&quot; for maxpooling, &quot;d&quot; for dropout. E.g. of layout: &quot;ccnapd&quot;.</span>
+<span class="sd">    filters : int, list or None</span>
+<span class="sd">        Number of filters for convolutions. Can be a single number (all convolutions will</span>
+<span class="sd">        have the same number of filters), a list of the same length as a count of letters &quot;c&quot;</span>
+<span class="sd">        in the layout, or None if the layout contains no &quot;c&quot;.</span>
+<span class="sd">    transpose : bool</span>
+<span class="sd">        If true, transposed convolutions are used.</span>
+<span class="sd">    rate : float</span>
+<span class="sd">        Dropout rate parameter. Default to 0.1.</span>
+<span class="sd">    activation : function</span>
+<span class="sd">        Activation function. If not specified activation is tf.nn.elu.</span>
+<span class="sd">    is_training: bool</span>
+<span class="sd">        Phase of training for batchnorm.</span>
+<span class="sd">        Default to True.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    x : tensor</span>
+<span class="sd">        Output tensor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">iter</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="n">filters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="n">filters</span><span class="p">]</span> <span class="o">*</span> <span class="n">layout</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">layout</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">transpose</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">conv2d_transpose</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">filters</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;same&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">filters</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;same&#39;</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">activation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">activation</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">elu</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">activation</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">max_pooling2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;n&#39;</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">batch_normalization</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">is_training</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">rate</span> <span class="o">=</span> <span class="mf">0.1</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="n">rate</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="n">is_training</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;unknown letter </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<div class="viewcode-block" id="u_net"><a class="viewcode-back" href="../../../api/models.html#helio.models.u_net">[docs]</a><span class="k">def</span> <span class="nf">u_net</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">init_filters</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;U-net implementation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    images : 4d tensor</span>
+<span class="sd">        Input tensor.</span>
+<span class="sd">    depth : int</span>
+<span class="sd">        Depth of the U-net.</span>
+<span class="sd">    init_filters : int</span>
+<span class="sd">        Number of filters in the first conv block.</span>
+<span class="sd">    output : dict</span>
+<span class="sd">        Output conv block config.</span>
+<span class="sd">    is_training: bool</span>
+<span class="sd">        Phase of training for batchnorm. Default to True.</span>
+<span class="sd">    verbose : int</span>
+<span class="sd">        Level for information messages. Default to 0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    up : 4d tensor</span>
+<span class="sd">        Output tensor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">verboseprint</span> <span class="o">=</span> <span class="nb">print</span> <span class="k">if</span> <span class="n">verbose</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="kc">None</span>
+
+    <span class="n">conv_d</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">conv</span> <span class="o">=</span> <span class="n">images</span>
+    <span class="n">verboseprint</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_shape</span><span class="p">())</span>
+
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">depth</span><span class="p">):</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">conv_block</span><span class="p">(</span><span class="n">conv</span><span class="p">,</span> <span class="s1">&#39;caca&#39;</span><span class="p">,</span> <span class="n">init_filters</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">d</span><span class="p">),</span> <span class="n">is_training</span><span class="o">=</span><span class="n">is_training</span><span class="p">)</span>
+        <span class="n">verboseprint</span><span class="p">(</span><span class="s1">&#39;conv_block_</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_shape</span><span class="p">())</span>
+        <span class="n">conv_d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conv</span><span class="p">)</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">conv_block</span><span class="p">(</span><span class="n">conv</span><span class="p">,</span> <span class="s1">&#39;pd&#39;</span><span class="p">)</span>
+        <span class="n">verboseprint</span><span class="p">(</span><span class="s1">&#39;pool_</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_shape</span><span class="p">())</span>
+
+    <span class="n">conv</span> <span class="o">=</span> <span class="n">conv_block</span><span class="p">(</span><span class="n">conv</span><span class="p">,</span> <span class="s1">&#39;cacad&#39;</span><span class="p">,</span> <span class="n">init_filters</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">depth</span><span class="p">),</span> <span class="n">is_training</span><span class="o">=</span><span class="n">is_training</span><span class="p">)</span>
+    <span class="n">verboseprint</span><span class="p">(</span><span class="s1">&#39;bottom_conv_block_</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">depth</span><span class="p">),</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_shape</span><span class="p">())</span>
+
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">conv_block</span><span class="p">(</span><span class="n">conv</span><span class="p">,</span> <span class="s1">&#39;cad&#39;</span><span class="p">,</span> <span class="n">init_filters</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">d</span><span class="p">),</span> <span class="n">transpose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="n">is_training</span><span class="p">)</span>
+        <span class="n">verboseprint</span><span class="p">(</span><span class="s1">&#39;up_</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_shape</span><span class="p">())</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">conv</span><span class="p">,</span> <span class="n">conv_d</span><span class="p">[</span><span class="n">d</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">verboseprint</span><span class="p">(</span><span class="s1">&#39;concat_</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_shape</span><span class="p">())</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">conv_block</span><span class="p">(</span><span class="n">conv</span><span class="p">,</span> <span class="s1">&#39;cacad&#39;</span><span class="p">,</span> <span class="n">init_filters</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">d</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">is_training</span><span class="o">=</span><span class="n">is_training</span><span class="p">)</span>
+        <span class="n">verboseprint</span><span class="p">(</span><span class="s1">&#39;up_conv_block_</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_shape</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">conv_block</span><span class="p">(</span><span class="n">conv</span><span class="p">,</span> <span class="n">is_training</span><span class="o">=</span><span class="n">is_training</span><span class="p">,</span> <span class="o">**</span><span class="n">output</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">conv</span>
+
+    <span class="n">verboseprint</span><span class="p">(</span><span class="s1">&#39;output shape&#39;</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">get_shape</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, observethesun
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -161,7 +161,7 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">blosc</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;blosc module not found, this file format will be not available.&#39;</span><span class="p">,</span> <span class="ne">ImportWarning</span><span class="p">)</span>
+    <span class="k">pass</span>
 
 <span class="kn">from</span> <span class="nn">.decorators</span> <span class="k">import</span> <span class="n">execute</span><span class="p">,</span> <span class="n">add_actions</span><span class="p">,</span> <span class="n">extract_actions</span><span class="p">,</span> <span class="n">TEMPLATE_DOCSTRING</span>
 <span class="kn">from</span> <span class="nn">.index</span> <span class="k">import</span> <span class="n">BaseIndex</span>
