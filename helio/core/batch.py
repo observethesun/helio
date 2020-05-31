@@ -266,13 +266,15 @@ class HelioBatch():
         """Dump image with scatterplot."""
         _ = dst
         img = self.data[src][i]
-        fname = os.path.join(path, str(self.indices[i])) + '.' + format
-        fig, ax = plt.subplots(figsize=figsize)
-        ax.set_position([0, 0, 1, 1])
-        ax.imshow(img, cmap=cmap)
         pts = self.data[scatter][i]
+        fname = os.path.join(path, str(self.indices[i])) + '.' + format
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_axes([0, 0, 1, 1])
+        ax.imshow(img, cmap=cmap, aspect='auto')
         ax.scatter(pts[1], pts[0], **scatter_kw)
-        plt.axis('off')
+        ax.axis('off')
+        ax.set_xlim([0, img.shape[1]])
+        ax.set_ylim([img.shape[0], 0])
         plt.savefig(fname, dpi=dpi)
         plt.close(fig)
         return self
