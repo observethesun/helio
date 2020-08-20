@@ -20,7 +20,7 @@ except ImportError:
 from .decorators import execute, add_actions, extract_actions, TEMPLATE_DOCSTRING
 from .index import BaseIndex
 from .synoptic_maps import make_synoptic_map, label360, region_statistics
-from .io import load_fits, load_abp_mask, write_syn_abp_file, write_fits
+from .io import load_fits, load_abp, write_syn_abp_file, write_fits
 from .utils import detect_edges
 
 def softmax(x):
@@ -180,7 +180,7 @@ class HelioBatch():
                 raise ValueError('Expected single key, found {}.'.format(len(keys)))
             data = f[keys[0]]
         elif fmt == 'abp':
-            data = load_abp_mask(path, **kwargs)
+            data = load_abp(path, **kwargs)
         elif fmt in ['fts', 'fits']:
             data = load_fits(path, **kwargs)
         else:

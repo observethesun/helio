@@ -18,8 +18,30 @@ def load_fits(path, verify='fix', unit=0, as_smap=False):
     hdul.verify(verify)
     return hdul[unit].data
 
-def load_abp_mask(path, shape, sunspot_observation=False):
-    """Builds segmentation mask from `abp` file.
+def load_abp(path, **kwargs):
+    """Build segmentation mask from `abp` file.
+
+    Parameters
+    ----------
+    path : str
+        Path to abp file.
+    kwargs : misc
+        Additional named arguments.
+
+    Returns
+    -------
+    mask : ndarray
+        Segmentation mask.
+    """
+    with open(path, 'r') as fin:
+        fread = fin.readlines()
+        header = fread[0].split()
+        if header[-1] == 'Syn_map':
+            return load_abp_syn(path, **kwargs)
+        return load_abp_disk(path, **kwargs)
+
+def load_abp_disk(path, shape, sunspot_observation=False):
+    """Build segmentation mask in solar disk from `abp` file.
 
     Parameters
     ----------
@@ -79,6 +101,30 @@ def load_abp_mask(path, shape, sunspot_observation=False):
         return mask
     pts = np.vstack(df['pts'])
     mask[pts[:, 0], pts[:, 1]] = True
+    return mask
+
+def load_abp_syn(path):
+    """Build segmentation mask in synoptic map from `abp` file.
+
+    Parameters
+    ----------
+    path : str
+        Path to abp file.
+
+    Returns
+    -------
+    mask : ndarray
+        Segmentation mask.
+    """
+    with open(path, 'r') as fin:
+        fread = fin.readlines()
+        header = np.array(fread[0].split()[:9]).astype(float)
+        shape = (header[7:9]).astype(int)
+        num_obj = int(fread[2])
+        mask = np.zeros(shape[::-1], dtype='bool')
+        for i in range(num_obj):
+            obj = np.array(fread[4 + 2*i].split()).astype(int).reshape(-1, 3)
+            mask[obj[:, 1], obj[:, 0]] = True
     return mask
 
 def write_fits(fname, data, index, meta, kind=None, **kwargs):
