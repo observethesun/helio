@@ -3,10 +3,15 @@ import os
 import warnings
 from pathlib import Path
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
-import dill
+# import dill
 from astropy.io import fits
-from aiapy.calibrate import correct_degradation
+try:
+    from aiapy.calibrate import correct_degradation
+except ImportError:
+    print('Warning: aiapy package not found.')
+    pass
 from scipy import interpolate
 from skimage.io import imread
 import skimage
@@ -15,12 +20,13 @@ from skimage.transform import resize
 try:
     import blosc
 except ImportError:
+    print('Warning: blocs package not found.')
     pass
 
 from .decorators import execute, add_actions, extract_actions, TEMPLATE_DOCSTRING
 from .index import BaseIndex
 from .synoptic_maps import make_synoptic_map, label360, region_statistics
-from .io import load_fits, load_abp, write_syn_abp_file, write_fits
+from .io import load_fits, load_abp_mask, write_syn_abp_file, write_fits
 from .utils import detect_edges
 
 def softmax(x):
@@ -180,8 +186,10 @@ class HelioBatch():
                 raise ValueError('Expected single key, found {}.'.format(len(keys)))
             data = f[keys[0]]
         elif fmt == 'abp':
-            data = load_abp(path, **kwargs)
-        elif fmt in ['fts', 'fits']:
+            if isinstance(kwargs['shape'], str):
+                kwargs['shape'] = self.data[kwargs['shape']][i].shape
+            data = load_abp_mask(path, **kwargs)
+        elif fmt in ['fts', 'fits', 'fit']:
             data = load_fits(path, **kwargs)
         else:
             data = imread(path, **kwargs)
@@ -301,6 +309,186 @@ class HelioBatch():
             write_fits(fname, data, index=self.index.iloc[[i]], meta=meta, **kwargs)
         else:
             plt.imsave(fname, data, format=format, **kwargs)
+        return self
+
+    def sample_patches(self, src, dst, shape, size, squeeze=True):
+        """Sample random patches from image.
+
+        Parameters
+        ----------
+        src : str
+            The source for original image.
+        dst : str
+            The source to put patches in.
+        shape : tuple of ints
+            Patch shape.
+        size : int
+            Number of patches to be sampled from each image.
+        squeeze : bool
+            Whether to unstack patches if ```size``` is 1. Default to ```True```.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with sampled patches.
+        """
+        x, y = [], []
+        for arr in self.data[src]:
+            x.append(np.random.randint(0, arr.shape[1] - shape[0] + 1, size=size))
+            y.append(np.random.randint(0, arr.shape[0] - shape[1] + 1, size=size))
+
+        return self._get_patches(src=src, dst=dst, x=x, y=y, shape=shape, squeeze=squeeze)
+
+    def sample_object_patches(self, src, dst, mask, shape, size, label_balance=None, squeeze=True):
+        """Sample patches containing objects given in mask. If mask contains no objects,
+        patches are sampled at random.
+
+        Parameters
+        ----------
+        src : str
+            The source for original image.
+        dst : str
+            The source to put patches in.
+        mask : str
+            The source for mask.
+        shape : tuple of ints
+            Patch shape in x and y dimensions.
+        size : int
+            Number of patches to be sampled from each image.
+        label_balance : array or None
+            Relative proportion of object sampled.
+        squeeze : bool
+            Whether to unstack patches if ```size``` is 1. Default to ```True```.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with sampled patches.
+        """
+        x, y = [], []
+        for arr in self.data[mask]:
+            max_x, max_y = arr.shape[1] - shape[1], arr.shape[0] - shape[0]
+            if label_balance is None:
+                if np.any(arr):
+                    py, px = np.where(arr)[:2]
+                    sample = np.random.randint(0, len(px), size)
+                    px = px[sample] - np.random.randint(0, shape[0], size=size)
+                    py = py[sample] - np.random.randint(0, shape[1], size=size)
+                    x.append(np.clip(px, 0, max_x))
+                    y.append(np.clip(py, 0, max_y))
+                else:
+                    x.append(np.random.randint(0, max_x + 1, size=size))
+                    y.append(np.random.randint(0, max_y + 1, size=size))
+            else:
+                xi = []
+                yi = []
+                props = np.array(label_balance) / sum(label_balance)
+                sizes = [int(size * w) for w in props]
+                sizes[-1] = size - sum(sizes[:-1])
+                for i in range(len(sizes)):
+                    if sizes[i] == 0:
+                        continue
+                    if np.any(arr[:, :, i]):
+                        py, px = np.where(arr[:, :, i])[:2]
+                        sample = np.random.randint(0, len(px), sizes[i])
+                        px = px[sample] - np.random.randint(0, shape[0], size=sizes[i])
+                        py = py[sample] - np.random.randint(0, shape[1], size=sizes[i])
+                        xi.extend(np.clip(px, 0, max_x))
+                        yi.extend(np.clip(py, 0, max_y))
+                    else:
+                        xi.extend(np.random.randint(0, max_x + 1, size=sizes[i]))
+                        yi.extend(np.random.randint(0, max_y + 1, size=sizes[i]))
+                x.append(xi)
+                y.append(yi)
+
+        return self._get_patches(src=src, dst=dst, x=x, y=y, shape=shape, squeeze=squeeze)
+
+    def get_patches(self, src, dst, x, y, shape, squeeze=True):
+        """Split image into patches of given locations and shapes.
+
+        Parameters
+        ----------
+        src : str
+            The source for original image.
+        dst : str
+            The source to put patches in.
+        x : int or array of ints, shape shape as ```y```
+            x-coordinate(s) of the top-left patch corner(s).
+        y : int or array of ints, same shape as ```x```
+            y-coordinate(s) of the top-left patch corner(s).
+        shape : tuple of ints or array of tuples
+            Patch shape(s) in x and y dimentions. If shape is a tuple, all patches will have this shape.
+        squeeze : bool
+            Whether to unstack patches if ```size``` is 1. Default to ```True```.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with sampled patches.
+        """
+        x = np.tile(x, len(self)).reshape(len(self), -1)
+        y = np.tile(y, len(self)).reshape(len(self), -1)
+        return self._get_patches(src=src, dst=dst, x=x, y=x, shape=shape, squeeze=squeeze)
+
+    @execute(how='threads')
+    def _get_patches(self, i, src, dst, x, y, shape, squeeze=True):
+        """Split image into patches"""
+        data = self.data[src][i]
+        res = []
+        if np.array(shape).ndim == 1:
+            for px, py in zip(x[i], y[i]):
+                res.append(data[py: py + shape[1], px: px + shape[0]])
+        else:
+            for px, py, shp in zip(x[i], y[i], shape[i]):
+                res.append(data[py: py + shp[1], px: px + shp[0]])
+
+        if (len(res) == 1) and (squeeze is True):
+            res = res[0]
+        else:
+            res = np.stack(res)
+
+        self.data[dst][i] = res
+        return self
+
+    def unstack(self, src):
+        """Unstack arrays along item's axis 0 and return a new batch.
+
+        Parameters
+        ----------
+        src : str or array of str
+            The source or list of source components to unstack.
+
+        Returns
+        -------
+        batch : HelioBatch
+            New batch with unstacked patches.
+        """
+        src = np.atleast_1d(src)
+        index = BaseIndex(pd.RangeIndex(sum([item.shape[0] for item in self.data[src[0]]])).to_frame())
+        batch = self.__class__(index)
+        for k in src:
+            data = np.array([arr for item in self.data[k] for arr in item] + [None], dtype=object)[:-1]
+            assert len(data) == len(index)
+            batch.data[k] = data
+        return batch
+
+    def split_channels(self, src, dst):
+        """Split arrays along item's last axis.
+
+        Parameters
+        ----------
+        src : str
+            The source for array.
+        dst : array of str
+            Destinations for results.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with new attributes.
+        """
+        for i, k in enumerate(dst):
+            self.data[k] = np.array([x[..., i] for x in self.data[src]] + [None], dtype=object)[:-1]
         return self
 
     @execute(how='threads')

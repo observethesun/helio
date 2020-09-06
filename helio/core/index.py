@@ -5,8 +5,11 @@ import glob
 import numpy as np
 import pandas as pd
 import dateutil.parser as dparser
-from sunpy.coordinates.sun import carrington_rotation_number, L0, B0
-
+try:
+    from sunpy.coordinates.sun import carrington_rotation_number, L0, B0
+except ImportError:
+    print('Warning: sunpy package not found.')
+    pass
 
 class BaseIndex(pd.DataFrame): #pylint: disable=abstract-method
     """Base index class."""
