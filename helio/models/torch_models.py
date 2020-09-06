@@ -111,6 +111,7 @@ class Unet(nn.Module):
             in_channels = out_channels
 
         self.bottom = ConvBlock('cancan', in_channels, init_filters * (2 ** depth), kernel_size=kernel_size)
+
         in_channels = init_filters * (2 ** depth)
 
         for d in range(depth - 1, -1, -1):
