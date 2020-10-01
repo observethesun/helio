@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-# import dill
+import dill
 from astropy.io import fits
 try:
     from aiapy.calibrate import correct_degradation
@@ -20,7 +20,7 @@ from skimage.transform import resize
 try:
     import blosc
 except ImportError:
-    print('Warning: blocs package not found.')
+    print('Warning: blosc package not found.')
     pass
 
 from .decorators import execute, add_actions, extract_actions, TEMPLATE_DOCSTRING
