@@ -54,7 +54,7 @@ TEMPLATE_DOCSTRING = """
 TEMPLATE_DOCSTRING = dedent(TEMPLATE_DOCSTRING).strip()
 
 
-def execute(how):
+def execute(how, split_attrs=True):
     """Execute scheme decorator."""
     def decorator(method):
         """Returned decorator."""
@@ -63,6 +63,13 @@ def execute(how):
             """Method wrapper."""
             src = np.atleast_1d(src)
             dst = src if dst is None else np.atleast_1d(dst)
+            if len(dst) != len(src) and split_attrs:
+                if len(src) == 1:
+                    src = np.repeat(src, len(dst))
+                elif len(dst) == 1:
+                    dst = np.repeat(dst, len(src))
+                else:
+                    raise ValueError('Mismatch of src and dst lenghts.')
 
             for d in dst:
                 if d not in self.data:
@@ -76,6 +83,10 @@ def execute(how):
 
             random_kwargs = {k: v(size=len(self)) for k, v in kwargs.items() if isinstance(v, R)}
             static_kwargs = {k: v for k, v in kwargs.items() if not isinstance(v, R)}
+
+            if not split_attrs:
+                src = [src]
+                dst = [dst]
 
             if how == 'threads':
                 with cf.ThreadPoolExecutor(max_workers=n_workers) as executor:

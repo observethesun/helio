@@ -121,6 +121,32 @@ class HelioBatch():
         self.data[dst][i] = func(data, **kwargs)
         return self
 
+    @execute(how='threads', split_attrs=False)
+    def mapply(self, i, func, src, dst, **kwargs):
+        """Apply a ``func`` to multiple ``src`` items and write results in ``dst``.
+
+        Parameters
+        ----------
+        src : str, tuple of str
+            A source for data.
+        dst : same type as src
+            A destination for results.
+        func : callable
+            A function to apply.
+        kwargs : misc
+            Any additional named arguments to ``func``.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Processed batch.
+        """
+        assert len(dst) == 1
+        dst = dst[0]
+        data = (self.data[x][i] for x in src)
+        self.data[dst][i] = func(*data, **kwargs)
+        return self
+
     @execute(how='threads')
     def apply_meta(self, i, func, src, dst, **kwargs):
         """Apply a ``func`` to each item in meta.
@@ -145,7 +171,7 @@ class HelioBatch():
         self.meta[dst][i] = func(meta, **kwargs)
         return self
 
-    def load(self, src, dtype=None, meta=None, **kwargs):
+    def load(self, src, dst=None, dtype=None, meta=None, **kwargs):
         """Load batch data from source.
 
         Parameters
@@ -164,7 +190,7 @@ class HelioBatch():
         batch : HelioBatch
             Batch with loaded data.
         """
-        self._load_data(src=src, dtype=dtype, **kwargs)
+        self._load_data(src=src, dst=dst, dtype=dtype, **kwargs)
         if meta is None:
             return self
         src = np.atleast_1d(src)
@@ -181,10 +207,10 @@ class HelioBatch():
                 data = dill.loads(blosc.decompress(f.read()))
         elif fmt == 'npz':
             f = np.load(path)
-            keys = list(f.keys())
-            if len(keys) != 1:
-                raise ValueError('Expected single key, found {}.'.format(len(keys)))
-            data = f[keys[0]]
+            if len(f.files) > 1:
+                data = f[dst]
+            else:
+                data = f[f.files[0]]
         elif fmt == 'abp':
             if isinstance(kwargs['shape'], str):
                 kwargs['shape'] = self.data[kwargs['shape']][i].shape
@@ -262,8 +288,6 @@ class HelioBatch():
         batch : HelioBatch
             Batch unchanged.
         """
-        if len(np.atleast_1d(src)) > 1:
-            raise ValueError('Only single attribute allowed.')
         if 'scatter' in kwargs:
             return self._dump_scatter_image(src=src, path=path, format=format, **kwargs)
         return self._dump(src=src, path=path, format=format, **kwargs)
@@ -287,17 +311,23 @@ class HelioBatch():
         plt.close(fig)
         return self
 
-    @execute(how='threads')
+    @execute(how='threads', split_attrs=False)
     def _dump(self, i, src, dst, path, format, **kwargs): #pylint: disable=redefined-builtin
         """Dump data in various formats."""
         _ = dst
         fname = os.path.join(path, str(self.indices[i])) + '.' + format
-        data = self.data[src][i]
+        if isinstance(src, str):
+            data = self.data[src][i]
+        else:
+            data = {k: self.data[k][i] for k in src}
         if format == 'blosc':
             with open(fname, 'w+b') as f:
                 f.write(blosc.compress(dill.dumps(data)))
         elif format == 'npz':
-            np.savez(fname, data, **kwargs)
+            if isinstance(data, dict):
+                np.savez(fname, **data, **kwargs)
+            else:
+                np.savez(fname, data, **kwargs)
         elif format == 'txt':
             np.savetxt(fname, data, **kwargs)
         elif format == 'binary':
@@ -332,12 +362,12 @@ class HelioBatch():
         batch : HelioBatch
             Batch with sampled patches.
         """
-        x, y = [], []
+        ax1, ax2 = [], []
         for arr in self.data[src]:
-            x.append(np.random.randint(0, arr.shape[1] - shape[0] + 1, size=size))
-            y.append(np.random.randint(0, arr.shape[0] - shape[1] + 1, size=size))
+            ax1.append(np.random.randint(0, arr.shape[0] - shape[0] + 1, size=size))
+            ax2.append(np.random.randint(0, arr.shape[1] - shape[1] + 1, size=size))
 
-        return self._get_patches(src=src, dst=dst, x=x, y=y, shape=shape, squeeze=squeeze)
+        return self._get_patches(src=src, dst=dst, ax1=ax1, ax2=ax2, shape=shape, squeeze=squeeze)
 
     def sample_object_patches(self, src, dst, mask, shape, size, label_balance=None, squeeze=True):
         """Sample patches containing objects given in mask. If mask contains no objects,
@@ -352,7 +382,7 @@ class HelioBatch():
         mask : str
             The source for mask.
         shape : tuple of ints
-            Patch shape in x and y dimensions.
+            Patch shape.
         size : int
             Number of patches to be sampled from each image.
         label_balance : array or None
@@ -365,23 +395,23 @@ class HelioBatch():
         batch : HelioBatch
             Batch with sampled patches.
         """
-        x, y = [], []
+        ax1, ax2 = [], []
         for arr in self.data[mask]:
-            max_x, max_y = arr.shape[1] - shape[1], arr.shape[0] - shape[0]
+            max1, max2 = arr.shape[0] - shape[0], arr.shape[1] - shape[1]
             if label_balance is None:
                 if np.any(arr):
-                    py, px = np.where(arr)[:2]
-                    sample = np.random.randint(0, len(px), size)
-                    px = px[sample] - np.random.randint(0, shape[0], size=size)
-                    py = py[sample] - np.random.randint(0, shape[1], size=size)
-                    x.append(np.clip(px, 0, max_x))
-                    y.append(np.clip(py, 0, max_y))
+                    p1, p2 = np.where(arr)[:2]
+                    sample = np.random.randint(0, len(p1), size)
+                    p1 = p1[sample] - np.random.randint(0, shape[0], size=size)
+                    p2 = p2[sample] - np.random.randint(0, shape[1], size=size)
+                    ax1.append(np.clip(p1, 0, max1))
+                    ax2.append(np.clip(p2, 0, max2))
                 else:
-                    x.append(np.random.randint(0, max_x + 1, size=size))
-                    y.append(np.random.randint(0, max_y + 1, size=size))
+                    ax1.append(np.random.randint(0, max1 + 1, size=size))
+                    ax2.append(np.random.randint(0, max2 + 1, size=size))
             else:
-                xi = []
-                yi = []
+                _ax1 = []
+                _ax2 = []
                 props = np.array(label_balance) / sum(label_balance)
                 sizes = [int(size * w) for w in props]
                 sizes[-1] = size - sum(sizes[:-1])
@@ -389,21 +419,21 @@ class HelioBatch():
                     if sizes[i] == 0:
                         continue
                     if np.any(arr[:, :, i]):
-                        py, px = np.where(arr[:, :, i])[:2]
-                        sample = np.random.randint(0, len(px), sizes[i])
-                        px = px[sample] - np.random.randint(0, shape[0], size=sizes[i])
-                        py = py[sample] - np.random.randint(0, shape[1], size=sizes[i])
-                        xi.extend(np.clip(px, 0, max_x))
-                        yi.extend(np.clip(py, 0, max_y))
+                        p1, p2 = np.where(arr[:, :, i])[:2]
+                        sample = np.random.randint(0, len(p1), sizes[i])
+                        p1 = p1[sample] - np.random.randint(0, shape[0], size=sizes[i])
+                        p2 = p2[sample] - np.random.randint(0, shape[1], size=sizes[i])
+                        _ax1.extend(np.clip(p1, 0, max1))
+                        _ax2.extend(np.clip(p2, 0, max2))
                     else:
-                        xi.extend(np.random.randint(0, max_x + 1, size=sizes[i]))
-                        yi.extend(np.random.randint(0, max_y + 1, size=sizes[i]))
-                x.append(xi)
-                y.append(yi)
+                        _ax1.extend(np.random.randint(0, max1 + 1, size=sizes[i]))
+                        _ax2.extend(np.random.randint(0, max2 + 1, size=sizes[i]))
+                ax1.append(_ax1)
+                ax2.append(_ax2)
 
-        return self._get_patches(src=src, dst=dst, x=x, y=y, shape=shape, squeeze=squeeze)
+        return self._get_patches(src=src, dst=dst, ax1=ax1, ax2=ax2, shape=shape, squeeze=squeeze)
 
-    def get_patches(self, src, dst, x, y, shape, squeeze=True):
+    def get_patches(self, src, dst, ax1, ax2, shape, squeeze=True):
         """Split image into patches of given locations and shapes.
 
         Parameters
@@ -412,12 +442,12 @@ class HelioBatch():
             The source for original image.
         dst : str
             The source to put patches in.
-        x : int or array of ints, shape shape as ```y```
-            x-coordinate(s) of the top-left patch corner(s).
-        y : int or array of ints, same shape as ```x```
-            y-coordinate(s) of the top-left patch corner(s).
-        shape : tuple of ints or array of tuples
-            Patch shape(s) in x and y dimentions. If shape is a tuple, all patches will have this shape.
+        ax1 : int or array of ints, same shape as ```ax2```
+            First axis coordinate(s) of the top-left patch corner(s).
+        ax2 : int or array of ints, same shape as ```ax1```
+            Second axis coordinate(s) of the top-left patch corner(s).
+        shape : tuple of ints
+            Patch shape in x and y dimentions.
         squeeze : bool
             Whether to unstack patches if ```size``` is 1. Default to ```True```.
 
@@ -426,21 +456,28 @@ class HelioBatch():
         batch : HelioBatch
             Batch with sampled patches.
         """
-        x = np.tile(x, len(self)).reshape(len(self), -1)
-        y = np.tile(y, len(self)).reshape(len(self), -1)
-        return self._get_patches(src=src, dst=dst, x=x, y=x, shape=shape, squeeze=squeeze)
+        ax1 = np.tile(ax1, len(self)).reshape(len(self), -1)
+        ax2 = np.tile(ax2, len(self)).reshape(len(self), -1)
+        return self._get_patches(src=src, dst=dst, ax1=ax1, ax2=ax2, shape=shape, squeeze=squeeze)
 
     @execute(how='threads')
-    def _get_patches(self, i, src, dst, x, y, shape, squeeze=True):
-        """Split image into patches"""
+    def _get_patches(self, i, src, dst, ax1, ax2, shape, squeeze=True, pad_value=np.nan):
+        """Split image into patches. Channels last."""
         data = self.data[src][i]
         res = []
-        if np.array(shape).ndim == 1:
-            for px, py in zip(x[i], y[i]):
-                res.append(data[py: py + shape[1], px: px + shape[0]])
-        else:
-            for px, py, shp in zip(x[i], y[i], shape[i]):
-                res.append(data[py: py + shp[1], px: px + shp[0]])
+
+        def relu(x):
+            return max(x, 0)
+
+        for p1, p2 in zip(ax1[i], ax2[i]):
+            crop = data[relu(p1): relu(p1 + shape[0]), relu(p2): relu(p2 + shape[1])]
+            if crop.shape[:2] != shape:
+                before1, before2 = relu(-p1), relu(-p2)
+                after1 = shape[0] - crop.shape[0] - before1
+                after2 = shape[1] - crop.shape[1] - before2
+                pad_width=((before1, after1), (before2, after2)) + tuple([(0, 0)] * (crop.ndim - 2))
+                crop = np.pad(crop, pad_width=pad_width, mode='constant', constant_values=pad_value)
+            res.append(crop)
 
         if (len(res) == 1) and (squeeze is True):
             res = res[0]
@@ -450,6 +487,44 @@ class HelioBatch():
         self.data[dst][i] = res
         return self
 
+    def disk_center_crop(self, src, dst=None, meta=None, shape=None, pad_value=0):
+        """Get disk centered image of given shape.
+
+        Parameters
+        ----------
+        src : str
+            The source for original image.
+        dst : str
+            The source to put patches in.
+        meta : str
+            Meta source with disk location data.
+        shape : tuple of ints
+            Crop shape in x and y dimentions.
+        padvalue : scalar
+            Padding constant value.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with croped images.
+        """
+        assert shape is not None, 'Shape is not defined.'
+        meta = src if meta is None else meta
+        dst = src if dst is None else dst
+        loc = np.array([[t['i_cen'], t['j_cen'], t['r']] for t in self.meta[meta]])
+        ax1 = loc[:, 0].reshape(-1, 1) - shape[0] // 2
+        ax2 = loc[:, 1].reshape(-1, 1) - shape[1] // 2
+        oversize = np.where(2 * loc[:, 2] > min(shape))[0]
+        if oversize.size:
+            print('Disk is out of image for indices {}'.format(self.indices[oversize]))
+
+        self._get_patches(src=src, dst=dst, ax1=ax1, ax2=ax2,
+                          shape=shape, squeeze=True, pad_value=pad_value)
+        for i in range(len(self)):
+            for d in np.atleast_1d(dst):
+                self.meta[d][i] = dict(i_cen=shape[0] // 2, j_cen=shape[1] // 2, r=loc[i, 2])
+        return self
+        
     def unstack(self, src):
         """Unstack arrays along item's axis 0 and return a new batch.
 
@@ -472,7 +547,8 @@ class HelioBatch():
             batch.data[k] = data
         return batch
 
-    def split_channels(self, src, dst):
+    @execute(how='threads', split_attrs=False)
+    def split_channels(self, i, src, dst):
         """Split arrays along item's last axis.
 
         Parameters
@@ -487,8 +563,50 @@ class HelioBatch():
         batch : HelioBatch
             Batch with new attributes.
         """
+        assert len(src) == 1
+        src = src[0]
+        for j, k in enumerate(dst):
+            self.data[k][i] = self.data[src][i][..., j]
+        return self
+
+    @execute(how='threads', split_attrs=False)
+    def stack_channels(self, i, src, dst):
+        """Stack arrays along channel axis.
+
+        Parameters
+        ----------
+        src : str
+            The source for array.
+        dst : array of str
+            Destinations for results.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with stacked arrays.
+        """
+        assert len(dst) == 1
+        dst = dst[0]
+        self.data[dst][i] = np.stack([self.data[x][i] for x in src], axis=-1)
+        return self
+
+    def split_dict(self, src, dst):
+        """Split dict into separate attributes.
+
+        Parameters
+        ----------
+        src : str
+            The source for array.
+        dst : array of str
+            Destinations for results.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with new attributes.
+        """
         for i, k in enumerate(dst):
-            self.data[k] = np.array([x[..., i] for x in self.data[src]] + [None], dtype=object)[:-1]
+            self.data[k] = np.array([x[k] for x in self.data[src]] + [None], dtype=object)[:-1]
         return self
 
     @execute(how='threads')
@@ -561,7 +679,11 @@ class HelioBatch():
         meta = self.meta[src][i]
         ind = np.transpose(np.indices(img.shape[:2]), axes=(1, 2, 0))
         outer = np.where(np.linalg.norm(ind - np.array([meta['i_cen'], meta['j_cen']]), axis=-1) > meta['r'])
-        img[outer] = fill_value
+        try:
+            img[outer] = fill_value
+        except ValueError:
+            img = img.astype(type(fill_value))
+            img[outer] = fill_value
         self.data[dst][i] = img
         return self
 

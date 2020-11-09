@@ -100,8 +100,6 @@ class BatchSampler: #pylint: disable=too-many-instance-attributes
         if b == len(self.indices):
             self._batch_start = 0
             self._on_epoch += 1
-            if self._shuffle:
-                np.random.shuffle(self._order)
         else:
             self._batch_start = b
         return self._index.loc[next_items]
