@@ -11,7 +11,8 @@ from scipy import interpolate
 from skimage.io import imread
 import skimage
 import skimage.transform
-from skimage.transform import resize
+from skimage.transform import resize, hough_circle, hough_circle_peaks
+from skimage.feature import canny
 try:
     import blosc
 except ImportError:
@@ -203,7 +204,7 @@ class HelioBatch():
         _ = kwargs
         path = self.index.iloc[i, self.index.columns.get_loc(src)]
         fmt = Path(path).suffix.lower()[1:]
-        if fmt == 'abp':
+        if fmt in ['abp', 'cnt']:
             with open(path, 'r') as fin:
                 fread = fin.readlines()
                 header = np.array(fread[0].split())
@@ -396,6 +397,41 @@ class HelioBatch():
             self.data[k] = v[valid]
         for k, v in self.meta.items():
             self.meta[k] = v[valid]
+        return self
+
+    @execute(how='threads')
+    def get_radius(self, i, src, dst, hough_radii=None, sigma=2):
+        """Estimate solar disk center and radius.
+
+        Parameters
+        ----------
+        src : str
+            A source for solar disk images.
+        kwargs : misc
+            Any additional named arguments to resize method.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with updated meta.
+        """
+        img = self.data[src][i]
+        meta = self.meta[src][i]
+
+        if hough_radii is None:
+            hough_radii = np.arange(2, len(img) // 2)
+
+        edges = canny(img, sigma=sigma)
+        hough_res = hough_circle(edges, hough_radii)
+        _, c_x, c_y, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=1)
+        if radii in [hough_radii[0], hough_radii[-1]]:
+            warnings.warn('Estimated radius is at the end of hough_radii.\
+            Try to extend hough_radii to verify radius found.')
+
+        meta['i_cen'] = int(c_y)
+        meta['j_cen'] = int(c_x)
+        meta['r'] = int(radii)
+        self.meta[dst][i] = meta
         return self
 
     @execute(how='threads')
