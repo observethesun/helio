@@ -97,7 +97,9 @@ def write_syn_fits(fname, data, index, meta, **headers):
     hdr = fits.Header()
     index = index.reset_index()
     hdr['DATE'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-    hdr['CAR_ROT'] = int(index.loc[0, 'CR'])
+    car_rot = np.unique(index.loc[0, 'CR'])
+    assert len(car_rot) == 1, 'CR numbers are not unique'
+    hdr['CAR_ROT'] = int(car_rot[0])
     a = index.loc[0, 'DateTime'][0]
     b = index.loc[0, 'DateTime'][-1]
     rot = a + (b - a) / 2

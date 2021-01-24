@@ -400,7 +400,7 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def get_radius(self, i, src, dst, hough_radii=None, sigma=2):
+    def get_radius(self, i, src, dst, hough_radii=None, sigma=2, logger=None):
         """Estimate solar disk center and radius.
 
         Parameters
@@ -425,8 +425,9 @@ class HelioBatch():
         hough_res = hough_circle(edges, hough_radii)
         _, c_x, c_y, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=1)
         if radii in [hough_radii[0], hough_radii[-1]]:
-            warnings.warn('Estimated radius is at the end of hough_radii.\
-            Try to extend hough_radii to verify radius found.')
+            out = warnings if logger is None else logger
+            out.warn('At index {}. Estimated radius is at the end of hough_radii.\
+            Try to extend hough_radii to verify radius found.'.format(self.index.indices[i]))
 
         meta['i_cen'] = int(c_y)
         meta['j_cen'] = int(c_x)
