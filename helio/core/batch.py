@@ -21,7 +21,7 @@ except ImportError:
 from .decorators import execute, add_actions, extract_actions, TEMPLATE_DOCSTRING
 from .index import BaseIndex
 from .synoptic_maps import make_synoptic_map, label360, region_statistics
-from .io import load_fits, load_abp_mask, write_syn_abp_file, write_fits
+from .io import load_fits, load_abp_mask, write_abp_file, write_fits
 from .utils import detect_edges
 
 def softmax(x):
@@ -281,11 +281,12 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def _dump(self, i, src, dst, path, format, **kwargs): #pylint: disable=redefined-builtin
+    def _dump(self, i, src, dst, path, format, meta=None, **kwargs): #pylint: disable=redefined-builtin
         """Dump data in various formats."""
         _ = dst
         fname = os.path.join(path, str(self.indices[i])) + '.' + format
         data = self.data[src][i]
+        meta = self.meta[src if meta is None else meta][i]
         if format == 'blosc':
             with open(fname, 'w+b') as f:
                 f.write(blosc.compress(dill.dumps(data)))
@@ -296,7 +297,7 @@ class HelioBatch():
         elif format == 'binary':
             data.tofile(fname)
         elif format == 'abp':
-            write_syn_abp_file(fname, data)
+            write_abp_file(fname, data, meta=meta)
         elif format == 'fits':
             meta = self.meta[kwargs.pop('meta', src)][i]
             write_fits(fname, data, index=self.index.iloc[[i]], meta=meta, **kwargs)

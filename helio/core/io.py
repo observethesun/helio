@@ -171,12 +171,15 @@ def write_simple_fits(fname, data, index, meta, **headers):
     hdul = fits.HDUList([hdu])
     hdul.writeto(fname, overwrite=True)
 
-def write_syn_abp_file(fname, binary_mask, neighbors=None):
-    """Write synoptic map to `abp` file."""
+def write_abp_file(fname, binary_mask, neighbors=None, meta=None):
+    """Write binary map to `abp` file."""
     binary_mask = binary_mask.astype(int)
-    shape = binary_mask.shape[:2]
-    header = [shape[1] // 2, shape[0] // 2, np.min(shape) // 2, 0, 0, 0, 1,
-              shape[1], shape[0], 0, shape[1], 0, shape[0], 'Syn_map']
+    if 'r' in meta:
+        header = [meta['j_cen'], meta['i_cen'], meta['r'], 0, 0, 0, 0]
+    else:
+        shape = binary_mask.shape[:2]
+        header = [shape[1] // 2, shape[0] // 2, np.min(shape) // 2, 0, 0, 0, 1,
+                  shape[1], shape[0], 0, shape[1], 0, shape[0], 'Syn_map']
 
     labeled, num = label(binary_mask, neighbors=neighbors, background=0, return_num=True)
     edges = detect_edges(binary_mask)
