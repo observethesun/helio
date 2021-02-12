@@ -3,6 +3,7 @@ import os
 import warnings
 from pathlib import Path
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import dill
 from astropy.io import fits
@@ -13,6 +14,7 @@ import skimage
 import skimage.transform
 from skimage.transform import resize, hough_circle, hough_circle_peaks
 from skimage.feature import canny
+from sklearn.metrics.pairwise import haversine_distances
 try:
     import blosc
 except ImportError:
@@ -21,6 +23,7 @@ except ImportError:
 from .decorators import execute, add_actions, extract_actions, TEMPLATE_DOCSTRING
 from .index import BaseIndex
 from .synoptic_maps import make_synoptic_map, label360, region_statistics
+from .geometry_utils import xy_to_xyz, xyz_to_sp, xy_to_carr
 from .io import load_fits, load_abp_mask, write_abp_file, write_fits
 from .utils import detect_edges
 
@@ -299,7 +302,6 @@ class HelioBatch():
         elif format == 'abp':
             write_abp_file(fname, data, meta=meta)
         elif format == 'fits':
-            meta = self.meta[kwargs.pop('meta', src)][i]
             write_fits(fname, data, index=self.index.iloc[[i]], meta=meta, **kwargs)
         else:
             plt.imsave(fname, data, format=format, **kwargs)
@@ -471,6 +473,47 @@ class HelioBatch():
         meta['r'] = int(meta['r'] / ratio)
         if src != dst:
             self.meta[dst][i] = meta
+        return self
+
+    @execute(how='threads')
+    def get_pixel_params(self, i, src, dst, meta=None):
+        """Get coordinates and area of individual pixels for regions identified in solar disk image.
+
+        Parameters
+        ----------
+        src : str
+            A source for binary mask.
+        dst : str
+            A destination for results.
+        meta : str, optional
+            An optional source for meta information.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with parameters calculated.
+        """
+        mask = self.data[src][i]
+        meta = self.meta[src if meta is None else meta][i]
+        rad = meta['r']
+        i_cen = meta['i_cen']
+        j_cen = meta['j_cen']
+        B0 = self.index.iloc[i]['B0']
+        L0 = self.index.iloc[i]['L0']
+        mask_ij = np.vstack(np.where(mask)).T
+        mask_xy = np.array([mask_ij[:, 1] - j_cen, -mask_ij[:, 0] + i_cen]).T
+        spp = xyz_to_sp(xy_to_xyz(mask_xy, rad=rad), deg=False)
+        dist = haversine_distances(spp[:, ::-1], np.zeros((1, 2))).ravel()
+        areas = 10**6 / (2 * np.cos(dist) * np.pi * rad**2)
+        carr = xy_to_carr(mask_xy, rad, B0=B0, L0=L0, deg=True)
+        df = pd.DataFrame({'i': mask_ij[:, 0],
+                           'j': mask_ij[:, 1],
+                           'Lat': carr[:, 1],
+                           'Long': carr[:, 0],
+                           'q': np.rad2deg(spp[:, 1]),
+                           'phi': np.rad2deg(spp[:, 0]),
+                           'area': areas})
+        self.data[dst][i] = df
         return self
 
     def show(self, i, image, mask=None, figsize=None, cmap=None, s=None, color=None, **kwargs):

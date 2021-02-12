@@ -89,6 +89,8 @@ def write_fits(fname, data, index, meta, kind=None, **kwargs):
         return write_syn_fits(fname, data, index, meta, **kwargs)
     if kind == 'synoptic_mask':
         return write_syn_mask_fits(fname, data, index, meta, **kwargs)
+    if kind == 'aia_mask':
+        return write_aia_mask_fits(fname, data, index, meta, **kwargs)
     raise NotImplementedError('FITS files for data of type {} are not implemented.'.format(kind))
 
 def write_syn_fits(fname, data, index, meta, **headers):
@@ -154,6 +156,39 @@ def write_syn_mask_fits(fname, data, index, meta, **headers):
     hdr['BZERO'] = 0.
     hdr['BUNIT'] = 'counts / pixel'
     hdr['WCSNAME'] = 'Carrington Heliographic'
+    hdr['MISSVALS'] = np.isnan(data).sum()
+    for k, v in headers.items():
+        hdr[k] = v
+    hdu = fits.PrimaryHDU(header=hdr, data=data[::-1])
+    hdul = fits.HDUList([hdu])
+    hdul.writeto(fname, overwrite=True)
+
+def write_aia_mask_fits(fname, data, index, meta, **headers):
+    """Write mask for AIA disk image to FITS file."""
+    hdr = fits.Header()
+    hdr['DATE'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    index = index.reset_index()
+    hdr['CAR_ROT'] = int(index.loc[0, 'CR'])
+    hdr['DATE-OBS'] = index.loc[0, 'DateTime'].strftime("%Y-%m-%dT%H:%M:%S")
+    hdr['T_OBS'] = index.loc[0, 'DateTime'].strftime("%Y.%m.%d_%H:%M:%S_TAI")
+    hdr['B0_OBS'] = index.loc[0, 'B0']
+    hdr['L0_OBS'] = index.loc[0, 'L0']
+    hdr['R_SUN'] = meta['r']
+    hdr['X0_MP'] = meta['j_cen']
+    hdr['Y0_MP'] = meta['i_cen']
+    hdr['CRPIX1'] = (data.shape[1] + 1.) / 2
+    hdr['CRPIX2'] = (data.shape[0] + 1.) / 2
+    hdr['CRVAL1'] = 0.
+    hdr['CRVAL2'] = 0.
+    hdr['CDELT1'] = 0.6 * 4096 / data.shape[1]
+    hdr['CDELT2'] = 0.6 * 4096 / data.shape[0]
+    hdr['CUNIT1'] = 'arcsec'
+    hdr['CUNIT2'] = 'arcsec'
+    hdr['CTYPE1'] = 'HPLN-TAN'
+    hdr['CTYPE2'] = 'HPLN-TAN'
+    hdr['BSCALE'] = 1.
+    hdr['BZERO'] = 0.
+    hdr['BUNIT'] = 'counts / pixel'
     hdr['MISSVALS'] = np.isnan(data).sum()
     for k, v in headers.items():
         hdr[k] = v
