@@ -12,6 +12,7 @@ from scipy import interpolate
 from skimage.io import imread
 import skimage
 import skimage.transform
+from skimage.measure import label
 from skimage.transform import resize, hough_circle, hough_circle_peaks
 from skimage.feature import canny
 from sklearn.metrics.pairwise import haversine_distances
@@ -514,6 +515,39 @@ class HelioBatch():
                            'phi': np.rad2deg(spp[:, 0]),
                            'area': areas})
         self.data[dst][i] = df
+        return self
+
+    @execute(how='threads')
+    def filter_regions(self, i, src, dst, min_area=10, **kwargs):
+        """Filter regions with pixel area less than npix.
+
+        Parameters
+        ----------
+        src : str
+            A source for binary mask.
+        dst : str
+            A destination for results.
+        min_area : int
+            Minimal area in pixels.
+        kwargs : misc
+            Additional label keywords.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with filtered masks.
+        """
+        mask = self.data[src][i]
+        if dst != src:
+            mask = mask.copy()
+
+        labeled, num = label(mask.astype(int), return_num=True, **kwargs)
+        for k in range(1, num + 1):
+            obj = np.where(labeled == k)
+            if len(obj[0]) < min_area:
+                mask[obj] = False
+
+        self.data[dst][i] = mask
         return self
 
     def show(self, i, image, mask=None, figsize=None, cmap=None, s=None, color=None, **kwargs):
