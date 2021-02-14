@@ -440,6 +440,29 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
+    def get_radius_by_nans(self, i, src, dst):
+        """Estimate solar disk center and radius in image filled with nans outside the disk.
+
+        Parameters
+        ----------
+        src : str
+            A source for solar disk images.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with updated meta.
+        """
+        _ = dst
+        img = self.data[src][i]
+        meta = self.meta[src][i]
+        j_cen = int(np.where(~np.isnan(img).all(axis=0))[0].mean())
+        i_cen = int(np.where(~np.isnan(img).all(axis=1))[0].mean())
+        rad = len(np.where(~np.isnan(img).all(axis=0))[0]) // 2
+        meta.update({'i_cen': i_cen, 'j_cen': j_cen, 'r': rad})
+        return self
+
+    @execute(how='threads')
     def disk_resize(self, i, src, dst, output_shape, **kwargs):
         """Resize solar disk image and update center location and radius.
 
@@ -474,6 +497,43 @@ class HelioBatch():
         meta['r'] = int(meta['r'] / ratio)
         if src != dst:
             self.meta[dst][i] = meta
+        return self
+
+    @execute(how='threads')
+    def fit_mask(self, i, src, dst, target):
+        """Fit mask to new disk center and radius.
+
+        Parameters
+        ----------
+        src : str
+            A source for mask.
+        dst : str
+            A destination for new mask.
+        target : str
+            A disk image to fit to.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with new masks.
+        """
+        img = self.data[target][i]
+        i_cen, j_cen = self.meta[target][i]['i_cen'], self.meta[target][i]['j_cen']
+        rad = self.meta[target][i]['r']
+
+        mask = self.data[src][i]
+        i_cen_mask, j_cen_mask = self.meta[src][i]['i_cen'], self.meta[src][i]['j_cen']
+        rad_mask = self.meta[src][i]['r']
+
+        scale = rad / rad_mask
+        rmask = resize(mask, (np.array(img.shape) * scale).astype(int), preserve_range=True)
+        new_mask = np.full(img.shape, False)
+        iarr, jarr = np.where(rmask > 0.5)
+        new_mask[iarr - int(i_cen_mask * scale) + i_cen,
+                 jarr - int(j_cen_mask * scale) + j_cen] = True
+
+        self.data[dst][i] = new_mask
+        self.meta[dst][i] = {'i_cen': i_cen, 'j_cen': j_cen, 'r': rad}
         return self
 
     @execute(how='threads')
