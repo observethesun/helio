@@ -1,4 +1,7 @@
 """IO utils."""
+import os
+import warnings
+from string import Template
 import datetime
 import numpy as np
 import pandas as pd
@@ -8,6 +11,7 @@ from sunpy.coordinates.sun import B0
 from skimage.measure import label
 
 from .utils import detect_edges
+from .templates import CH_XML
 
 
 def load_fits(path, verify='fix', unit=0, as_smap=False):
@@ -239,3 +243,46 @@ def write_abp_file(fname, binary_mask, neighbors=None, meta=None):
     with open(fname, 'w') as fout:
         for line in buff:
             fout.writelines(line)
+
+def _make_chs_xml(ivorn, props, index, **kwargs):
+    """Fill CHs props into template XML."""
+    tmp = Template(CH_XML)
+    fill_values = {}
+    fill_values['ivorn'] = ivorn
+    fill_values['datetime_now'] = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
+    fill_values['datetime'] = index.loc[0, 'DateTime'].strftime('%Y-%m-%dT%H:%M:%S')
+    fill_values['start_datetime'] = index.loc[0, 'DateTime'].strftime('%Y-%m-%dT%H:%M:%S')
+    fill_values['stop_datetime'] = index.loc[0, 'DateTime'].strftime('%Y-%m-%dT%H:%M:%S')
+    fill_values['area'] = '%.3f' % props.area_msh
+    fill_values['area_unit'] = 'microhemisphere'
+    fill_values['lat_mean'] = '%.3f' % props.centroid_hpc[0]
+    fill_values['long_mean'] = '%.3f' % props.centroid_hpc[1]
+    fill_values['bbox_lat'] = '%.3f' % props.bbox_hpc[0]
+    fill_values['bbox_long'] = '%.3f' % props.bbox_hpc[1]
+    fill_values['bbox_lat_size'] = '%.3f' % (props.bbox_hpc[2] - props.bbox_hpc[0])
+    fill_values['bbox_long_size'] = '%.3f' % (props.bbox_hpc[3] - props.bbox_hpc[1])
+    fill_values['chaincode_size'] = len(props.approx_contour_hpc)
+    fill_values['chaincode_lat_start'] = '%.3f' % props.approx_contour_hpc[0, 0]
+    fill_values['chaincode_long_start'] = '%.3f' % props.approx_contour_hpc[0, 1]
+    fill_values['chaincode'] = ','.join(['%.3f' % x for x in props.approx_contour_hpc.ravel()])
+    tmp = Template(tmp.safe_substitute(fill_values))
+    tmp = Template(tmp.safe_substitute(kwargs))
+    out = tmp.safe_substitute()
+    return out
+
+def write_xml(path, data, index, kind, basename, **kwargs):
+    """Write HEK xml file."""
+    index = index.reset_index()
+    ivorn_base = basename + '_' + index.loc[0, 'DateTime'].strftime('%Y%m%d_%H%M%S')
+    if kind.lower() == 'chs':
+        make_xml = _make_chs_xml
+    else:
+        raise NotImplementedError(kind)
+    for i, props in enumerate(data):
+        ivorn = ivorn_base + '_' + str(i)
+        xml = make_xml(ivorn, props, index, **kwargs)
+        missing = Template.pattern.findall(xml)
+        if missing:
+            warnings.warn('Missed values for ' + ', '.join([k[1] for k in missing]))
+        with open(os.path.join(path, ivorn + '.xml'), 'w') as f:
+            f.writelines(xml)

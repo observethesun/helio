@@ -1,3 +1,4 @@
+#pylint: disable=too-many-lines
 """HelioBatch class."""
 import os
 import warnings
@@ -9,10 +10,11 @@ import dill
 from astropy.io import fits
 from aiapy.calibrate import correct_degradation
 from scipy import interpolate
+from scipy.ndimage.morphology import binary_fill_holes
 from skimage.io import imread
 import skimage
 import skimage.transform
-from skimage.measure import label
+from skimage.measure import label, regionprops, find_contours, approximate_polygon
 from skimage.transform import resize, hough_circle, hough_circle_peaks
 from skimage.feature import canny
 from sklearn.metrics.pairwise import haversine_distances
@@ -25,7 +27,7 @@ from .decorators import execute, add_actions, extract_actions, TEMPLATE_DOCSTRIN
 from .index import BaseIndex
 from .synoptic_maps import make_synoptic_map, label360, region_statistics
 from .geometry_utils import xy_to_xyz, xyz_to_sp, xy_to_carr
-from .io import load_fits, load_abp_mask, write_abp_file, write_fits
+from .io import load_fits, load_abp_mask, write_abp_file, write_fits, write_xml
 from .utils import detect_edges
 
 def softmax(x):
@@ -304,6 +306,8 @@ class HelioBatch():
             write_abp_file(fname, data, meta=meta)
         elif format == 'fits':
             write_fits(fname, data, index=self.index.iloc[[i]], meta=meta, **kwargs)
+        elif format == 'xml':
+            write_xml(path, data, index=self.index.iloc[[i]], meta=meta, **kwargs)
         else:
             plt.imsave(fname, data, format=format, **kwargs)
         return self
@@ -534,6 +538,124 @@ class HelioBatch():
 
         self.data[dst][i] = new_mask
         self.meta[dst][i] = {'i_cen': i_cen, 'j_cen': j_cen, 'r': rad}
+        return self
+
+    @execute(how='threads')
+    def get_region_props(self, i, src, dst, tolerance=3, cache=True):
+        """Get region properties.
+
+        Parameters
+        ----------
+        src : str
+            A source for binary mask.
+        dst : str
+            A destination for props.
+        tolerance : int, optional
+            A tolerance for contour approximation. Default 3.
+        cache : bool, optional
+            Use cache in regionprops.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with props calculated.
+        """
+        mask = binary_fill_holes(self.data[src][i])
+        labeled, num = label(mask, background=0, return_num=True)
+        if not num:
+            self.data[dst][i] = []
+            return self
+        props = regionprops(labeled, cache=cache)
+        for prop in props:
+            cnt = find_contours(labeled == prop.label, 0)[0]
+            prop.contour = cnt
+            prop.approx_contour = approximate_polygon(cnt, tolerance=tolerance)
+        self.data[dst][i] = props
+        return self
+
+    def props2hgc(self, src, meta):
+        """Map props in i,j coordinates to HGC (Heliographic-Carrington) coordinates.
+
+        Parameters
+        ----------
+        src : str
+            A source for props.
+        meta : str
+            A source for disk meta information.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with props calculated.
+        """
+        return self._props_mapping(src=src, meta=meta, name='HGC')
+
+    def props2hpc(self, src, meta, resolution):
+        """Map props in i,j coordinates to HPC (Helioprojective-Cartesian) coordinates.
+
+        Parameters
+        ----------
+        src : str
+            A source for props.
+        meta : str
+            A source for disk meta information.
+        resolution : float
+            Pixel resolution in arcsec.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with props calculated.
+        """
+        return self._props_mapping(src=src, meta=meta, name='HPC', resolution=resolution)
+
+    @execute(how='threads')
+    def _props_mapping(self, i, src, dst, meta, name, resolution=None):
+        """Props mapping."""
+        _ = dst
+        props = self.data[src][i]
+        meta = self.meta[meta][i]
+        rad = meta['r']
+        i_cen = meta['i_cen']
+        j_cen = meta['j_cen']
+        B0 = self.index.iloc[i]['B0']
+        L0 = self.index.iloc[i]['L0']
+
+        def map2hpc(ij_arr):
+            '''Cartesian x, y in arcsec.'''
+            ij_arr = np.atleast_2d(ij_arr)
+            xy = np.array([ij_arr[:, 1] - j_cen, -ij_arr[:, 0] + i_cen]).T
+            return xy * resolution
+
+        def map2hgc(ij_arr):
+            '''Carrington lat and long.'''
+            ij_arr = np.atleast_2d(ij_arr)
+            xy = np.array([ij_arr[:, 1] - j_cen, -ij_arr[:, 0] + i_cen]).T
+            carr = xy_to_carr(xy, rad, B0=B0, L0=L0, deg=True)
+            return carr[:, ::-1] #lat, long
+
+        def pixel_areas(ij_arr):
+            '''Pixel areas in MSH.'''
+            ij_arr = np.atleast_2d(ij_arr)
+            xy = np.array([ij_arr[:, 1] - j_cen, -ij_arr[:, 0] + i_cen]).T
+            spp = xyz_to_sp(xy_to_xyz(xy, rad=rad), deg=False)
+            dist = haversine_distances(spp[:, ::-1], np.zeros((1, 2))).ravel()
+            return 10**6 / (2 * np.cos(dist) * np.pi * rad**2)
+
+        for prop in props:
+            if name.lower() == 'hpc':
+                bbox = map2hpc(np.array(prop.bbox).reshape(2, 2))
+                bbox = np.hstack([bbox.min(axis=0), bbox.max(axis=0)])
+                setattr(prop, 'bbox_hpc', bbox)
+                setattr(prop, 'centroid_hpc', map2hpc(prop.centroid).ravel())
+                setattr(prop, 'coords_hpc', map2hpc(prop.coords))
+                setattr(prop, 'approx_contour_hpc', map2hpc(prop.approx_contour))
+            elif name.lower() == 'hgc':
+                setattr(prop, 'coords_hgc', map2hgc(prop.coords))
+                setattr(prop, 'approx_contour_hgc', map2hgc(prop.approx_contour))
+            areas = pixel_areas(prop.coords)
+            setattr(prop, 'pixel_area_msh', areas)
+            setattr(prop, 'area_msh', areas.sum())
         return self
 
     @execute(how='threads')
