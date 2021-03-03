@@ -758,11 +758,21 @@ class HelioBatch():
         img = self.data[image][i]
         plt.imshow(img, cmap=cmap, extent=(0, img.shape[1], img.shape[0], 0), **kwargs)
         if mask is not None:
-            binary = np.rint(self.data[mask][i]) == 1
-            if binary.shape != img.shape:
-                raise ValueError('Image and mask should have equal shape.')
-            cnt = np.where(detect_edges(binary))
-            plt.scatter(cnt[1], cnt[0], s=s, color=color)
+            mask = np.atleast_1d(mask)
+            s = np.atleast_1d(s)
+            if len(s) < len(mask):
+                assert len(s) == 1
+                s = np.full(len(mask), s[0])
+            color = np.atleast_1d(color)
+            if len(color) < len(mask):
+                assert len(color) == 1
+                color = np.full(len(mask), color[0])
+            for src, size, c in zip(mask, s, color):
+                binary = np.rint(self.data[src][i]) == 1
+                if binary.shape != img.shape:
+                    raise ValueError('Image and mask should have equal shape.')
+                cnt = np.where(detect_edges(binary))
+                plt.scatter(cnt[1], cnt[0], s=size, color=c)
         plt.xlim([0, img.shape[1]])
         plt.ylim([img.shape[0], 0])
         plt.show()
