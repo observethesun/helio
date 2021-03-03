@@ -1,17 +1,23 @@
+#pylint: disable=too-many-lines
 """HelioBatch class."""
 import os
 import warnings
 from pathlib import Path
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import dill
 from astropy.io import fits
 from aiapy.calibrate import correct_degradation
 from scipy import interpolate
+from scipy.ndimage.morphology import binary_fill_holes
 from skimage.io import imread
 import skimage
 import skimage.transform
-from skimage.transform import resize
+from skimage.measure import label, regionprops, find_contours, approximate_polygon
+from skimage.transform import resize, hough_circle, hough_circle_peaks
+from skimage.feature import canny
+from sklearn.metrics.pairwise import haversine_distances
 try:
     import blosc
 except ImportError:
@@ -20,7 +26,8 @@ except ImportError:
 from .decorators import execute, add_actions, extract_actions, TEMPLATE_DOCSTRING
 from .index import BaseIndex
 from .synoptic_maps import make_synoptic_map, label360, region_statistics
-from .io import load_fits, load_abp_mask, write_syn_abp_file, write_fits
+from .geometry_utils import xy_to_xyz, xyz_to_sp, xy_to_carr
+from .io import load_fits, load_abp_mask, write_abp_file, write_fits, write_xml
 from .utils import detect_edges
 
 def softmax(x):
@@ -203,7 +210,7 @@ class HelioBatch():
         _ = kwargs
         path = self.index.iloc[i, self.index.columns.get_loc(src)]
         fmt = Path(path).suffix.lower()[1:]
-        if fmt == 'abp':
+        if fmt in ['abp', 'cnt']:
             with open(path, 'r') as fin:
                 fread = fin.readlines()
                 header = np.array(fread[0].split())
@@ -280,11 +287,12 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def _dump(self, i, src, dst, path, format, **kwargs): #pylint: disable=redefined-builtin
+    def _dump(self, i, src, dst, path, format, meta=None, **kwargs): #pylint: disable=redefined-builtin
         """Dump data in various formats."""
         _ = dst
         fname = os.path.join(path, str(self.indices[i])) + '.' + format
         data = self.data[src][i]
+        meta = self.meta[src if meta is None else meta][i]
         if format == 'blosc':
             with open(fname, 'w+b') as f:
                 f.write(blosc.compress(dill.dumps(data)))
@@ -295,10 +303,11 @@ class HelioBatch():
         elif format == 'binary':
             data.tofile(fname)
         elif format == 'abp':
-            write_syn_abp_file(fname, data)
+            write_abp_file(fname, data, meta=meta)
         elif format == 'fits':
-            meta = self.meta[kwargs.pop('meta', src)][i]
             write_fits(fname, data, index=self.index.iloc[[i]], meta=meta, **kwargs)
+        elif format == 'xml':
+            write_xml(path, data, index=self.index.iloc[[i]], meta=meta, **kwargs)
         else:
             plt.imsave(fname, data, format=format, **kwargs)
         return self
@@ -399,6 +408,65 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
+    def get_radius(self, i, src, dst, hough_radii=None, sigma=2, logger=None):
+        """Estimate solar disk center and radius.
+
+        Parameters
+        ----------
+        src : str
+            A source for solar disk images.
+        kwargs : misc
+            Any additional named arguments to resize method.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with updated meta.
+        """
+        img = self.data[src][i]
+        meta = self.meta[src][i]
+
+        if hough_radii is None:
+            hough_radii = np.arange(2, len(img) // 2)
+
+        edges = canny(img, sigma=sigma)
+        hough_res = hough_circle(edges, hough_radii)
+        _, c_x, c_y, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=1)
+        if radii in [hough_radii[0], hough_radii[-1]]:
+            out = warnings if logger is None else logger
+            out.warn('At index {}. Estimated radius is at the end of hough_radii.\
+            Try to extend hough_radii to verify radius found.'.format(self.index.indices[i]))
+
+        meta['i_cen'] = int(c_y)
+        meta['j_cen'] = int(c_x)
+        meta['r'] = int(radii)
+        self.meta[dst][i] = meta
+        return self
+
+    @execute(how='threads')
+    def get_radius_by_nans(self, i, src, dst):
+        """Estimate solar disk center and radius in image filled with nans outside the disk.
+
+        Parameters
+        ----------
+        src : str
+            A source for solar disk images.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with updated meta.
+        """
+        _ = dst
+        img = self.data[src][i]
+        meta = self.meta[src][i]
+        j_cen = int(np.where(~np.isnan(img).all(axis=0))[0].mean())
+        i_cen = int(np.where(~np.isnan(img).all(axis=1))[0].mean())
+        rad = len(np.where(~np.isnan(img).all(axis=0))[0]) // 2
+        meta.update({'i_cen': i_cen, 'j_cen': j_cen, 'r': rad})
+        return self
+
+    @execute(how='threads')
     def disk_resize(self, i, src, dst, output_shape, **kwargs):
         """Resize solar disk image and update center location and radius.
 
@@ -435,6 +503,235 @@ class HelioBatch():
             self.meta[dst][i] = meta
         return self
 
+    @execute(how='threads')
+    def fit_mask(self, i, src, dst, target):
+        """Fit mask to new disk center and radius.
+
+        Parameters
+        ----------
+        src : str
+            A source for mask.
+        dst : str
+            A destination for new mask.
+        target : str
+            A disk image to fit to.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with new masks.
+        """
+        img = self.data[target][i]
+        i_cen, j_cen = self.meta[target][i]['i_cen'], self.meta[target][i]['j_cen']
+        rad = self.meta[target][i]['r']
+
+        mask = self.data[src][i]
+        i_cen_mask, j_cen_mask = self.meta[src][i]['i_cen'], self.meta[src][i]['j_cen']
+        rad_mask = self.meta[src][i]['r']
+
+        scale = rad / rad_mask
+        rmask = resize(mask, (np.array(img.shape) * scale).astype(int), preserve_range=True)
+        new_mask = np.full(img.shape, False)
+        iarr, jarr = np.where(rmask > 0.5)
+        new_mask[iarr - int(i_cen_mask * scale) + i_cen,
+                 jarr - int(j_cen_mask * scale) + j_cen] = True
+
+        self.data[dst][i] = new_mask
+        self.meta[dst][i] = {'i_cen': i_cen, 'j_cen': j_cen, 'r': rad}
+        return self
+
+    @execute(how='threads')
+    def get_region_props(self, i, src, dst, tolerance=3, cache=True):
+        """Get region properties.
+
+        Parameters
+        ----------
+        src : str
+            A source for binary mask.
+        dst : str
+            A destination for props.
+        tolerance : int, optional
+            A tolerance for contour approximation. Default 3.
+        cache : bool, optional
+            Use cache in regionprops.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with props calculated.
+        """
+        mask = binary_fill_holes(self.data[src][i])
+        labeled, num = label(mask, background=0, return_num=True)
+        if not num:
+            self.data[dst][i] = []
+            return self
+        props = regionprops(labeled, cache=cache)
+        for prop in props:
+            cnt = find_contours(labeled == prop.label, 0)[0]
+            prop.contour = cnt
+            prop.approx_contour = approximate_polygon(cnt, tolerance=tolerance)
+        self.data[dst][i] = props
+        return self
+
+    def props2hgc(self, src, meta):
+        """Map props in i,j coordinates to HGC (Heliographic-Carrington) coordinates.
+
+        Parameters
+        ----------
+        src : str
+            A source for props.
+        meta : str
+            A source for disk meta information.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with props calculated.
+        """
+        return self._props_mapping(src=src, meta=meta, name='HGC')
+
+    def props2hpc(self, src, meta, resolution):
+        """Map props in i,j coordinates to HPC (Helioprojective-Cartesian) coordinates.
+
+        Parameters
+        ----------
+        src : str
+            A source for props.
+        meta : str
+            A source for disk meta information.
+        resolution : float
+            Pixel resolution in arcsec.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with props calculated.
+        """
+        return self._props_mapping(src=src, meta=meta, name='HPC', resolution=resolution)
+
+    @execute(how='threads')
+    def _props_mapping(self, i, src, dst, meta, name, resolution=None):
+        """Props mapping."""
+        _ = dst
+        props = self.data[src][i]
+        meta = self.meta[meta][i]
+        rad = meta['r']
+        i_cen = meta['i_cen']
+        j_cen = meta['j_cen']
+        B0 = self.index.iloc[i]['B0']
+        L0 = self.index.iloc[i]['L0']
+
+        def map2hpc(ij_arr):
+            '''Cartesian x, y in arcsec.'''
+            ij_arr = np.atleast_2d(ij_arr)
+            xy = np.array([ij_arr[:, 1] - j_cen, -ij_arr[:, 0] + i_cen]).T
+            return xy * resolution
+
+        def map2hgc(ij_arr):
+            '''Carrington lat and long.'''
+            ij_arr = np.atleast_2d(ij_arr)
+            xy = np.array([ij_arr[:, 1] - j_cen, -ij_arr[:, 0] + i_cen]).T
+            carr = xy_to_carr(xy, rad, B0=B0, L0=L0, deg=True)
+            return carr[:, ::-1] #lat, long
+
+        def pixel_areas(ij_arr):
+            '''Pixel areas in MSH.'''
+            ij_arr = np.atleast_2d(ij_arr)
+            xy = np.array([ij_arr[:, 1] - j_cen, -ij_arr[:, 0] + i_cen]).T
+            spp = xyz_to_sp(xy_to_xyz(xy, rad=rad), deg=False)
+            dist = haversine_distances(spp[:, ::-1], np.zeros((1, 2))).ravel()
+            return 10**6 / (2 * np.cos(dist) * np.pi * rad**2)
+
+        for prop in props:
+            if name.lower() == 'hpc':
+                bbox = map2hpc(np.array(prop.bbox).reshape(2, 2))
+                bbox = np.hstack([bbox.min(axis=0), bbox.max(axis=0)])
+                setattr(prop, 'bbox_hpc', bbox)
+                setattr(prop, 'centroid_hpc', map2hpc(prop.centroid).ravel())
+                setattr(prop, 'coords_hpc', map2hpc(prop.coords))
+                setattr(prop, 'approx_contour_hpc', map2hpc(prop.approx_contour))
+            elif name.lower() == 'hgc':
+                setattr(prop, 'coords_hgc', map2hgc(prop.coords))
+                setattr(prop, 'approx_contour_hgc', map2hgc(prop.approx_contour))
+            areas = pixel_areas(prop.coords)
+            setattr(prop, 'pixel_area_msh', areas)
+            setattr(prop, 'area_msh', areas.sum())
+        return self
+
+    @execute(how='threads')
+    def get_pixel_params(self, i, src, dst, meta=None):
+        """Get coordinates and area of individual pixels for regions identified in solar disk image.
+
+        Parameters
+        ----------
+        src : str
+            A source for binary mask.
+        dst : str
+            A destination for results.
+        meta : str, optional
+            An optional source for meta information.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with parameters calculated.
+        """
+        mask = self.data[src][i]
+        meta = self.meta[src if meta is None else meta][i]
+        rad = meta['r']
+        i_cen = meta['i_cen']
+        j_cen = meta['j_cen']
+        B0 = self.index.iloc[i]['B0']
+        L0 = self.index.iloc[i]['L0']
+        mask_ij = np.vstack(np.where(mask)).T
+        mask_xy = np.array([mask_ij[:, 1] - j_cen, -mask_ij[:, 0] + i_cen]).T
+        spp = xyz_to_sp(xy_to_xyz(mask_xy, rad=rad), deg=False)
+        dist = haversine_distances(spp[:, ::-1], np.zeros((1, 2))).ravel()
+        areas = 10**6 / (2 * np.cos(dist) * np.pi * rad**2)
+        carr = xy_to_carr(mask_xy, rad, B0=B0, L0=L0, deg=True)
+        df = pd.DataFrame({'i': mask_ij[:, 0],
+                           'j': mask_ij[:, 1],
+                           'Lat': carr[:, 1],
+                           'Long': carr[:, 0],
+                           'q': np.rad2deg(spp[:, 1]),
+                           'phi': np.rad2deg(spp[:, 0]),
+                           'area': areas})
+        self.data[dst][i] = df
+        return self
+
+    @execute(how='threads')
+    def filter_regions(self, i, src, dst, min_area=10, **kwargs):
+        """Filter regions with pixel area less than npix.
+
+        Parameters
+        ----------
+        src : str
+            A source for binary mask.
+        dst : str
+            A destination for results.
+        min_area : int
+            Minimal area in pixels.
+        kwargs : misc
+            Additional label keywords.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with filtered masks.
+        """
+        mask = self.data[src][i]
+        if dst != src:
+            mask = mask.copy()
+
+        labeled, num = label(mask.astype(int), return_num=True, **kwargs)
+        for k in range(1, num + 1):
+            obj = np.where(labeled == k)
+            if len(obj[0]) < min_area:
+                mask[obj] = False
+
+        self.data[dst][i] = mask
+        return self
+
     def show(self, i, image, mask=None, figsize=None, cmap=None, s=None, color=None, **kwargs):
         """Show image data with optional mask countours overlayed.
 
@@ -461,11 +758,21 @@ class HelioBatch():
         img = self.data[image][i]
         plt.imshow(img, cmap=cmap, extent=(0, img.shape[1], img.shape[0], 0), **kwargs)
         if mask is not None:
-            binary = np.rint(self.data[mask][i]) == 1
-            if binary.shape != img.shape:
-                raise ValueError('Image and mask should have equal shape.')
-            cnt = np.where(detect_edges(binary))
-            plt.scatter(cnt[1], cnt[0], s=s, color=color)
+            mask = np.atleast_1d(mask)
+            s = np.atleast_1d(s)
+            if len(s) < len(mask):
+                assert len(s) == 1
+                s = np.full(len(mask), s[0])
+            color = np.atleast_1d(color)
+            if len(color) < len(mask):
+                assert len(color) == 1
+                color = np.full(len(mask), color[0])
+            for src, size, c in zip(mask, s, color):
+                binary = np.rint(self.data[src][i]) == 1
+                if binary.shape != img.shape:
+                    raise ValueError('Image and mask should have equal shape.')
+                cnt = np.where(detect_edges(binary))
+                plt.scatter(cnt[1], cnt[0], s=size, color=c)
         plt.xlim([0, img.shape[1]])
         plt.ylim([img.shape[0], 0])
         plt.show()

@@ -68,7 +68,7 @@ def execute(how):
                 if d not in self.data:
                     self.data[d] = np.array([None] * len(self))
                 if d not in self.meta:
-                    self.meta[d] = np.array([None] * len(self))
+                    self.meta[d] = np.array([{} for _ in range(len(self))])
 
             results = []
             n_workers = kwargs.get('n_workers', os.cpu_count() * 4)

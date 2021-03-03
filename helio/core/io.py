@@ -1,4 +1,7 @@
 """IO utils."""
+import os
+import warnings
+from string import Template
 import datetime
 import numpy as np
 import pandas as pd
@@ -8,6 +11,7 @@ from sunpy.coordinates.sun import B0
 from skimage.measure import label
 
 from .utils import detect_edges
+from .templates import CH_XML
 
 
 def load_fits(path, verify='fix', unit=0, as_smap=False):
@@ -89,6 +93,8 @@ def write_fits(fname, data, index, meta, kind=None, **kwargs):
         return write_syn_fits(fname, data, index, meta, **kwargs)
     if kind == 'synoptic_mask':
         return write_syn_mask_fits(fname, data, index, meta, **kwargs)
+    if kind == 'aia_mask':
+        return write_aia_mask_fits(fname, data, index, meta, **kwargs)
     raise NotImplementedError('FITS files for data of type {} are not implemented.'.format(kind))
 
 def write_syn_fits(fname, data, index, meta, **headers):
@@ -97,7 +103,9 @@ def write_syn_fits(fname, data, index, meta, **headers):
     hdr = fits.Header()
     index = index.reset_index()
     hdr['DATE'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-    hdr['CAR_ROT'] = int(index.loc[0, 'CR'])
+    car_rot = np.unique(index.loc[0, 'CR'])
+    assert len(car_rot) == 1, 'CR numbers are not unique'
+    hdr['CAR_ROT'] = int(car_rot[0])
     a = index.loc[0, 'DateTime'][0]
     b = index.loc[0, 'DateTime'][-1]
     rot = a + (b - a) / 2
@@ -159,6 +167,39 @@ def write_syn_mask_fits(fname, data, index, meta, **headers):
     hdul = fits.HDUList([hdu])
     hdul.writeto(fname, overwrite=True)
 
+def write_aia_mask_fits(fname, data, index, meta, **headers):
+    """Write mask for AIA disk image to FITS file."""
+    hdr = fits.Header()
+    hdr['DATE'] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    index = index.reset_index()
+    hdr['CAR_ROT'] = int(index.loc[0, 'CR'])
+    hdr['DATE-OBS'] = index.loc[0, 'DateTime'].strftime("%Y-%m-%dT%H:%M:%S")
+    hdr['T_OBS'] = index.loc[0, 'DateTime'].strftime("%Y.%m.%d_%H:%M:%S_TAI")
+    hdr['B0_OBS'] = index.loc[0, 'B0']
+    hdr['L0_OBS'] = index.loc[0, 'L0']
+    hdr['R_SUN'] = meta['r']
+    hdr['X0_MP'] = meta['j_cen']
+    hdr['Y0_MP'] = meta['i_cen']
+    hdr['CRPIX1'] = (data.shape[1] + 1.) / 2
+    hdr['CRPIX2'] = (data.shape[0] + 1.) / 2
+    hdr['CRVAL1'] = 0.
+    hdr['CRVAL2'] = 0.
+    hdr['CDELT1'] = 0.6 * 4096 / data.shape[1]
+    hdr['CDELT2'] = 0.6 * 4096 / data.shape[0]
+    hdr['CUNIT1'] = 'arcsec'
+    hdr['CUNIT2'] = 'arcsec'
+    hdr['CTYPE1'] = 'HPLN-TAN'
+    hdr['CTYPE2'] = 'HPLN-TAN'
+    hdr['BSCALE'] = 1.
+    hdr['BZERO'] = 0.
+    hdr['BUNIT'] = 'counts / pixel'
+    hdr['MISSVALS'] = np.isnan(data).sum()
+    for k, v in headers.items():
+        hdr[k] = v
+    hdu = fits.PrimaryHDU(header=hdr, data=data[::-1])
+    hdul = fits.HDUList([hdu])
+    hdul.writeto(fname, overwrite=True)
+
 def write_simple_fits(fname, data, index, meta, **headers):
     """Write array to FITS file."""
     _ = index, meta
@@ -169,12 +210,15 @@ def write_simple_fits(fname, data, index, meta, **headers):
     hdul = fits.HDUList([hdu])
     hdul.writeto(fname, overwrite=True)
 
-def write_syn_abp_file(fname, binary_mask, neighbors=None):
-    """Write synoptic map to `abp` file."""
+def write_abp_file(fname, binary_mask, neighbors=None, meta=None):
+    """Write binary map to `abp` file."""
     binary_mask = binary_mask.astype(int)
-    shape = binary_mask.shape[:2]
-    header = [shape[1] // 2, shape[0] // 2, np.min(shape) // 2, 0, 0, 0, 1,
-              shape[1], shape[0], 0, shape[1], 0, shape[0], 'Syn_map']
+    if 'r' in meta:
+        header = [meta['j_cen'], meta['i_cen'], meta['r'], 0, 0, 0, 0]
+    else:
+        shape = binary_mask.shape[:2]
+        header = [shape[1] // 2, shape[0] // 2, np.min(shape) // 2, 0, 0, 0, 1,
+                  shape[1], shape[0], 0, shape[1], 0, shape[0], 'Syn_map']
 
     labeled, num = label(binary_mask, neighbors=neighbors, background=0, return_num=True)
     edges = detect_edges(binary_mask)
@@ -199,3 +243,46 @@ def write_syn_abp_file(fname, binary_mask, neighbors=None):
     with open(fname, 'w') as fout:
         for line in buff:
             fout.writelines(line)
+
+def _make_chs_xml(ivorn, props, index, **kwargs):
+    """Fill CHs props into template XML."""
+    tmp = Template(CH_XML)
+    fill_values = {}
+    fill_values['ivorn'] = ivorn
+    fill_values['datetime_now'] = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
+    fill_values['datetime'] = index.loc[0, 'DateTime'].strftime('%Y-%m-%dT%H:%M:%S')
+    fill_values['start_datetime'] = index.loc[0, 'DateTime'].strftime('%Y-%m-%dT%H:%M:%S')
+    fill_values['stop_datetime'] = index.loc[0, 'DateTime'].strftime('%Y-%m-%dT%H:%M:%S')
+    fill_values['area'] = '%.3f' % props.area_msh
+    fill_values['area_unit'] = 'microhemisphere'
+    fill_values['lat_mean'] = '%.3f' % props.centroid_hpc[0]
+    fill_values['long_mean'] = '%.3f' % props.centroid_hpc[1]
+    fill_values['bbox_lat'] = '%.3f' % props.bbox_hpc[0]
+    fill_values['bbox_long'] = '%.3f' % props.bbox_hpc[1]
+    fill_values['bbox_lat_size'] = '%.3f' % (props.bbox_hpc[2] - props.bbox_hpc[0])
+    fill_values['bbox_long_size'] = '%.3f' % (props.bbox_hpc[3] - props.bbox_hpc[1])
+    fill_values['chaincode_size'] = len(props.approx_contour_hpc)
+    fill_values['chaincode_lat_start'] = '%.3f' % props.approx_contour_hpc[0, 0]
+    fill_values['chaincode_long_start'] = '%.3f' % props.approx_contour_hpc[0, 1]
+    fill_values['chaincode'] = ','.join(['%.3f' % x for x in props.approx_contour_hpc.ravel()])
+    tmp = Template(tmp.safe_substitute(fill_values))
+    tmp = Template(tmp.safe_substitute(kwargs))
+    out = tmp.safe_substitute()
+    return out
+
+def write_xml(path, data, index, kind, basename, **kwargs):
+    """Write HEK xml file."""
+    index = index.reset_index()
+    ivorn_base = basename + '_' + index.loc[0, 'DateTime'].strftime('%Y%m%d_%H%M%S')
+    if kind.lower() == 'chs':
+        make_xml = _make_chs_xml
+    else:
+        raise NotImplementedError(kind)
+    for i, props in enumerate(data):
+        ivorn = ivorn_base + '_' + str(i)
+        xml = make_xml(ivorn, props, index, **kwargs)
+        missing = Template.pattern.findall(xml)
+        if missing:
+            warnings.warn('Missed values for ' + ', '.join([k[1] for k in missing]))
+        with open(os.path.join(path, ivorn + '.xml'), 'w') as f:
+            f.writelines(xml)

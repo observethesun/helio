@@ -20,6 +20,10 @@ Clone the repository
 ```
 git clone https://github.com/observethesun/helio.git
 ```
+or install it using pip
+```
+pip install git+https://github.com/observethesun/helio.git@master
+```
 
 ## Quick start
 
