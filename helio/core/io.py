@@ -244,15 +244,16 @@ def write_abp_file(fname, binary_mask, neighbors=None, meta=None):
         for line in buff:
             fout.writelines(line)
 
-def _make_chs_xml(ivorn, props, index, **kwargs):
+def _make_chs_xml(ivorn, props, index, stop_datetime=None, **kwargs):
     """Fill CHs props into template XML."""
     tmp = Template(CH_XML)
     fill_values = {}
     fill_values['ivorn'] = ivorn
     fill_values['datetime_now'] = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
     fill_values['datetime'] = index.loc[0, 'DateTime'].strftime('%Y-%m-%dT%H:%M:%S')
-    fill_values['start_datetime'] = index.loc[0, 'DateTime'].strftime('%Y-%m-%dT%H:%M:%S')
-    fill_values['stop_datetime'] = index.loc[0, 'DateTime'].strftime('%Y-%m-%dT%H:%M:%S')
+    fill_values['start_datetime'] = fill_values['datetime']
+    fill_values['stop_datetime'] = (fill_values['start_datetime'] if stop_datetime is None
+                                    else stop_datetime.strftime('%Y-%m-%dT%H:%M:%S'))
     fill_values['area'] = '%.3f' % props.area_msh
     fill_values['area_unit'] = 'microhemisphere'
     fill_values['lat_mean'] = '%.3f' % props.centroid_hpc[0]

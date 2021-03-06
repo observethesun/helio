@@ -408,15 +408,21 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def get_radius(self, i, src, dst, hough_radii=None, sigma=2, logger=None):
+    def get_radius(self, i, src, dst, hough_radii, sigma=2, raise_limits=False, logger=None):
         """Estimate solar disk center and radius.
 
         Parameters
         ----------
         src : str
             A source for solar disk images.
-        kwargs : misc
-            Any additional named arguments to resize method.
+        hough_radii : tuple
+            Mininal and maximal radius to search.
+        sigma : scalar, optional
+            Canny filter parameter. Default 2.
+        raise_limits : bool, optional
+            Raise error if radius found is in the end of search interval. Default False.
+        logger : logger, optional
+            Logger for messages. Default None.
 
         Returns
         -------
@@ -426,16 +432,17 @@ class HelioBatch():
         img = self.data[src][i]
         meta = self.meta[src][i]
 
-        if hough_radii is None:
-            hough_radii = np.arange(2, len(img) // 2)
-
         edges = canny(img, sigma=sigma)
         hough_res = hough_circle(edges, hough_radii)
         _, c_x, c_y, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=1)
         if radii in [hough_radii[0], hough_radii[-1]]:
-            out = warnings if logger is None else logger
-            out.warn('At index {}. Estimated radius is at the end of hough_radii.\
-            Try to extend hough_radii to verify radius found.'.format(self.index.indices[i]))
+            logger = warnings if logger is None else logger
+            msg = 'At index {}. Estimated radius {} is in the end of hough_radii.\
+            Try to extend hough_radii to verify radius found.'.format(self.index.indices[i], radii)
+            if raise_limits:
+                logger.error(msg)
+                raise ValueError
+            logger.warn(msg)
 
         meta['i_cen'] = int(c_y)
         meta['j_cen'] = int(c_x)
@@ -700,7 +707,7 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def filter_regions(self, i, src, dst, min_area=10, **kwargs):
+    def filter_regions(self, i, src, dst, min_area, **kwargs):
         """Filter regions with pixel area less than npix.
 
         Parameters
