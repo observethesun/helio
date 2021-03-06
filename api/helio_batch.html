@@ -442,7 +442,7 @@ even if the image dtype allows negative values.</p></li>
 
 <dl class="method">
 <dt id="helio.core.HelioBatch.filter_regions">
-<code class="sig-name descname">filter_regions</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">min_area=10</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.filter_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.filter_regions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">filter_regions</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">min_area</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.filter_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.filter_regions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter regions with pixel area less than npix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -530,13 +530,16 @@ will flip images with probability 0.5.</p></li>
 
 <dl class="method">
 <dt id="helio.core.HelioBatch.get_radius">
-<code class="sig-name descname">get_radius</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">hough_radii=None</em>, <em class="sig-param">sigma=2</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.get_radius"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.get_radius" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_radius</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">hough_radii</em>, <em class="sig-param">sigma=2</em>, <em class="sig-param">raise_limits=False</em>, <em class="sig-param">logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.get_radius"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.get_radius" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate solar disk center and radius.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – A source for solar disk images.</p></li>
-<li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to resize method.</p></li>
+<li><p><strong>hough_radii</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a>) – Mininal and maximal radius to search.</p></li>
+<li><p><strong>sigma</strong> (<em>scalar</em><em>, </em><em>optional</em>) – Canny filter parameter. Default 2.</p></li>
+<li><p><strong>raise_limits</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Raise error if radius found is in the end of search interval. Default False.</p></li>
+<li><p><strong>logger</strong> (<em>logger</em><em>, </em><em>optional</em>) – Logger for messages. Default None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

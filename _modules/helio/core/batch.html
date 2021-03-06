@@ -554,15 +554,21 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="HelioBatch.get_radius"><a class="viewcode-back" href="../../../api/helio_batch.html#helio.core.HelioBatch.get_radius">[docs]</a>    <span class="nd">@execute</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;threads&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">hough_radii</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">hough_radii</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">raise_limits</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Estimate solar disk center and radius.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        src : str</span>
 <span class="sd">            A source for solar disk images.</span>
-<span class="sd">        kwargs : misc</span>
-<span class="sd">            Any additional named arguments to resize method.</span>
+<span class="sd">        hough_radii : tuple</span>
+<span class="sd">            Mininal and maximal radius to search.</span>
+<span class="sd">        sigma : scalar, optional</span>
+<span class="sd">            Canny filter parameter. Default 2.</span>
+<span class="sd">        raise_limits : bool, optional</span>
+<span class="sd">            Raise error if radius found is in the end of search interval. Default False.</span>
+<span class="sd">        logger : logger, optional</span>
+<span class="sd">            Logger for messages. Default None.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -572,16 +578,17 @@
         <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">hough_radii</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">hough_radii</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
-
         <span class="n">edges</span> <span class="o">=</span> <span class="n">canny</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
         <span class="n">hough_res</span> <span class="o">=</span> <span class="n">hough_circle</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">hough_radii</span><span class="p">)</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">c_x</span><span class="p">,</span> <span class="n">c_y</span><span class="p">,</span> <span class="n">radii</span> <span class="o">=</span> <span class="n">hough_circle_peaks</span><span class="p">(</span><span class="n">hough_res</span><span class="p">,</span> <span class="n">hough_radii</span><span class="p">,</span> <span class="n">total_num_peaks</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">radii</span> <span class="ow">in</span> <span class="p">[</span><span class="n">hough_radii</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">hough_radii</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">warnings</span> <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">logger</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;At index </span><span class="si">{}</span><span class="s1">. Estimated radius is at the end of hough_radii.</span><span class="se">\</span>
-<span class="s1">            Try to extend hough_radii to verify radius found.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="n">logger</span> <span class="o">=</span> <span class="n">warnings</span> <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">logger</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;At index </span><span class="si">{}</span><span class="s1">. Estimated radius </span><span class="si">{}</span><span class="s1"> is in the end of hough_radii.</span><span class="se">\</span>
+<span class="s1">            Try to extend hough_radii to verify radius found.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">radii</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">raise_limits</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;i_cen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">c_y</span><span class="p">)</span>
         <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;j_cen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">c_x</span><span class="p">)</span>
@@ -846,7 +853,7 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="HelioBatch.filter_regions"><a class="viewcode-back" href="../../../api/helio_batch.html#helio.core.HelioBatch.filter_regions">[docs]</a>    <span class="nd">@execute</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;threads&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">filter_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">min_area</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">filter_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">min_area</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Filter regions with pixel area less than npix.</span>
 
 <span class="sd">        Parameters</span>
