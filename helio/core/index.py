@@ -20,7 +20,7 @@ class BaseIndex(pd.DataFrame): #pylint: disable=abstract-method
         """Unique indices."""
         return self.index.unique().values
 
-    def train_test_split(self, train_ratio=0.8, suffle=True, seed=None):
+    def train_test_split(self, train_ratio=0.8, shuffle=True, seed=None):
         """Splits index into train and test subsets.
 
         Parameters
@@ -39,7 +39,7 @@ class BaseIndex(pd.DataFrame): #pylint: disable=abstract-method
             Train and test indices.
         """
         indices = self.index.unique().values
-        if suffle:
+        if shuffle:
             np.random.seed(seed)
             np.random.shuffle(indices)
         train_size = int(train_ratio * len(indices))
