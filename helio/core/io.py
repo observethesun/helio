@@ -22,7 +22,7 @@ def load_fits(path, verify='fix', unit=0, as_smap=False):
     hdul.verify(verify)
     return hdul[unit].data
 
-def load_abp_mask(path, shape, sunspot_observation=False):
+def load_abp_mask(path, shape, sunspot_observation=False, group_label=False):
     """Builds segmentation mask from `abp` file.
 
     Parameters
@@ -34,7 +34,9 @@ def load_abp_mask(path, shape, sunspot_observation=False):
     sunspot_observation : bool
         If False, all active regions will be put in a single mask.
         If True, active regions will be separated into sunspots, cores and
-        pores and put into separate masks.
+        pores and put into separate masks. Default False.
+    group_label : bool
+        If True, return a mask with group numbers. Default False.
 
     Returns
     -------
@@ -51,9 +53,17 @@ def load_abp_mask(path, shape, sunspot_observation=False):
 
         df = pd.DataFrame(columns=['obj_num', 'core_num', 'pts'])
         if num_objects:
+            df['group_num'] = obj_meta[:, 2]
             df['obj_num'] = obj_meta[:, -2]
             df['core_num'] = obj_meta[:, -1]
             df['pts'] = [arr.reshape((-1, 3))[:, [1, 0]].astype('int') for arr in data]
+
+    if group_label:
+        mask = np.zeros(shape, dtype='int')
+        for _, row in df.iterrows():
+            pts = row['pts']
+            mask[pts[:, 0], pts[:, 1]] = row['group_num']
+        return mask
 
     if sunspot_observation:
         mask = np.zeros(shape + (3,), dtype='bool')

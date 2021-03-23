@@ -187,6 +187,8 @@ class HelioBatch():
                 raise ValueError('Expected single key, found {}.'.format(len(keys)))
             data = f[keys[0]]
         elif fmt == 'abp':
+            if isinstance(kwargs['shape'], str):
+                kwargs['shape'] = self.data[kwargs['shape']][i].shape
             data = load_abp_mask(path, **kwargs)
         elif fmt in ['fts', 'fits']:
             data = load_fits(path, **kwargs)
@@ -310,6 +312,25 @@ class HelioBatch():
             write_xml(path, data, index=self.index.iloc[[i]], meta=meta, **kwargs)
         else:
             plt.imsave(fname, data, format=format, **kwargs)
+        return self
+
+    @execute(how='threads')
+    def dump_group_patches(self, i, src, dst):
+        """Dump group pathes into separate `.npz` files."""
+        ind = self.indices[i]
+        data = self.data[src][i]
+        labels = np.unique(data)
+        for n in labels:
+            if n == 0:
+                continue
+            group = np.where(data == n)
+            imin = group[0].min()
+            imax = group[0].max()
+            jmin = group[1].min()
+            jmax = group[1].max()
+            patch = data[imin:imax, jmin:jmax]
+            path = os.path.join(dst, ind + '_' + str(n) + '.npz')
+            np.savez(path, patch)
         return self
 
     @execute(how='threads')
