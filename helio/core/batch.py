@@ -315,7 +315,7 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def dump_group_patches(self, i, src, dst):
+    def dump_group_patches(self, i, src, dst, output_shape=None, min_area=0):
         """Dump group pathes into separate `.npz` files."""
         ind = self.indices[i]
         data = self.data[src][i]
@@ -328,7 +328,11 @@ class HelioBatch():
             imax = group[0].max()
             jmin = group[1].min()
             jmax = group[1].max()
-            patch = data[imin:imax, jmin:jmax]
+            patch = data[imin:imax, jmin:jmax] > 0
+            if patch.sum() < min_area:
+                continue
+            if output_shape is not None:
+                patch = resize(patch, output_shape=output_shape, preserve_range=True) > 0.5
             path = os.path.join(dst, ind + '_' + str(n) + '.npz')
             np.savez(path, patch)
         return self
@@ -461,8 +465,7 @@ class HelioBatch():
             msg = 'At index {}. Estimated radius {} is in the end of hough_radii.\
             Try to extend hough_radii to verify radius found.'.format(self.index.indices[i], radii)
             if raise_limits:
-                logger.error(msg)
-                raise ValueError
+                raise ValueError(msg)
             logger.warn(msg)
 
         meta['i_cen'] = int(c_y)
