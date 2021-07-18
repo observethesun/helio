@@ -15,7 +15,7 @@ from skimage.io import imread
 import skimage
 import skimage.transform
 from skimage.measure import label, regionprops, find_contours, approximate_polygon
-from skimage.transform import resize, hough_circle, hough_circle_peaks
+from skimage.transform import resize, rotate, hough_circle, hough_circle_peaks
 from skimage.feature import canny
 from sklearn.metrics.pairwise import haversine_distances
 try:
@@ -218,8 +218,8 @@ class HelioBatch():
                             j_cen=int(header[0]),
                             r=int(header[2]),
                             P=float(header[3]),
-                            B=float(header[4]),
-                            L=float(header[5]))
+                            B0=float(header[4]),
+                            L0=float(header[5]))
         elif fmt in ['fts', 'fits']:
             hdul = fits.open(path)
             hdul.verify(verify)
@@ -384,6 +384,38 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
+    def rotate_p_angle(self, i, src, dst, deg=True, **kwargs):
+        """Rotate disk image to P=0 around disk center.
+
+        Parameters
+        ----------
+        src : str
+            A source for disk images.
+        dst : str
+            A destination for results.
+        deg : bool
+            Angles are in degrees. Default True.
+        kwargs : misc
+            Any additional named arguments to ``skimage.transform.rotate`` method.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with rotated disk.
+        """
+        data = self.data[src][i]
+        meta = self.meta[src][i]
+        p_angle = meta["P"] if deg else np.rad2deg(meta["P"])
+        is_bool = data.dtype == np.bool
+        data = rotate(data, p_angle, center=(meta['j_cen'], meta['i_cen']),
+                      preserve_range=True, **kwargs)
+        if is_bool:
+            data = data > 0.5
+        self.data[dst][i] = data
+        self.meta[dst][i]['P'] = 0.
+        return self
+
+    @execute(how='threads')
     def mask_disk(self, i, src, dst, fill_value=np.nan):
         """Set dummy value to pixels outside the solar disk.
 
@@ -509,7 +541,7 @@ class HelioBatch():
         output_shape : tuple
             Shape of output images. Axes ratio should be the same as for source image.
         kwargs : misc
-            Any additional named arguments to resize method.
+            Any additional named arguments to ``skimage.transform.resize`` method.
 
         Returns
         -------
@@ -681,9 +713,11 @@ class HelioBatch():
                 setattr(prop, 'bbox_hpc', bbox)
                 setattr(prop, 'centroid_hpc', map2hpc(prop.centroid).ravel())
                 setattr(prop, 'coords_hpc', map2hpc(prop.coords))
+                setattr(prop, 'contour_hpc', map2hgc(prop.contour))
                 setattr(prop, 'approx_contour_hpc', map2hpc(prop.approx_contour))
             elif name.lower() == 'hgc':
                 setattr(prop, 'coords_hgc', map2hgc(prop.coords))
+                setattr(prop, 'contour_hgc', map2hgc(prop.contour))
                 setattr(prop, 'approx_contour_hgc', map2hgc(prop.approx_contour))
             areas = pixel_areas(prop.coords)
             setattr(prop, 'pixel_area_msh', areas)
