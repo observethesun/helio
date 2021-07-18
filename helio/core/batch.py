@@ -316,11 +316,11 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def dump_group_patches(self, i, src, dst, meta=None, output_shape=None, min_area=0):
+    def dump_group_patches(self, i, src, dst, meta=None, min_area=0):
         """Dump group pathes into separate `.npz` files."""
         ind = self.indices[i]
         data = self.data[src][i]
-        meta = batch.meta[src if meta is None else meta][i]
+        meta = self.meta[src if meta is None else meta][i]
         labels = np.unique(data)
         for n in labels:
             if n == 0:
