@@ -183,11 +183,9 @@ class HelioBatch():
         elif fmt == 'npz':
             f = np.load(path)
             keys = list(f.keys())
-            if len(keys) != 1:
-                raise ValueError('Expected single key, found {}.'.format(len(keys)))
-            data = f[keys[0]]
+            data = f[src] if len(keys) != 1 else f[keys[0]]
         elif fmt == 'abp':
-            if isinstance(kwargs['shape'], str):
+            if isinstance(kwargs.get('shape', None), str):
                 kwargs['shape'] = self.data[kwargs['shape']][i].shape
             data = load_abp_mask(path, **kwargs)
         elif fmt in ['fts', 'fits']:
@@ -218,7 +216,10 @@ class HelioBatch():
                 header = np.array(fread[0].split())
                 meta = dict(i_cen=int(header[1]),
                             j_cen=int(header[0]),
-                            r=int(header[2]))
+                            r=int(header[2]),
+                            P=float(header[3]),
+                            B=float(header[4]),
+                            L=float(header[5]))
         elif fmt in ['fts', 'fits']:
             hdul = fits.open(path)
             hdul.verify(verify)
@@ -315,10 +316,11 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def dump_group_patches(self, i, src, dst):
+    def dump_group_patches(self, i, src, dst, meta=None, output_shape=None, min_area=0):
         """Dump group pathes into separate `.npz` files."""
         ind = self.indices[i]
         data = self.data[src][i]
+        meta = batch.meta[src if meta is None else meta][i]
         labels = np.unique(data)
         for n in labels:
             if n == 0:
@@ -329,8 +331,10 @@ class HelioBatch():
             jmin = group[1].min()
             jmax = group[1].max()
             patch = data[imin:imax, jmin:jmax]
+            if patch.sum() < min_area:
+                continue
             path = os.path.join(dst, ind + '_' + str(n) + '.npz')
-            np.savez(path, patch)
+            np.savez(path, patch=patch, r=meta['r'])
         return self
 
     @execute(how='threads')
