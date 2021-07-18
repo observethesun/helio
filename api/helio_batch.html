@@ -315,7 +315,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – A source for solar disk images.</p></li>
 <li><p><strong>output_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a>) – Shape of output images. Axes ratio should be the same as for source image.</p></li>
-<li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to resize method.</p></li>
+<li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to <code class="docutils literal notranslate"><span class="pre">skimage.transform.resize</span></code> method.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1384,6 +1384,28 @@ ordering.</p></li>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Batch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.HelioBatch.rotate_p_angle">
+<code class="sig-name descname">rotate_p_angle</code><span class="sig-paren">(</span><em class="sig-param">i</em>, <em class="sig-param">src</em>, <em class="sig-param">dst</em>, <em class="sig-param">deg=True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/batch.html#HelioBatch.rotate_p_angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.HelioBatch.rotate_p_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate disk image to P=0 around disk center.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – A source for disk images.</p></li>
+<li><p><strong>dst</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – A destination for results.</p></li>
+<li><p><strong>deg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Angles are in degrees. Default True.</p></li>
+<li><p><strong>kwargs</strong> (<em>misc</em>) – Any additional named arguments to <code class="docutils literal notranslate"><span class="pre">skimage.transform.rotate</span></code> method.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>batch</strong> – Batch with rotated disk.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helio.core.HelioBatch" title="helio.core.HelioBatch">HelioBatch</a></p>
 </dd>
 </dl>
 </dd></dl>
