@@ -1,6 +1,7 @@
 """Utils for geometry tranformation."""
 import numpy as np
 from scipy.linalg import expm
+from skimage.transform import rotate
 
 def xy_to_xyz(xy, rad):
     """Map points from plane onto sphere.
@@ -122,6 +123,45 @@ def rotate_B0(xyz, B0, deg=True): #pylint: disable=invalid-name
     """
     rmat = rotation_matrix(np.array([0, 1, 0]), -B0, deg=deg)
     return np.dot(rmat, xyz.T).T
+
+def rotate_at_center(data, angle, center=None, deg=True, labels=False, background=0, **kwargs):
+    """Rotate disk image to P=0 around disk center.
+
+       Parameters
+       ----------
+       data : array
+           Array to rotate.
+       angle : scalar
+           Rotation angle.
+       center : tuple
+           Rotation center.
+       deg : bool
+           Angles are in degrees. Default True.
+       labels : bool
+           Data contains labels. Default False.
+       background : scalar
+           Background label.
+       kwargs : misc
+           Any additional named arguments to ``skimage.transform.rotate`` method.
+
+       Returns
+       -------
+       data : array
+       Rotated array.
+       """
+    angle = angle if deg else np.rad2deg(angle)
+    if labels:
+        res = np.full_like(data, background)
+        for lbl in np.unique(data):
+            if lbl == background:
+                continue
+            mask = data == lbl
+            mask = rotate(mask, angle, center=center, preserve_range=True, **kwargs) > 0.5
+            res[mask] = lbl
+        return res
+    is_bool = data.dtype == np.bool
+    data = rotate(data, angle, center=center, preserve_range=True, **kwargs)
+    return data > 0.5 if is_bool else data
 
 def xy_to_carr(xy, rad, B0, L0, deg=True):
     """Get carrington coordinates from xy.

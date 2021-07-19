@@ -15,7 +15,7 @@ from skimage.io import imread
 import skimage
 import skimage.transform
 from skimage.measure import label, regionprops, find_contours, approximate_polygon
-from skimage.transform import resize, rotate, hough_circle, hough_circle_peaks
+from skimage.transform import resize, hough_circle, hough_circle_peaks
 from skimage.feature import canny
 from sklearn.metrics.pairwise import haversine_distances
 try:
@@ -26,7 +26,7 @@ except ImportError:
 from .decorators import execute, add_actions, extract_actions, TEMPLATE_DOCSTRING
 from .index import BaseIndex
 from .synoptic_maps import make_synoptic_map, label360, region_statistics
-from .geometry_utils import xy_to_xyz, xyz_to_sp, xy_to_carr
+from .geometry_utils import xy_to_xyz, xyz_to_sp, xy_to_carr, rotate_at_center
 from .io import load_fits, load_abp_mask, write_abp_file, write_fits, write_xml
 from .utils import detect_edges
 
@@ -384,7 +384,7 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def rotate_p_angle(self, i, src, dst, deg=True, **kwargs):
+    def rotate_p_angle(self, i, src, dst, deg=True, labels=False, background=0, **kwargs):
         """Rotate disk image to P=0 around disk center.
 
         Parameters
@@ -395,6 +395,10 @@ class HelioBatch():
             A destination for results.
         deg : bool
             Angles are in degrees. Default True.
+        labels : bool
+           Data contains labels. Default False.
+       background : scalar
+           Background label.
         kwargs : misc
             Any additional named arguments to ``skimage.transform.rotate`` method.
 
@@ -405,12 +409,8 @@ class HelioBatch():
         """
         data = self.data[src][i]
         meta = self.meta[src][i]
-        p_angle = meta["P"] if deg else np.rad2deg(meta["P"])
-        is_bool = data.dtype == np.bool
-        data = rotate(data, p_angle, center=(meta['j_cen'], meta['i_cen']),
-                      preserve_range=True, **kwargs)
-        if is_bool:
-            data = data > 0.5
+        data = rotate_at_center(data, angle=meta["P"], center=(meta['j_cen'], meta['i_cen']),
+                                deg=deg, labels=labels, background=background, **kwargs)
         self.data[dst][i] = data
         self.meta[dst][i]['P'] = 0.
         return self
@@ -748,6 +748,8 @@ class HelioBatch():
         j_cen = meta['j_cen']
         B0 = self.index.iloc[i]['B0']
         L0 = self.index.iloc[i]['L0']
+        if meta.get('P', 0) != 0:
+            mask = rotate_at_center(mask, meta["P"], center=(meta['j_cen'], meta['i_cen']))
         mask_ij = np.vstack(np.where(mask)).T
         mask_xy = np.array([mask_ij[:, 1] - j_cen, -mask_ij[:, 0] + i_cen]).T
         spp = xyz_to_sp(xy_to_xyz(mask_xy, rad=rad), deg=False)
