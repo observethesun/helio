@@ -751,6 +751,10 @@ class HelioBatch():
         if meta.get('P', 0) != 0:
             mask = rotate_at_center(mask, meta["P"], center=(meta['j_cen'], meta['i_cen']))
         mask_ij = np.vstack(np.where(mask)).T
+        if not mask_ij.size:
+            df = pd.DataFrame(columns=['i', 'j', 'Lat', 'Long', 'q', 'phi', 'area'])
+            self.data[dst][i] = df
+            return self
         mask_xy = np.array([mask_ij[:, 1] - j_cen, -mask_ij[:, 0] + i_cen]).T
         spp = xyz_to_sp(xy_to_xyz(mask_xy, rad=rad), deg=False)
         dist = haversine_distances(spp[:, ::-1], np.zeros((1, 2))).ravel()

@@ -68,7 +68,7 @@ def load_abp_mask(path, shape=None, sunspot_observation=False, group_label=False
         group_mask = np.zeros(shape, dtype='int')
         for _, row in df.iterrows():
             pts = row['pts']
-            group_mask[pts[:, 0], pts[:, 1]] = row['group_num']
+            group_mask[pts[:, 0], pts[:, 1]] = row['group_num'] #assume positive group numbers
         if sunspot_observation is False:
             return group_mask
 
