@@ -15,7 +15,7 @@ from skimage.io import imread
 import skimage
 import skimage.transform
 from skimage.measure import label, regionprops, find_contours, approximate_polygon
-from skimage.transform import resize, hough_circle, hough_circle_peaks
+from skimage.transform import resize, rotate, hough_circle, hough_circle_peaks
 from skimage.feature import canny
 from sklearn.metrics.pairwise import haversine_distances
 try:
@@ -183,11 +183,9 @@ class HelioBatch():
         elif fmt == 'npz':
             f = np.load(path)
             keys = list(f.keys())
-            if len(keys) != 1:
-                raise ValueError('Expected single key, found {}.'.format(len(keys)))
-            data = f[keys[0]]
+            data = f[src] if len(keys) != 1 else f[keys[0]]
         elif fmt == 'abp':
-            if isinstance(kwargs['shape'], str):
+            if isinstance(kwargs.get('shape', None), str):
                 kwargs['shape'] = self.data[kwargs['shape']][i].shape
             data = load_abp_mask(path, **kwargs)
         elif fmt in ['fts', 'fits']:
@@ -218,7 +216,10 @@ class HelioBatch():
                 header = np.array(fread[0].split())
                 meta = dict(i_cen=int(header[1]),
                             j_cen=int(header[0]),
-                            r=int(header[2]))
+                            r=int(header[2]),
+                            P=float(header[3]),
+                            B0=float(header[4]),
+                            L0=float(header[5]))
         elif fmt in ['fts', 'fits']:
             hdul = fits.open(path)
             hdul.verify(verify)
@@ -315,10 +316,11 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def dump_group_patches(self, i, src, dst, output_shape=None, min_area=0):
+    def dump_group_patches(self, i, src, dst, meta=None, min_area=0):
         """Dump group pathes into separate `.npz` files."""
         ind = self.indices[i]
         data = self.data[src][i]
+        meta = self.meta[src if meta is None else meta][i]
         labels = np.unique(data)
         for n in labels:
             if n == 0:
@@ -328,13 +330,11 @@ class HelioBatch():
             imax = group[0].max()
             jmin = group[1].min()
             jmax = group[1].max()
-            patch = data[imin:imax, jmin:jmax] > 0
+            patch = data[imin:imax, jmin:jmax]
             if patch.sum() < min_area:
                 continue
-            if output_shape is not None:
-                patch = resize(patch, output_shape=output_shape, preserve_range=True) > 0.5
             path = os.path.join(dst, ind + '_' + str(n) + '.npz')
-            np.savez(path, patch)
+            np.savez(path, patch=patch, r=meta['r'])
         return self
 
     @execute(how='threads')
@@ -381,6 +381,38 @@ class HelioBatch():
         """
         smap = self.data[src][i]
         self.data[dst][i] = correct_degradation(smap, **kwargs)
+        return self
+
+    @execute(how='threads')
+    def rotate_p_angle(self, i, src, dst, deg=True, **kwargs):
+        """Rotate disk image to P=0 around disk center.
+
+        Parameters
+        ----------
+        src : str
+            A source for disk images.
+        dst : str
+            A destination for results.
+        deg : bool
+            Angles are in degrees. Default True.
+        kwargs : misc
+            Any additional named arguments to ``skimage.transform.rotate`` method.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with rotated disk.
+        """
+        data = self.data[src][i]
+        meta = self.meta[src][i]
+        p_angle = meta["P"] if deg else np.rad2deg(meta["P"])
+        is_bool = data.dtype == np.bool
+        data = rotate(data, p_angle, center=(meta['j_cen'], meta['i_cen']),
+                      preserve_range=True, **kwargs)
+        if is_bool:
+            data = data > 0.5
+        self.data[dst][i] = data
+        self.meta[dst][i]['P'] = 0.
         return self
 
     @execute(how='threads')
@@ -508,7 +540,7 @@ class HelioBatch():
         output_shape : tuple
             Shape of output images. Axes ratio should be the same as for source image.
         kwargs : misc
-            Any additional named arguments to resize method.
+            Any additional named arguments to ``skimage.transform.resize`` method.
 
         Returns
         -------
@@ -680,9 +712,11 @@ class HelioBatch():
                 setattr(prop, 'bbox_hpc', bbox)
                 setattr(prop, 'centroid_hpc', map2hpc(prop.centroid).ravel())
                 setattr(prop, 'coords_hpc', map2hpc(prop.coords))
+                setattr(prop, 'contour_hpc', map2hgc(prop.contour))
                 setattr(prop, 'approx_contour_hpc', map2hpc(prop.approx_contour))
             elif name.lower() == 'hgc':
                 setattr(prop, 'coords_hgc', map2hgc(prop.coords))
+                setattr(prop, 'contour_hgc', map2hgc(prop.contour))
                 setattr(prop, 'approx_contour_hgc', map2hgc(prop.approx_contour))
             areas = pixel_areas(prop.coords)
             setattr(prop, 'pixel_area_msh', areas)
