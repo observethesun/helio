@@ -270,7 +270,8 @@ class HelioBatch():
     def _jsoc_load(self, i, src, dst, client, path, verbose=True):
         """Download data from JSOC."""
         _ = src, dst
-        client.download(path, i, verbose=verbose)
+        if i < len(client.data):
+            client.download(path, i, verbose=verbose)
         return self
 
     def deepcopy(self):
