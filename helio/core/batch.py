@@ -18,10 +18,7 @@ from skimage.measure import label, regionprops, find_contours, approximate_polyg
 from skimage.transform import resize, hough_circle, hough_circle_peaks
 from skimage.feature import canny
 from sklearn.metrics.pairwise import haversine_distances
-try:
-    import blosc
-except ImportError:
-    pass
+import drms
 
 from .decorators import execute, add_actions, extract_actions, TEMPLATE_DOCSTRING
 from .index import BaseIndex
@@ -177,10 +174,7 @@ class HelioBatch():
         """Load arrays with observational data from various formats."""
         path = self.index.iloc[i, self.index.columns.get_loc(src)]
         fmt = Path(path).suffix.lower()[1:]
-        if fmt == 'blosc':
-            with open(path, 'rb') as f:
-                data = dill.loads(blosc.decompress(f.read()))
-        elif fmt == 'npz':
+        if fmt == 'npz':
             f = np.load(path)
             keys = list(f.keys())
             data = f[src] if len(keys) != 1 else f[keys[0]]
@@ -235,6 +229,48 @@ class HelioBatch():
             raise NotImplementedError('Format {} is not supported.'.format(fmt))
 
         self.meta[dst][i] = meta
+        return self
+
+    def jsoc_load(self, path, series, email, method='url', protocol='fits', verbose=True):
+        """Download data from JSOC based on DateTime column in the batch index.
+
+        Parameters
+        ----------
+        path : str
+            Directory to save files.
+        series : str
+            JSOC series name, e.g. hmi.M_720s.
+        email : str
+            User email.
+        method : str
+            `drms` export method. Default fits.
+        protocol: str
+            `drms` export protocol. Default url.
+        verbose : bool
+            `drms` export and download verbose option. Default True.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch unchanged.
+        """
+        client = drms.Client(email=email, verbose=verbose)
+        arr = []
+        for i in range(len(self)):
+            dt = self.index.iloc[i]['DateTime']
+            arr.append('{}[{}_TAI]'.format(series, dt.strftime('%Y.%m.%d_%H:%M')))
+        query = ','.join(arr)
+        k = client.export(query, method=method, protocol=protocol)
+        k.wait()
+        if k.status:
+            return self
+        return self._jsoc_load(client=k, path=path, verbose=verbose)
+
+    @execute(how='threads')
+    def _jsoc_load(self, i, src, dst, client, path, verbose=True):
+        """Download data from JSOC."""
+        _ = src, dst
+        client.download(path, i, verbose=verbose)
         return self
 
     def deepcopy(self):
@@ -296,10 +332,7 @@ class HelioBatch():
         fname = os.path.join(path, str(self.indices[i])) + '.' + format
         data = self.data[src][i]
         meta = self.meta[src if meta is None else meta][i]
-        if format == 'blosc':
-            with open(fname, 'w+b') as f:
-                f.write(blosc.compress(dill.dumps(data)))
-        elif format == 'npz':
+        if format == 'npz':
             np.savez(fname, data, **kwargs)
         elif format == 'txt':
             np.savetxt(fname, data, **kwargs)
