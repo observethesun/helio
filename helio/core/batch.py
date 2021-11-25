@@ -10,6 +10,7 @@ import dill
 from astropy.io import fits
 from aiapy.calibrate import correct_degradation
 from scipy import interpolate
+from scipy import sparse
 from scipy.ndimage.morphology import binary_fill_holes
 from skimage.io import imread
 import skimage
@@ -175,9 +176,12 @@ class HelioBatch():
         path = self.index.iloc[i, self.index.columns.get_loc(src)]
         fmt = Path(path).suffix.lower()[1:]
         if fmt == 'npz':
-            f = np.load(path)
-            keys = list(f.keys())
-            data = f[src] if len(keys) != 1 else f[keys[0]]
+            if kwargs.get('sparse', False):
+                data = sparse.load_npz(path)
+            else:
+                f = np.load(path)
+                keys = list(f.keys())
+                data = f[src] if len(keys) != 1 else f[keys[0]]
         elif fmt == 'abp':
             if isinstance(kwargs.get('shape', None), str):
                 kwargs['shape'] = self.data[kwargs['shape']][i].shape
