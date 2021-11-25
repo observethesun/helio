@@ -1,6 +1,6 @@
 """Conv block and NN models."""
 import torch
-import torch.nn as nn
+from torch import nn
 
 class ConvBlock(nn.Module):
     """Convolutional block.
@@ -16,15 +16,13 @@ class ConvBlock(nn.Module):
         Number of filters for convolutions. Can be a single number (all convolutions will
         have the same number of filters), a list of the same length as a count of letters "c"
         in the layout, or None if the layout contains no "c".
-    transpose : bool
-        If true, transposed convolutions are used.
     rate : float
         Dropout rate parameter. Default to 0.1.
     activation : function
         Activation function. If not specified activation is tf.nn.elu.
     """
     def __init__(self, layout, in_channels=None, filters=None, kernel_size=3, stride=1,#pylint:disable=too-many-branches
-                 padding='same', transpose=False, rate=0.1, activation=None):
+                 padding='same', rate=0.1, activation=None):
         super().__init__()
         seq = []
         i = 0
@@ -172,8 +170,8 @@ class Encoder(nn.Module):
 
     def forward(self, x):
         """Forward pass."""
-        for i in range(0, len(self.down)):
-            x = self.down[i](x)
+        for layer in self.down:
+            x = layer(x)
         return self.out(x) if self.out is not None else x
 
 
