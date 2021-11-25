@@ -16,7 +16,7 @@ from skimage.io import imread
 import skimage
 import skimage.transform
 from skimage.measure import label, regionprops, find_contours, approximate_polygon
-from skimage.transform import resize, hough_circle, hough_circle_peaks
+from skimage.transform import resize, rescale, hough_circle, hough_circle_peaks
 from skimage.feature import canny
 from sklearn.metrics.pairwise import haversine_distances
 import drms
@@ -399,6 +399,32 @@ class HelioBatch():
         data[np.isnan(data)] = value
         self.data[dst][i] = data
 
+    @execute(how='threads')
+    def disk_center_crop(self, i, src, dst):
+        """Crop disk to radius.
+
+        Parameters
+        ----------
+        src : str
+            A source for data.
+        dst : str
+            A destination for results.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch cropped data.
+        """
+        data = self.data[src][i]
+        i_cen = self.meta[src][i]['i_cen']
+        j_cen = self.meta[src][i]['j_cen']
+        r = self.meta[src][i]['r']
+        self.data[dst][i] = data[i_cen-r:i_cen+r+1, j_cen-r:j_cen+r+1]
+        self.meta[dst][i]['i_cen'] = r
+        self.meta[dst][i]['j_cen'] = r
+        self.meta[dst][i]['r'] = r
+        return self
+
     @execute(how='loop')
     def correct_degradation(self, i, src, dst, **kwargs):
         """Apply ``aiapy.calibrate.correct_degradation`` procedure to AIA data.
@@ -545,29 +571,6 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def get_radius_by_nans(self, i, src, dst):
-        """Estimate solar disk center and radius in image filled with nans outside the disk.
-
-        Parameters
-        ----------
-        src : str
-            A source for solar disk images.
-
-        Returns
-        -------
-        batch : HelioBatch
-            Batch with updated meta.
-        """
-        _ = dst
-        img = self.data[src][i]
-        meta = self.meta[src][i]
-        j_cen = int(np.where(~np.isnan(img).all(axis=0))[0].mean())
-        i_cen = int(np.where(~np.isnan(img).all(axis=1))[0].mean())
-        rad = len(np.where(~np.isnan(img).all(axis=0))[0]) // 2
-        meta.update({'i_cen': i_cen, 'j_cen': j_cen, 'r': rad})
-        return self
-
-    @execute(how='threads')
     def disk_resize(self, i, src, dst, output_shape, **kwargs):
         """Resize solar disk image and update center location and radius.
 
@@ -627,18 +630,78 @@ class HelioBatch():
         rad = self.meta[target][i]['r']
 
         mask = self.data[src][i]
+        has_channels = mask.ndim == 3
+        mask = np.atleast_3d(mask)
         i_cen_mask, j_cen_mask = self.meta[src][i]['i_cen'], self.meta[src][i]['j_cen']
         rad_mask = self.meta[src][i]['r']
 
         scale = rad / rad_mask
-        rmask = resize(mask, (np.array(img.shape) * scale).astype(int), preserve_range=True)
-        new_mask = np.full(img.shape, False)
-        iarr, jarr = np.where(rmask > 0.5)
+        rmask = rescale(mask, (scale, scale), preserve_range=True, multichannel=True)
+        new_mask = np.full(img.shape[:2] + mask.shape[2:], False)
+        iarr, jarr, zarr = np.where(rmask > 0.5)
         new_mask[iarr - int(i_cen_mask * scale) + i_cen,
-                 jarr - int(j_cen_mask * scale) + j_cen] = True
+                 jarr - int(j_cen_mask * scale) + j_cen,
+                 zarr] = True
 
-        self.data[dst][i] = new_mask
+        self.data[dst][i] = new_mask if has_channels else new_mask[..., 0]
         self.meta[dst][i] = {'i_cen': i_cen, 'j_cen': j_cen, 'r': rad}
+        return self
+
+    @execute(how='threads')
+    def fit_scale(self, i, src, dst, target, labels=False, background=0):
+        """Fit data scale to the target disk radius.
+
+        Parameters
+        ----------
+        src : str
+            A source for data.
+        dst : str
+            A destination for new image.
+        target : str or int
+            Target radius. If str, then get radius from the target meta.
+        labels : bool
+            Data contains labels. Default False.
+        background : scalar
+            Background label. Default 0.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with rescaled images.
+        """
+        data = self.data[src][i]
+        rad = self.meta[src][i]['r']
+        i_cen = self.meta[src][i]['i_cen']
+        j_cen = self.meta[src][i]['j_cen']
+
+        has_channels = data.ndim == 3
+        data = np.atleast_3d(data)
+        is_bool = data.dtype == np.bool
+
+        rad_target = self.meta[target][i]['r'] if isinstance(target, str) else target
+        scale = rad_target / rad
+        if labels:
+            new_data = None
+            lbs = np.unique(data)
+            for k in lbs:
+                if (k == background) and (len(lbs) > 1):
+                    continue
+                mask = data == k
+                rmask = rescale(mask, (scale, scale), preserve_range=True, multichannel=True) > 0.5
+                if new_data is None:
+                    new_data = np.full(rmask.shape, background)
+                new_data[rmask] = k
+        else:
+            new_data = rescale(data, (scale, scale), preserve_range=True, multichannel=True)
+        if not has_channels:
+            new_data = new_data[..., 0]
+        if is_bool:
+            new_data = new_data > 0.5
+
+        self.data[dst][i] = new_data
+        self.meta[dst][i].update({'i_cen': int(i_cen * scale + 0.5),
+                                  'j_cen': int(j_cen * scale + 0.5),
+                                  'r': int(rad * scale + 0.5)})
         return self
 
     @execute(how='threads')
