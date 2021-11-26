@@ -461,7 +461,7 @@ class HelioBatch():
             Angles are in degrees. Default True.
         labels : bool
            Data contains labels. Default False.
-       background : scalar
+        background : scalar
            Background label.
         kwargs : misc
             Any additional named arguments to ``skimage.transform.rotate`` method.
@@ -1112,7 +1112,7 @@ class HelioBatch():
             A parameter for pixel weights according to `weight_decay(-(dist - shift) / scale)`.
         scale : scalar
             A parameter for pixel weights according to `weight_decay(-(dist - shift) / scale)`.
-         weight_decay: callable
+        weight_decay: callable
             Function to get a pixel weight based on its distance from central meridian.
             Distance unit should be degree. Default is sigmoid function.
         deg : bool
