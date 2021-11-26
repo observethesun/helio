@@ -57,7 +57,6 @@ for ids in batch_sampler:
 
 For more examples see [tutorials](./tutorials).
 
-
 ### Acknowledgments
 
 Project is supported by the RFB grant 20-72-00106. 

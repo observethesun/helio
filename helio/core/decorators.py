@@ -59,16 +59,22 @@ def execute(how):
     def decorator(method):
         """Returned decorator."""
         @wraps(method)
-        def wrapper(self, *args, src=None, dst=None, **kwargs):
+        def wrapper(self, *args, src=None, dst=None, **kwargs):#pylint:disable=too-many-branches
             """Method wrapper."""
-            src = np.atleast_1d(src)
-            dst = src if dst is None else np.atleast_1d(dst)
+            if src is not None:
+                src = np.atleast_1d(src)
+                dst = src if dst is None else np.atleast_1d(dst)
+            else:
+                src = [src]
 
-            for d in dst:
-                if d not in self.data:
-                    self.data[d] = np.array([None] * len(self))
-                if d not in self.meta:
-                    self.meta[d] = np.array([{} for _ in range(len(self))])
+            if dst is not None:
+                for d in dst:
+                    if d not in self.data:
+                        self.data[d] = np.array([None] * len(self))
+                    if d not in self.meta:
+                        self.meta[d] = np.array([{} for _ in range(len(self))])
+            else:
+                dst = [dst]
 
             results = []
             n_workers = kwargs.get('n_workers', os.cpu_count() * 4)

@@ -22,19 +22,21 @@ def load_fits(path, verify='fix', unit=0, as_smap=False):
     hdul.verify(verify)
     return hdul[unit].data
 
-def load_abp_mask(path, shape, sunspot_observation=False):
+def load_abp_mask(path, shape=None, sunspot_observation=False, group_label=False):
     """Builds segmentation mask from `abp` file.
 
     Parameters
     ----------
     path : str
         Path to abp file.
-    shape : tuple
+    shape : tuple, optional
         Shape of the source image.
     sunspot_observation : bool
         If False, all active regions will be put in a single mask.
         If True, active regions will be separated into sunspots, cores and
-        pores and put into separate masks.
+        pores and put into separate masks. Default False.
+    group_label : bool
+        If True, return a mask with group numbers. Default False.
 
     Returns
     -------
@@ -44,6 +46,12 @@ def load_abp_mask(path, shape, sunspot_observation=False):
     with open(path, 'r') as fin:
         fread = fin.readlines()
         n_lines = len(fread)
+        if shape is None:
+            header = np.array(fread[0].split())
+            i_cen = int(header[1])
+            j_cen = int(header[0])
+            r = int(header[2])
+            shape = (i_cen + r + 1, j_cen + r + 1)
         n_skip = int(fread[1].split()[0])
         num_objects = (n_lines - 3 - n_skip) // 2
         obj_meta = np.array([fread[3 + n_skip + 2 * i].split() for i in range(num_objects)]).astype(int)
@@ -51,9 +59,18 @@ def load_abp_mask(path, shape, sunspot_observation=False):
 
         df = pd.DataFrame(columns=['obj_num', 'core_num', 'pts'])
         if num_objects:
+            df['group_num'] = obj_meta[:, 2]
             df['obj_num'] = obj_meta[:, -2]
             df['core_num'] = obj_meta[:, -1]
             df['pts'] = [arr.reshape((-1, 3))[:, [1, 0]].astype('int') for arr in data]
+
+    if group_label:
+        group_mask = np.zeros(shape, dtype='int')
+        for _, row in df.iterrows():
+            pts = row['pts']
+            group_mask[pts[:, 0], pts[:, 1]] = row['group_num'] #assume positive group numbers
+        if sunspot_observation is False:
+            return group_mask
 
     if sunspot_observation:
         mask = np.zeros(shape + (3,), dtype='bool')
@@ -76,6 +93,8 @@ def load_abp_mask(path, shape, sunspot_observation=False):
         if not pts.empty:
             pts = np.vstack(pts)
             mask[pts[:, 0], pts[:, 1], 2] = True
+        if group_label:
+            return np.concatenate([mask, group_mask[..., np.newaxis]], axis=-1)
         return mask
 
     mask = np.zeros(shape, dtype='bool')

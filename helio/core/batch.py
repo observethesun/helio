@@ -10,23 +10,21 @@ import dill
 from astropy.io import fits
 from aiapy.calibrate import correct_degradation
 from scipy import interpolate
+from scipy import sparse
 from scipy.ndimage.morphology import binary_fill_holes
 from skimage.io import imread
 import skimage
 import skimage.transform
 from skimage.measure import label, regionprops, find_contours, approximate_polygon
-from skimage.transform import resize, rotate, hough_circle, hough_circle_peaks
+from skimage.transform import resize, rescale, hough_circle, hough_circle_peaks
 from skimage.feature import canny
 from sklearn.metrics.pairwise import haversine_distances
-try:
-    import blosc
-except ImportError:
-    pass
+import drms
 
 from .decorators import execute, add_actions, extract_actions, TEMPLATE_DOCSTRING
 from .index import BaseIndex
 from .synoptic_maps import make_synoptic_map, label360, region_statistics
-from .geometry_utils import xy_to_xyz, xyz_to_sp, xy_to_carr
+from .geometry_utils import xy_to_xyz, xyz_to_sp, xy_to_carr, rotate_at_center
 from .io import load_fits, load_abp_mask, write_abp_file, write_fits, write_xml
 from .utils import detect_edges
 
@@ -177,16 +175,16 @@ class HelioBatch():
         """Load arrays with observational data from various formats."""
         path = self.index.iloc[i, self.index.columns.get_loc(src)]
         fmt = Path(path).suffix.lower()[1:]
-        if fmt == 'blosc':
-            with open(path, 'rb') as f:
-                data = dill.loads(blosc.decompress(f.read()))
-        elif fmt == 'npz':
-            f = np.load(path)
-            keys = list(f.keys())
-            if len(keys) != 1:
-                raise ValueError('Expected single key, found {}.'.format(len(keys)))
-            data = f[keys[0]]
+        if fmt == 'npz':
+            if kwargs.get('sparse', False):
+                data = sparse.load_npz(path)
+            else:
+                f = np.load(path)
+                keys = list(f.keys())
+                data = f[src] if len(keys) != 1 else f[keys[0]]
         elif fmt == 'abp':
+            if isinstance(kwargs.get('shape', None), str):
+                kwargs['shape'] = self.data[kwargs['shape']][i].shape
             data = load_abp_mask(path, **kwargs)
         elif fmt in ['fts', 'fits']:
             data = load_fits(path, **kwargs)
@@ -235,6 +233,49 @@ class HelioBatch():
             raise NotImplementedError('Format {} is not supported.'.format(fmt))
 
         self.meta[dst][i] = meta
+        return self
+
+    def jsoc_load(self, path, series, email, method='url', protocol='fits', verbose=True):
+        """Download data from JSOC based on DateTime column in the batch index.
+
+        Parameters
+        ----------
+        path : str
+            Directory to save files.
+        series : str
+            JSOC series name, e.g. hmi.M_720s.
+        email : str
+            User email.
+        method : str
+            `drms` export method. Default fits.
+        protocol: str
+            `drms` export protocol. Default url.
+        verbose : bool
+            `drms` export and download verbose option. Default True.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch unchanged.
+        """
+        client = drms.Client(email=email, verbose=verbose)
+        arr = []
+        for i in range(len(self)):
+            dt = self.index.iloc[i]['DateTime']
+            arr.append('{}[{}_TAI]'.format(series, dt.strftime('%Y.%m.%d_%H:%M')))
+        query = ','.join(arr)
+        k = client.export(query, method=method, protocol=protocol)
+        k.wait()
+        if k.status:
+            return self
+        return self._jsoc_load(client=k, path=path, verbose=verbose)
+
+    @execute(how='threads')
+    def _jsoc_load(self, i, src, dst, client, path, verbose=True):
+        """Download data from JSOC."""
+        _ = src, dst
+        if i < len(client.data):
+            client.download(path, i, verbose=verbose)
         return self
 
     def deepcopy(self):
@@ -296,10 +337,7 @@ class HelioBatch():
         fname = os.path.join(path, str(self.indices[i])) + '.' + format
         data = self.data[src][i]
         meta = self.meta[src if meta is None else meta][i]
-        if format == 'blosc':
-            with open(fname, 'w+b') as f:
-                f.write(blosc.compress(dill.dumps(data)))
-        elif format == 'npz':
+        if format == 'npz':
             np.savez(fname, data, **kwargs)
         elif format == 'txt':
             np.savetxt(fname, data, **kwargs)
@@ -313,6 +351,28 @@ class HelioBatch():
             write_xml(path, data, index=self.index.iloc[[i]], meta=meta, **kwargs)
         else:
             plt.imsave(fname, data, format=format, **kwargs)
+        return self
+
+    @execute(how='threads')
+    def dump_group_patches(self, i, src, dst, meta=None, min_area=0):
+        """Dump group pathes into separate `.npz` files."""
+        ind = self.indices[i]
+        data = self.data[src][i]
+        meta = self.meta[src if meta is None else meta][i]
+        labels = np.unique(data)
+        for n in labels:
+            if n == 0:
+                continue
+            group = np.where(data == n)
+            imin = group[0].min()
+            imax = group[0].max()
+            jmin = group[1].min()
+            jmax = group[1].max()
+            patch = data[imin:imax, jmin:jmax]
+            if patch.sum() < min_area:
+                continue
+            path = os.path.join(dst, ind + '_' + str(n) + '.npz')
+            np.savez(path, patch=patch, r=meta['r'])
         return self
 
     @execute(how='threads')
@@ -339,6 +399,32 @@ class HelioBatch():
         data[np.isnan(data)] = value
         self.data[dst][i] = data
 
+    @execute(how='threads')
+    def disk_center_crop(self, i, src, dst):
+        """Crop disk to radius.
+
+        Parameters
+        ----------
+        src : str
+            A source for data.
+        dst : str
+            A destination for results.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch cropped data.
+        """
+        data = self.data[src][i]
+        i_cen = self.meta[src][i]['i_cen']
+        j_cen = self.meta[src][i]['j_cen']
+        r = self.meta[src][i]['r']
+        self.data[dst][i] = data[i_cen-r:i_cen+r+1, j_cen-r:j_cen+r+1]
+        self.meta[dst][i]['i_cen'] = r
+        self.meta[dst][i]['j_cen'] = r
+        self.meta[dst][i]['r'] = r
+        return self
+
     @execute(how='loop')
     def correct_degradation(self, i, src, dst, **kwargs):
         """Apply ``aiapy.calibrate.correct_degradation`` procedure to AIA data.
@@ -362,7 +448,7 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def rotate_p_angle(self, i, src, dst, deg=True, **kwargs):
+    def rotate_p_angle(self, i, src, dst, deg=True, labels=False, background=0, **kwargs):
         """Rotate disk image to P=0 around disk center.
 
         Parameters
@@ -373,6 +459,10 @@ class HelioBatch():
             A destination for results.
         deg : bool
             Angles are in degrees. Default True.
+        labels : bool
+           Data contains labels. Default False.
+       background : scalar
+           Background label.
         kwargs : misc
             Any additional named arguments to ``skimage.transform.rotate`` method.
 
@@ -383,12 +473,8 @@ class HelioBatch():
         """
         data = self.data[src][i]
         meta = self.meta[src][i]
-        p_angle = meta["P"] if deg else np.rad2deg(meta["P"])
-        is_bool = data.dtype == np.bool
-        data = rotate(data, p_angle, center=(meta['j_cen'], meta['i_cen']),
-                      preserve_range=True, **kwargs)
-        if is_bool:
-            data = data > 0.5
+        data = rotate_at_center(data, angle=meta["P"], center=(meta['j_cen'], meta['i_cen']),
+                                deg=deg, labels=labels, background=background, **kwargs)
         self.data[dst][i] = data
         self.meta[dst][i]['P'] = 0.
         return self
@@ -475,37 +561,13 @@ class HelioBatch():
             msg = 'At index {}. Estimated radius {} is in the end of hough_radii.\
             Try to extend hough_radii to verify radius found.'.format(self.index.indices[i], radii)
             if raise_limits:
-                logger.error(msg)
-                raise ValueError
+                raise ValueError(msg)
             logger.warn(msg)
 
         meta['i_cen'] = int(c_y)
         meta['j_cen'] = int(c_x)
         meta['r'] = int(radii)
         self.meta[dst][i] = meta
-        return self
-
-    @execute(how='threads')
-    def get_radius_by_nans(self, i, src, dst):
-        """Estimate solar disk center and radius in image filled with nans outside the disk.
-
-        Parameters
-        ----------
-        src : str
-            A source for solar disk images.
-
-        Returns
-        -------
-        batch : HelioBatch
-            Batch with updated meta.
-        """
-        _ = dst
-        img = self.data[src][i]
-        meta = self.meta[src][i]
-        j_cen = int(np.where(~np.isnan(img).all(axis=0))[0].mean())
-        i_cen = int(np.where(~np.isnan(img).all(axis=1))[0].mean())
-        rad = len(np.where(~np.isnan(img).all(axis=0))[0]) // 2
-        meta.update({'i_cen': i_cen, 'j_cen': j_cen, 'r': rad})
         return self
 
     @execute(how='threads')
@@ -568,18 +630,78 @@ class HelioBatch():
         rad = self.meta[target][i]['r']
 
         mask = self.data[src][i]
+        has_channels = mask.ndim == 3
+        mask = np.atleast_3d(mask)
         i_cen_mask, j_cen_mask = self.meta[src][i]['i_cen'], self.meta[src][i]['j_cen']
         rad_mask = self.meta[src][i]['r']
 
         scale = rad / rad_mask
-        rmask = resize(mask, (np.array(img.shape) * scale).astype(int), preserve_range=True)
-        new_mask = np.full(img.shape, False)
-        iarr, jarr = np.where(rmask > 0.5)
+        rmask = rescale(mask, (scale, scale), preserve_range=True, multichannel=True)
+        new_mask = np.full(img.shape[:2] + mask.shape[2:], False)
+        iarr, jarr, zarr = np.where(rmask > 0.5)
         new_mask[iarr - int(i_cen_mask * scale) + i_cen,
-                 jarr - int(j_cen_mask * scale) + j_cen] = True
+                 jarr - int(j_cen_mask * scale) + j_cen,
+                 zarr] = True
 
-        self.data[dst][i] = new_mask
+        self.data[dst][i] = new_mask if has_channels else new_mask[..., 0]
         self.meta[dst][i] = {'i_cen': i_cen, 'j_cen': j_cen, 'r': rad}
+        return self
+
+    @execute(how='threads')
+    def fit_scale(self, i, src, dst, target, labels=False, background=0):
+        """Fit data scale to the target disk radius.
+
+        Parameters
+        ----------
+        src : str
+            A source for data.
+        dst : str
+            A destination for new image.
+        target : str or int
+            Target radius. If str, then get radius from the target meta.
+        labels : bool
+            Data contains labels. Default False.
+        background : scalar
+            Background label. Default 0.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with rescaled images.
+        """
+        data = self.data[src][i]
+        rad = self.meta[src][i]['r']
+        i_cen = self.meta[src][i]['i_cen']
+        j_cen = self.meta[src][i]['j_cen']
+
+        has_channels = data.ndim == 3
+        data = np.atleast_3d(data)
+        is_bool = data.dtype == np.bool
+
+        rad_target = self.meta[target][i]['r'] if isinstance(target, str) else target
+        scale = rad_target / rad
+        if labels:
+            new_data = None
+            lbs = np.unique(data)
+            for k in lbs:
+                if (k == background) and (len(lbs) > 1):
+                    continue
+                mask = data == k
+                rmask = rescale(mask, (scale, scale), preserve_range=True, multichannel=True) > 0.5
+                if new_data is None:
+                    new_data = np.full(rmask.shape, background)
+                new_data[rmask] = k
+        else:
+            new_data = rescale(data, (scale, scale), preserve_range=True, multichannel=True)
+        if not has_channels:
+            new_data = new_data[..., 0]
+        if is_bool:
+            new_data = new_data > 0.5
+
+        self.data[dst][i] = new_data
+        self.meta[dst][i].update({'i_cen': int(i_cen * scale + 0.5),
+                                  'j_cen': int(j_cen * scale + 0.5),
+                                  'r': int(rad * scale + 0.5)})
         return self
 
     @execute(how='threads')
@@ -727,7 +849,13 @@ class HelioBatch():
         j_cen = meta['j_cen']
         B0 = self.index.iloc[i]['B0']
         L0 = self.index.iloc[i]['L0']
+        if meta.get('P', 0) != 0:
+            mask = rotate_at_center(mask, meta["P"], center=(meta['j_cen'], meta['i_cen']))
         mask_ij = np.vstack(np.where(mask)).T
+        if not mask_ij.size:
+            df = pd.DataFrame(columns=['i', 'j', 'Lat', 'Long', 'q', 'phi', 'area'])
+            self.data[dst][i] = df
+            return self
         mask_xy = np.array([mask_ij[:, 1] - j_cen, -mask_ij[:, 0] + i_cen]).T
         spp = xyz_to_sp(xy_to_xyz(mask_xy, rad=rad), deg=False)
         dist = haversine_distances(spp[:, ::-1], np.zeros((1, 2))).ravel()

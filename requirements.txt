@@ -1,7 +1,6 @@
 numpy>=1.13.1
 scipy>=0.19.1
 matplotlib>=2.1.0
-tensorflow-gpu==1.4
 tqdm>=4.19.7
 blosc>=1.5.0
 sunpy>=1.1.1
@@ -11,3 +10,6 @@ scikit-image>=0.16.2
 scikit-learn>=0.21.2
 dill>=0.3.1.1
 numpydoc>=0.8.0
+torch
+torchvision
+tensorflow==1.15.0
