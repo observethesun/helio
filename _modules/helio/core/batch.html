@@ -156,23 +156,21 @@
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="k">import</span> <span class="n">fits</span>
 <span class="kn">from</span> <span class="nn">aiapy.calibrate</span> <span class="k">import</span> <span class="n">correct_degradation</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">interpolate</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">sparse</span>
 <span class="kn">from</span> <span class="nn">scipy.ndimage.morphology</span> <span class="k">import</span> <span class="n">binary_fill_holes</span>
 <span class="kn">from</span> <span class="nn">skimage.io</span> <span class="k">import</span> <span class="n">imread</span>
 <span class="kn">import</span> <span class="nn">skimage</span>
 <span class="kn">import</span> <span class="nn">skimage.transform</span>
 <span class="kn">from</span> <span class="nn">skimage.measure</span> <span class="k">import</span> <span class="n">label</span><span class="p">,</span> <span class="n">regionprops</span><span class="p">,</span> <span class="n">find_contours</span><span class="p">,</span> <span class="n">approximate_polygon</span>
-<span class="kn">from</span> <span class="nn">skimage.transform</span> <span class="k">import</span> <span class="n">resize</span><span class="p">,</span> <span class="n">rotate</span><span class="p">,</span> <span class="n">hough_circle</span><span class="p">,</span> <span class="n">hough_circle_peaks</span>
+<span class="kn">from</span> <span class="nn">skimage.transform</span> <span class="k">import</span> <span class="n">resize</span><span class="p">,</span> <span class="n">rescale</span><span class="p">,</span> <span class="n">hough_circle</span><span class="p">,</span> <span class="n">hough_circle_peaks</span>
 <span class="kn">from</span> <span class="nn">skimage.feature</span> <span class="k">import</span> <span class="n">canny</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics.pairwise</span> <span class="k">import</span> <span class="n">haversine_distances</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">blosc</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="k">pass</span>
+<span class="kn">import</span> <span class="nn">drms</span>
 
 <span class="kn">from</span> <span class="nn">.decorators</span> <span class="k">import</span> <span class="n">execute</span><span class="p">,</span> <span class="n">add_actions</span><span class="p">,</span> <span class="n">extract_actions</span><span class="p">,</span> <span class="n">TEMPLATE_DOCSTRING</span>
 <span class="kn">from</span> <span class="nn">.index</span> <span class="k">import</span> <span class="n">BaseIndex</span>
 <span class="kn">from</span> <span class="nn">.synoptic_maps</span> <span class="k">import</span> <span class="n">make_synoptic_map</span><span class="p">,</span> <span class="n">label360</span><span class="p">,</span> <span class="n">region_statistics</span>
-<span class="kn">from</span> <span class="nn">.geometry_utils</span> <span class="k">import</span> <span class="n">xy_to_xyz</span><span class="p">,</span> <span class="n">xyz_to_sp</span><span class="p">,</span> <span class="n">xy_to_carr</span>
+<span class="kn">from</span> <span class="nn">.geometry_utils</span> <span class="k">import</span> <span class="n">xy_to_xyz</span><span class="p">,</span> <span class="n">xyz_to_sp</span><span class="p">,</span> <span class="n">xy_to_carr</span><span class="p">,</span> <span class="n">rotate_at_center</span>
 <span class="kn">from</span> <span class="nn">.io</span> <span class="k">import</span> <span class="n">load_fits</span><span class="p">,</span> <span class="n">load_abp_mask</span><span class="p">,</span> <span class="n">write_abp_file</span><span class="p">,</span> <span class="n">write_fits</span><span class="p">,</span> <span class="n">write_xml</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">detect_edges</span>
 
@@ -323,16 +321,16 @@
         <span class="sd">&quot;&quot;&quot;Load arrays with observational data from various formats.&quot;&quot;&quot;</span>
         <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">src</span><span class="p">)]</span>
         <span class="n">fmt</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="k">if</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s1">&#39;blosc&#39;</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">dill</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">blosc</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()))</span>
-        <span class="k">elif</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s1">&#39;npz&#39;</span><span class="p">:</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-            <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Expected single key, found </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)))</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s1">&#39;npz&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sparse&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">load_npz</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">src</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">f</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
         <span class="k">elif</span> <span class="n">fmt</span> <span class="o">==</span> <span class="s1">&#39;abp&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;shape&#39;</span><span class="p">]][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">load_abp_mask</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;fts&#39;</span><span class="p">,</span> <span class="s1">&#39;fits&#39;</span><span class="p">]:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">load_fits</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -381,6 +379,49 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Format </span><span class="si">{}</span><span class="s1"> is not supported.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fmt</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="HelioBatch.jsoc_load"><a class="viewcode-back" href="../../../api/helio_batch.html#helio.core.HelioBatch.jsoc_load">[docs]</a>    <span class="k">def</span> <span class="nf">jsoc_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">series</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;url&#39;</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="s1">&#39;fits&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Download data from JSOC based on DateTime column in the batch index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : str</span>
+<span class="sd">            Directory to save files.</span>
+<span class="sd">        series : str</span>
+<span class="sd">            JSOC series name, e.g. hmi.M_720s.</span>
+<span class="sd">        email : str</span>
+<span class="sd">            User email.</span>
+<span class="sd">        method : str</span>
+<span class="sd">            `drms` export method. Default fits.</span>
+<span class="sd">        protocol: str</span>
+<span class="sd">            `drms` export protocol. Default url.</span>
+<span class="sd">        verbose : bool</span>
+<span class="sd">            `drms` export and download verbose option. Default True.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        batch : HelioBatch</span>
+<span class="sd">            Batch unchanged.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">drms</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;DateTime&#39;</span><span class="p">]</span>
+            <span class="n">arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">[</span><span class="si">{}</span><span class="s1">_TAI]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y.%m.</span><span class="si">%d</span><span class="s1">_%H:%M&#39;</span><span class="p">)))</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">protocol</span><span class="p">)</span>
+        <span class="n">k</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">status</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jsoc_load</span><span class="p">(</span><span class="n">client</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span></div>
+
+    <span class="nd">@execute</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;threads&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_jsoc_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Download data from JSOC.&quot;&quot;&quot;</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 
 <div class="viewcode-block" id="HelioBatch.deepcopy"><a class="viewcode-back" href="../../../api/helio_batch.html#helio.core.HelioBatch.deepcopy">[docs]</a>    <span class="k">def</span> <span class="nf">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -442,10 +483,7 @@
         <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nb">format</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span> <span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">meta</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;blosc&#39;</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w+b&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">blosc</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">dill</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
-        <span class="k">elif</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;npz&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;npz&#39;</span><span class="p">:</span>
             <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;txt&#39;</span><span class="p">:</span>
             <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -460,6 +498,28 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="HelioBatch.dump_group_patches"><a class="viewcode-back" href="../../../api/helio_batch.html#helio.core.HelioBatch.dump_group_patches">[docs]</a>    <span class="nd">@execute</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;threads&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">dump_group_patches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_area</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Dump group pathes into separate `.npz` files.&quot;&quot;&quot;</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span> <span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">meta</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data</span> <span class="o">==</span> <span class="n">n</span><span class="p">)</span>
+            <span class="n">imin</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="n">imax</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="n">jmin</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="n">jmax</span> <span class="o">=</span> <span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="n">patch</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">imin</span><span class="p">:</span><span class="n">imax</span><span class="p">,</span> <span class="n">jmin</span><span class="p">:</span><span class="n">jmax</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">patch</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">min_area</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">ind</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.npz&#39;</span><span class="p">)</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">patch</span><span class="o">=</span><span class="n">patch</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="HelioBatch.fillna"><a class="viewcode-back" href="../../../api/helio_batch.html#helio.core.HelioBatch.fillna">[docs]</a>    <span class="nd">@execute</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;threads&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">fillna</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
@@ -485,6 +545,32 @@
         <span class="n">data</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span></div>
 
+<div class="viewcode-block" id="HelioBatch.disk_center_crop"><a class="viewcode-back" href="../../../api/helio_batch.html#helio.core.HelioBatch.disk_center_crop">[docs]</a>    <span class="nd">@execute</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;threads&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">disk_center_crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Crop disk to radius.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        src : str</span>
+<span class="sd">            A source for data.</span>
+<span class="sd">        dst : str</span>
+<span class="sd">            A destination for results.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        batch : HelioBatch</span>
+<span class="sd">            Batch cropped data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">i_cen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;i_cen&#39;</span><span class="p">]</span>
+        <span class="n">j_cen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;j_cen&#39;</span><span class="p">]</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;r&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i_cen</span><span class="o">-</span><span class="n">r</span><span class="p">:</span><span class="n">i_cen</span><span class="o">+</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">j_cen</span><span class="o">-</span><span class="n">r</span><span class="p">:</span><span class="n">j_cen</span><span class="o">+</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;i_cen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;j_cen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
 <div class="viewcode-block" id="HelioBatch.correct_degradation"><a class="viewcode-back" href="../../../api/helio_batch.html#helio.core.HelioBatch.correct_degradation">[docs]</a>    <span class="nd">@execute</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;loop&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">correct_degradation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Apply ``aiapy.calibrate.correct_degradation`` procedure to AIA data.</span>
@@ -508,7 +594,7 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="HelioBatch.rotate_p_angle"><a class="viewcode-back" href="../../../api/helio_batch.html#helio.core.HelioBatch.rotate_p_angle">[docs]</a>    <span class="nd">@execute</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;threads&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">rotate_p_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">rotate_p_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">background</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Rotate disk image to P=0 around disk center.</span>
 
 <span class="sd">        Parameters</span>
@@ -519,6 +605,10 @@
 <span class="sd">            A destination for results.</span>
 <span class="sd">        deg : bool</span>
 <span class="sd">            Angles are in degrees. Default True.</span>
+<span class="sd">        labels : bool</span>
+<span class="sd">           Data contains labels. Default False.</span>
+<span class="sd">        background : scalar</span>
+<span class="sd">           Background label.</span>
 <span class="sd">        kwargs : misc</span>
 <span class="sd">            Any additional named arguments to ``skimage.transform.rotate`` method.</span>
 
@@ -529,12 +619,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">p_angle</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">deg</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">])</span>
-        <span class="n">is_bool</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">bool</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">rotate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">p_angle</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;j_cen&#39;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;i_cen&#39;</span><span class="p">]),</span>
-                      <span class="n">preserve_range</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">is_bool</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">rotate_at_center</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">],</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;j_cen&#39;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;i_cen&#39;</span><span class="p">]),</span>
+                                <span class="n">deg</span><span class="o">=</span><span class="n">deg</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">background</span><span class="o">=</span><span class="n">background</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
         <span class="k">return</span> <span class="bp">self</span></div>
@@ -621,37 +707,13 @@
             <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;At index </span><span class="si">{}</span><span class="s1">. Estimated radius </span><span class="si">{}</span><span class="s1"> is in the end of hough_radii.</span><span class="se">\</span>
 <span class="s1">            Try to extend hough_radii to verify radius found.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">radii</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">raise_limits</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;i_cen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">c_y</span><span class="p">)</span>
         <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;j_cen&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">c_x</span><span class="p">)</span>
         <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">radii</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span>
-        <span class="k">return</span> <span class="bp">self</span></div>
-
-<div class="viewcode-block" id="HelioBatch.get_radius_by_nans"><a class="viewcode-back" href="../../../api/helio_batch.html#helio.core.HelioBatch.get_radius_by_nans">[docs]</a>    <span class="nd">@execute</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;threads&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_radius_by_nans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Estimate solar disk center and radius in image filled with nans outside the disk.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        src : str</span>
-<span class="sd">            A source for solar disk images.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        batch : HelioBatch</span>
-<span class="sd">            Batch with updated meta.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">_</span> <span class="o">=</span> <span class="n">dst</span>
-        <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">j_cen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-        <span class="n">i_cen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
-        <span class="n">rad</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span> <span class="o">//</span> <span class="mi">2</span>
-        <span class="n">meta</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;i_cen&#39;</span><span class="p">:</span> <span class="n">i_cen</span><span class="p">,</span> <span class="s1">&#39;j_cen&#39;</span><span class="p">:</span> <span class="n">j_cen</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">:</span> <span class="n">rad</span><span class="p">})</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="HelioBatch.disk_resize"><a class="viewcode-back" href="../../../api/helio_batch.html#helio.core.HelioBatch.disk_resize">[docs]</a>    <span class="nd">@execute</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;threads&#39;</span><span class="p">)</span>
@@ -714,18 +776,78 @@
         <span class="n">rad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">target</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;r&#39;</span><span class="p">]</span>
 
         <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">has_channels</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_3d</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
         <span class="n">i_cen_mask</span><span class="p">,</span> <span class="n">j_cen_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;i_cen&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;j_cen&#39;</span><span class="p">]</span>
         <span class="n">rad_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;r&#39;</span><span class="p">]</span>
 
         <span class="n">scale</span> <span class="o">=</span> <span class="n">rad</span> <span class="o">/</span> <span class="n">rad_mask</span>
-        <span class="n">rmask</span> <span class="o">=</span> <span class="n">resize</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">preserve_range</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">new_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-        <span class="n">iarr</span><span class="p">,</span> <span class="n">jarr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rmask</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">rmask</span> <span class="o">=</span> <span class="n">rescale</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">scale</span><span class="p">),</span> <span class="n">preserve_range</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multichannel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">new_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">iarr</span><span class="p">,</span> <span class="n">jarr</span><span class="p">,</span> <span class="n">zarr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rmask</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span>
         <span class="n">new_mask</span><span class="p">[</span><span class="n">iarr</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">i_cen_mask</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span> <span class="o">+</span> <span class="n">i_cen</span><span class="p">,</span>
-                 <span class="n">jarr</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">j_cen_mask</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span> <span class="o">+</span> <span class="n">j_cen</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                 <span class="n">jarr</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">j_cen_mask</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span> <span class="o">+</span> <span class="n">j_cen</span><span class="p">,</span>
+                 <span class="n">zarr</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_mask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_mask</span> <span class="k">if</span> <span class="n">has_channels</span> <span class="k">else</span> <span class="n">new_mask</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;i_cen&#39;</span><span class="p">:</span> <span class="n">i_cen</span><span class="p">,</span> <span class="s1">&#39;j_cen&#39;</span><span class="p">:</span> <span class="n">j_cen</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">:</span> <span class="n">rad</span><span class="p">}</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="HelioBatch.fit_scale"><a class="viewcode-back" href="../../../api/helio_batch.html#helio.core.HelioBatch.fit_scale">[docs]</a>    <span class="nd">@execute</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;threads&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fit_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">background</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fit data scale to the target disk radius.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        src : str</span>
+<span class="sd">            A source for data.</span>
+<span class="sd">        dst : str</span>
+<span class="sd">            A destination for new image.</span>
+<span class="sd">        target : str or int</span>
+<span class="sd">            Target radius. If str, then get radius from the target meta.</span>
+<span class="sd">        labels : bool</span>
+<span class="sd">            Data contains labels. Default False.</span>
+<span class="sd">        background : scalar</span>
+<span class="sd">            Background label. Default 0.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        batch : HelioBatch</span>
+<span class="sd">            Batch with rescaled images.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">rad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;r&#39;</span><span class="p">]</span>
+        <span class="n">i_cen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;i_cen&#39;</span><span class="p">]</span>
+        <span class="n">j_cen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">src</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;j_cen&#39;</span><span class="p">]</span>
+
+        <span class="n">has_channels</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_3d</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">is_bool</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">bool</span>
+
+        <span class="n">rad_target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">target</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;r&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">target</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">rad_target</span> <span class="o">/</span> <span class="n">rad</span>
+        <span class="k">if</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="n">new_data</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">lbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">lbs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="n">background</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lbs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="n">data</span> <span class="o">==</span> <span class="n">k</span>
+                <span class="n">rmask</span> <span class="o">=</span> <span class="n">rescale</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">scale</span><span class="p">),</span> <span class="n">preserve_range</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multichannel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
+                <span class="k">if</span> <span class="n">new_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">new_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">rmask</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">background</span><span class="p">)</span>
+                <span class="n">new_data</span><span class="p">[</span><span class="n">rmask</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_data</span> <span class="o">=</span> <span class="n">rescale</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">scale</span><span class="p">),</span> <span class="n">preserve_range</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multichannel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_channels</span><span class="p">:</span>
+            <span class="n">new_data</span> <span class="o">=</span> <span class="n">new_data</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">is_bool</span><span class="p">:</span>
+            <span class="n">new_data</span> <span class="o">=</span> <span class="n">new_data</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;i_cen&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">i_cen</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">),</span>
+                                  <span class="s1">&#39;j_cen&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">j_cen</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">),</span>
+                                  <span class="s1">&#39;r&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">rad</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)})</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="HelioBatch.get_region_props"><a class="viewcode-back" href="../../../api/helio_batch.html#helio.core.HelioBatch.get_region_props">[docs]</a>    <span class="nd">@execute</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s1">&#39;threads&#39;</span><span class="p">)</span>
@@ -873,7 +995,13 @@
         <span class="n">j_cen</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;j_cen&#39;</span><span class="p">]</span>
         <span class="n">B0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;B0&#39;</span><span class="p">]</span>
         <span class="n">L0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s1">&#39;L0&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">rotate_at_center</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;P&quot;</span><span class="p">],</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;j_cen&#39;</span><span class="p">],</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;i_cen&#39;</span><span class="p">]))</span>
         <span class="n">mask_ij</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mask_ij</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;j&#39;</span><span class="p">,</span> <span class="s1">&#39;Lat&#39;</span><span class="p">,</span> <span class="s1">&#39;Long&#39;</span><span class="p">,</span> <span class="s1">&#39;q&#39;</span><span class="p">,</span> <span class="s1">&#39;phi&#39;</span><span class="p">,</span> <span class="s1">&#39;area&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">dst</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span>
+            <span class="k">return</span> <span class="bp">self</span>
         <span class="n">mask_xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mask_ij</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">j_cen</span><span class="p">,</span> <span class="o">-</span><span class="n">mask_ij</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">i_cen</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
         <span class="n">spp</span> <span class="o">=</span> <span class="n">xyz_to_sp</span><span class="p">(</span><span class="n">xy_to_xyz</span><span class="p">(</span><span class="n">mask_xy</span><span class="p">,</span> <span class="n">rad</span><span class="o">=</span><span class="n">rad</span><span class="p">),</span> <span class="n">deg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">dist</span> <span class="o">=</span> <span class="n">haversine_distances</span><span class="p">(</span><span class="n">spp</span><span class="p">[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
@@ -1130,7 +1258,7 @@
 <span class="sd">            A parameter for pixel weights according to `weight_decay(-(dist - shift) / scale)`.</span>
 <span class="sd">        scale : scalar</span>
 <span class="sd">            A parameter for pixel weights according to `weight_decay(-(dist - shift) / scale)`.</span>
-<span class="sd">         weight_decay: callable</span>
+<span class="sd">        weight_decay: callable</span>
 <span class="sd">            Function to get a pixel weight based on its distance from central meridian.</span>
 <span class="sd">            Distance unit should be degree. Default is sigmoid function.</span>
 <span class="sd">        deg : bool</span>

@@ -152,10 +152,12 @@
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#P"><strong>P</strong></a>
@@ -163,6 +165,7 @@
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
 </div>
@@ -193,10 +196,12 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/models.html#helio.models.conv_block">conv_block() (in module helio.models)</a>
+      <li><a href="api/tf_models.html#helio.models.conv_block">conv_block() (in module helio.models)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/torch_models.html#helio.models.ConvBlock">ConvBlock (class in helio.models)</a>
+</li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.correct_degradation">correct_degradation() (HelioBatch method)</a>
 </li>
   </ul></td>
@@ -207,14 +212,18 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.data">data() (HelioBatch property)</a>
 </li>
+      <li><a href="api/torch_models.html#helio.models.VAE.decode">decode() (VAE method)</a>
+</li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.deepcopy">deepcopy() (HelioBatch method)</a>
 </li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.deg2sin">deg2sin() (HelioBatch method)</a>
 </li>
-      <li><a href="api/helio_batch.html#helio.core.HelioBatch.disk_resize">disk_resize() (HelioBatch method)</a>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.disk_center_crop">disk_center_crop() (HelioBatch method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.disk_resize">disk_resize() (HelioBatch method)</a>
+</li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.downscale_local_mean">downscale_local_mean() (HelioBatch method)</a>
 </li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.drop_empty_days">drop_empty_days() (HelioBatch method)</a>
@@ -222,6 +231,16 @@
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.dtype_limits">dtype_limits() (HelioBatch method)</a>
 </li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.dump">dump() (HelioBatch method)</a>
+</li>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.dump_group_patches">dump_group_patches() (HelioBatch method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/torch_models.html#helio.models.VAE.encode">encode() (VAE method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -233,14 +252,24 @@
 </li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.fillna">fillna() (HelioBatch method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.filter_regions">filter_regions() (HelioBatch method)</a>
 </li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.fit_mask">fit_mask() (HelioBatch method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.fit_scale">fit_scale() (HelioBatch method)</a>
+</li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.flip">flip() (HelioBatch method)</a>
 </li>
+      <li><a href="api/torch_models.html#helio.models.ConvBlock.forward">forward() (ConvBlock method)</a>
+
+      <ul>
+        <li><a href="api/torch_models.html#helio.models.Unet.forward">(Unet method)</a>
+</li>
+        <li><a href="api/torch_models.html#helio.models.VAE.forward">(VAE method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -253,8 +282,6 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/helio_batch.html#helio.core.HelioBatch.get_radius_by_nans">get_radius_by_nans() (HelioBatch method)</a>
-</li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.get_region_props">get_region_props() (HelioBatch method)</a>
 </li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.group_by_index">group_by_index() (HelioBatch method)</a>
@@ -312,6 +339,14 @@
 </li>
       </ul></li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.integral_image">integral_image() (HelioBatch method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/helio_batch.html#helio.core.HelioBatch.jsoc_load">jsoc_load() (HelioBatch method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -387,6 +422,8 @@
 </li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.region_statistics">region_statistics() (HelioBatch method)</a>
 </li>
+      <li><a href="api/torch_models.html#helio.models.VAE.reparameterize">reparameterize() (VAE method)</a>
+</li>
       <li><a href="api/helio_batch.html#helio.core.HelioBatch.rescale">rescale() (HelioBatch method)</a>
 </li>
   </ul></td>
@@ -427,13 +464,33 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/index.html#helio.core.FilesIndex.train_test_split">train_test_split() (FilesIndex method)</a>
 </li>
+      <li><a href="api/torch_models.html#helio.models.ConvBlock.training">training (ConvBlock attribute)</a>
+
+      <ul>
+        <li><a href="api/torch_models.html#helio.models.Unet.training">(Unet attribute)</a>
+</li>
+        <li><a href="api/torch_models.html#helio.models.VAE.training">(VAE attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/models.html#helio.models.u_net">u_net() (in module helio.models)</a>
+      <li><a href="api/tf_models.html#helio.models.u_net">u_net() (in module helio.models)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/torch_models.html#helio.models.Unet">Unet (class in helio.models)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/torch_models.html#helio.models.VAE">VAE (class in helio.models)</a>
 </li>
   </ul></td>
 </tr></table>

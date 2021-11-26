@@ -1,0 +1,322 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Pytorch models &mdash; helio  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Tensorflow models" href="tf_models.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> helio
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="helio.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="core.html">Core</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="models.html">Models</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tf_models.html">Tensorflow models</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Pytorch models</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">helio</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="helio.html">API</a> &raquo;</li>
+        
+          <li><a href="models.html">Models</a> &raquo;</li>
+        
+      <li>Pytorch models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/torch_models.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pytorch-models">
+<h1>Pytorch models<a class="headerlink" href="#pytorch-models" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<dl class="class">
+<dt id="helio.models.ConvBlock">
+<em class="property">class </em><code class="sig-name descname">ConvBlock</code><span class="sig-paren">(</span><em class="sig-param">layout</em>, <em class="sig-param">in_channels=None</em>, <em class="sig-param">filters=None</em>, <em class="sig-param">kernel_size=3</em>, <em class="sig-param">stride=1</em>, <em class="sig-param">padding='same'</em>, <em class="sig-param">rate=0.1</em>, <em class="sig-param">activation=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/models/torch_models.html#ConvBlock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.models.ConvBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convolutional block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Input channels size.</p></li>
+<li><p><strong>layout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Layout of layers. Can contain “c” for convolution, “a” for activation, “n” for batchnorm,
+“p” for maxpooling, “d” for dropout. E.g. of layout: “ccnapd”.</p></li>
+<li><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a>) – Number of filters for convolutions. Can be a single number (all convolutions will
+have the same number of filters), a list of the same length as a count of letters “c”
+in the layout, or None if the layout contains no “c”.</p></li>
+<li><p><strong>rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Dropout rate parameter. Default to 0.1.</p></li>
+<li><p><strong>activation</strong> (<em>function</em>) – Activation function. If not specified activation is tf.nn.elu.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="helio.models.ConvBlock.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/models/torch_models.html#ConvBlock.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.models.ConvBlock.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="helio.models.ConvBlock.training">
+<code class="sig-name descname">training</code><em class="property"> = None</em><a class="headerlink" href="#helio.models.ConvBlock.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="helio.models.Unet">
+<em class="property">class </em><code class="sig-name descname">Unet</code><span class="sig-paren">(</span><em class="sig-param">in_channels</em>, <em class="sig-param">depth</em>, <em class="sig-param">init_filters</em>, <em class="sig-param">kernel_size=3</em>, <em class="sig-param">output=None</em>, <em class="sig-param">norm=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/models/torch_models.html#Unet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.models.Unet" title="Permalink to this definition">¶</a></dt>
+<dd><p>U-net implementation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Input channels size.</p></li>
+<li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Depth of the U-net.</p></li>
+<li><p><strong>init_filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of filters in the first conv block.</p></li>
+<li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Output conv block config.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="helio.models.Unet.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/models/torch_models.html#Unet.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.models.Unet.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="helio.models.Unet.training">
+<code class="sig-name descname">training</code><em class="property"> = None</em><a class="headerlink" href="#helio.models.Unet.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="helio.models.VAE">
+<em class="property">class </em><code class="sig-name descname">VAE</code><span class="sig-paren">(</span><em class="sig-param">in_channels</em>, <em class="sig-param">filters_enc</em>, <em class="sig-param">filters_dec</em>, <em class="sig-param">z_dim</em>, <em class="sig-param">output</em>, <em class="sig-param">kernel_size=3</em>, <em class="sig-param">norm=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/models/torch_models.html#VAE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.models.VAE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convolutional VAE model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Input channels size.</p></li>
+<li><p><strong>filters_enc</strong> (<em>array</em>) – Sequence of filters for encoder.</p></li>
+<li><p><strong>filters_enc</strong> – Sequence of filters for decoder.</p></li>
+<li><p><strong>z_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of filters in the latent space.</p></li>
+<li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Output conv block config for decoder.</p></li>
+<li><p><strong>kernel_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Kernel size in convolution layers. Default 3.</p></li>
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – Include normalization layers. Default True.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="helio.models.VAE.decode">
+<code class="sig-name descname">decode</code><span class="sig-paren">(</span><em class="sig-param">z</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/models/torch_models.html#VAE.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.models.VAE.decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decoder.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.models.VAE.encode">
+<code class="sig-name descname">encode</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/models/torch_models.html#VAE.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.models.VAE.encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encoder.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.models.VAE.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/models/torch_models.html#VAE.forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.models.VAE.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward pass.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.models.VAE.reparameterize">
+<code class="sig-name descname">reparameterize</code><span class="sig-paren">(</span><em class="sig-param">mu</em>, <em class="sig-param">logvar</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/models/torch_models.html#VAE.reparameterize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.models.VAE.reparameterize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reparametrization trick.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="helio.models.VAE.training">
+<code class="sig-name descname">training</code><em class="property"> = None</em><a class="headerlink" href="#helio.models.VAE.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="tf_models.html" class="btn btn-neutral float-left" title="Tensorflow models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, observethesun
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
