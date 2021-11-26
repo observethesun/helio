@@ -28,7 +28,7 @@ setup(
     ],
     extras_require={
         'numpydoc': ['numpydoc>=0.8.0'],
-        'tensorflow-gpu': ['tensorflow-gpu==1.4']
+        'tensorflow-gpu': ['tensorflow-gpu==2.5.2']
     },
     classifiers=[
         'Development Status :: 4 - Beta',
