@@ -235,26 +235,31 @@ class VAE(nn.Module):
         Kernel size in convolution layers. Default 3.
     norm : bool
         Include normalization layers. Default True.
+    variational : bool
+        If False, implemnt ordinary AE scheme. Default True.
     """
     def __init__(self, in_channels, filters_enc, filters_dec, z_dim, output,
-                 kernel_size=3, norm=True):
+                 kernel_size=3, norm=True, variational=True):
         super().__init__()
+        self.variational = variational
         self.z_dim = z_dim
         self.last_f = filters_enc[-1]
         self.enc = Encoder(in_channels, filters=filters_enc, norm=norm, kernel_size=kernel_size)
         self.dec = Decoder(self.last_f, filters=filters_dec, norm=norm, kernel_size=kernel_size,
                            output=output)
         self.hid_mu = ConvBlock('c', self.last_f, self.z_dim)
-        self.hid_var = ConvBlock('c', self.last_f, self.z_dim)
+        self.hid_var = ConvBlock('c', self.last_f, self.z_dim) if variational else None
         self.hid_z = ConvBlock('c', self.z_dim, self.last_f)
 
     def forward(self, x):
         """Forward pass."""
         enc = self.enc(x)
         mu = self.hid_mu(enc)
-        logvar = self.hid_var(enc)
-        z = self.reparameterize(mu, logvar) if self.training else mu
-        return self.decode(z), mu, logvar
+        if self.variational:
+            logvar = self.hid_var(enc)
+            z = self.reparameterize(mu, logvar) if self.training else mu
+            return self.decode(z), mu, logvar
+        return self.decode(mu), mu
 
     def encode(self, x):
         """Encoder."""
