@@ -476,7 +476,8 @@ class HelioBatch():
         data = rotate_at_center(data, angle=meta["P"], center=(meta['j_cen'], meta['i_cen']),
                                 deg=deg, labels=labels, background=background, **kwargs)
         self.data[dst][i] = data
-        self.meta[dst][i]['P'] = 0.
+        self.meta[dst][i] = meta.copy()
+        self.meta[dst][i]['P'] = 0
         return self
 
     @execute(how='threads')
