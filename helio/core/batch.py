@@ -3,8 +3,10 @@
 import os
 import warnings
 from pathlib import Path
+import urllib.request
 import numpy as np
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
 import dill
 from astropy.io import fits
@@ -24,8 +26,10 @@ import drms
 from .decorators import execute, add_actions, extract_actions, TEMPLATE_DOCSTRING
 from .index import BaseIndex
 from .synoptic_maps import make_synoptic_map, label360, region_statistics
-from .geometry_utils import xy_to_xyz, xyz_to_sp, xy_to_carr, rotate_at_center
-from .io import load_fits, load_abp_mask, write_abp_file, write_fits, write_xml
+from .geometry_utils import xy_to_xyz, xyz_to_sp, xy_to_carr, sp_to_xy, rotate_at_center
+from .io import (load_fits, load_abp_mask, load_cnt, load_json,
+                 write_abp_file, write_fits, write_xml, write_json)
+from .polygon import SphericalPolygon, PlanePolygon
 from .utils import detect_edges
 
 def softmax(x):
@@ -150,7 +154,7 @@ class HelioBatch():
         Parameters
         ----------
         src : str, tuple of str
-            Index column labels with data source specifications.
+            Index column labels with data sources.
         dtype : dtype
             The type of output arrays.
         meta : str
@@ -186,6 +190,10 @@ class HelioBatch():
             if isinstance(kwargs.get('shape', None), str):
                 kwargs['shape'] = self.data[kwargs['shape']][i].shape
             data = load_abp_mask(path, **kwargs)
+        elif fmt == 'cnt':
+            data = load_cnt(path, **kwargs)
+        elif fmt == 'json':
+            data = load_json(path, **kwargs)
         elif fmt in ['fts', 'fits']:
             data = load_fits(path, **kwargs)
         else:
@@ -200,10 +208,6 @@ class HelioBatch():
     @execute(how='threads')
     def _load_meta(self, i, src, dst, verify='fix', unit=0, **kwargs):
         """Load additional meta information on observations.
-        |
-        i
-        |
-        ----j----
         """
         _ = kwargs
         path = self.index.iloc[i, self.index.columns.get_loc(src)]
@@ -212,6 +216,7 @@ class HelioBatch():
             with open(path, 'r') as fin:
                 fread = fin.readlines()
                 header = np.array(fread[0].split())
+                #i_cen enumerates rows, j_cen enumerates columns
                 meta = dict(i_cen=int(header[1]),
                             j_cen=int(header[0]),
                             r=int(header[2]),
@@ -223,6 +228,7 @@ class HelioBatch():
             hdul.verify(verify)
             hdr = hdul[unit].header
             meta = dict(hdr.items())
+            #i_cen enumerates rows, j_cen enumerates columns
             if 'X0_MP' in meta:
                 meta['j_cen'] = int(meta['X0_MP'])
             if 'Y0_MP' in meta:
@@ -276,6 +282,42 @@ class HelioBatch():
         _ = src, dst
         if i < len(client.data):
             client.download(path, i, verbose=verbose)
+        return self
+
+    def url_load(self, src, path, rename=False, fmt='%Y-%m-%dT%H%M%S'):
+        """Download data from URL address and save to local directory.
+
+        Parameters
+        ----------
+        src : str
+            Index colum label with data sources.
+        path : str
+            Directory to save files. Directory should exist.
+        rename : bool
+            Leave file names unchanged or make new names based on datetime and the source name.
+            Default False.
+        fmt : str, optional
+            Datetime format of the renamed files. Used if rename=True.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch unchanged.
+        """
+        return self._url_load(src=src, dst=path, rename=rename, fmt=fmt)
+
+    @execute(how='threads')
+    def _url_load(self, i, src, dst, rename, fmt):
+        """Load data from URL."""
+        url = self.index.iloc[i][src]
+        if rename:
+            file = (src +
+                    '_' +
+                    self.index.iloc[i]['DateTime'].strftime(fmt) +
+                    Path(url).suffix)
+        else:
+            file = Path(url).name
+        urllib.request.urlretrieve(url, Path(dst, file))
         return self
 
     def deepcopy(self):
@@ -349,6 +391,8 @@ class HelioBatch():
             write_fits(fname, data, index=self.index.iloc[[i]], meta=meta, **kwargs)
         elif format == 'xml':
             write_xml(path, data, index=self.index.iloc[[i]], meta=meta, **kwargs)
+        elif format == 'json':
+            write_json(path, data, index=self.index.iloc[[i]], **kwargs)
         else:
             plt.imsave(fname, data, format=format, **kwargs)
         return self
@@ -706,7 +750,7 @@ class HelioBatch():
         return self
 
     @execute(how='threads')
-    def get_region_props(self, i, src, dst, tolerance=3, cache=True):
+    def get_region_props(self, i, src, dst, level=0.5, tolerance=3, cache=True):
         """Get region properties.
 
         Parameters
@@ -715,6 +759,8 @@ class HelioBatch():
             A source for binary mask.
         dst : str
             A destination for props.
+        level : float
+            Value along which to find contours in the array. Default 0.5.
         tolerance : int, optional
             A tolerance for contour approximation. Default 3.
         cache : bool, optional
@@ -732,10 +778,11 @@ class HelioBatch():
             return self
         props = regionprops(labeled, cache=cache)
         for prop in props:
-            cnt = find_contours(labeled == prop.label, 0)[0]
+            cnt = find_contours(labeled == prop.label, level=level, fully_connected='high')[0]
             prop.contour = cnt
             prop.approx_contour = approximate_polygon(cnt, tolerance=tolerance)
         self.data[dst][i] = props
+        self.meta[dst][i] = self.meta[src][i].copy()
         return self
 
     def props2hgc(self, src, meta):
@@ -775,7 +822,7 @@ class HelioBatch():
         return self._props_mapping(src=src, meta=meta, name='HPC', resolution=resolution)
 
     @execute(how='threads')
-    def _props_mapping(self, i, src, dst, meta, name, resolution=None):
+    def _props_mapping(self, i, src, dst, meta, name, resolution=None, get_areas=True):
         """Props mapping."""
         _ = dst
         props = self.data[src][i]
@@ -783,8 +830,20 @@ class HelioBatch():
         rad = meta['r']
         i_cen = meta['i_cen']
         j_cen = meta['j_cen']
-        B0 = self.index.iloc[i]['B0']
-        L0 = self.index.iloc[i]['L0']
+        if 'B0' in meta:
+            B0 = meta['B0']
+        elif 'B0' in self.index:
+            B0 = self.index.iloc[i]['B0']
+        else:
+            raise ValueError('B0 is missing.')
+        if 'L0' in meta:
+            L0 = meta['L0']
+        elif 'L0' in self.index:
+            L0 = self.index.iloc[i]['L0']
+        else:
+            raise ValueError('L0 is missing.')
+        if meta.get('P', 0) != 0:
+            raise ValueError('P angle is not zero.')
 
         def map2hpc(ij_arr):
             '''Cartesian x, y in arcsec.'''
@@ -820,9 +879,43 @@ class HelioBatch():
                 setattr(prop, 'coords_hgc', map2hgc(prop.coords))
                 setattr(prop, 'contour_hgc', map2hgc(prop.contour))
                 setattr(prop, 'approx_contour_hgc', map2hgc(prop.approx_contour))
-            areas = pixel_areas(prop.coords)
-            setattr(prop, 'pixel_area_msh', areas)
-            setattr(prop, 'area_msh', areas.sum())
+            if get_areas:
+                areas = pixel_areas(prop.coords)
+                setattr(prop, 'pixel_area_msh', areas)
+                setattr(prop, 'area_msh', areas.sum())
+        return self
+
+    def get_polygons(self, src, dst, coords='hgc', tolerance=3, cache=True, ):
+        """Get polygons from binary mask.
+
+        Parameters
+        ----------
+        src : str
+            A source for binary masks.
+        dst : str
+            A destination for polygons.
+        coords : str
+            Coordinates for polygons: 'hgc' for Carrington heliographic, 'plane' for pixel coordinates.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with polygons calculated.
+        """
+        self.rotate_p_angle(src=src)
+        self.get_region_props(src=src, dst=dst, tolerance=tolerance, cache=cache)
+        if coords == 'hgc':
+            self.props2hgc(src=dst, meta=src)
+        self._get_polygons(src=dst, dst=dst, coords=coords)
+        return self
+
+    @execute(how='threads')
+    def _get_polygons(self, i, src, dst, coords):
+        data = self.data[src][i]
+        if coords == 'plane':
+            self.data[dst][i] = [PlanePolygon(arr.contour[:, ::-1]) for arr in data]
+        elif coords == 'hgc':
+            self.data[dst][i] = [SphericalPolygon(arr.contour_hgc, deg=True) for arr in data]
         return self
 
     @execute(how='threads')
@@ -848,8 +941,8 @@ class HelioBatch():
         rad = meta['r']
         i_cen = meta['i_cen']
         j_cen = meta['j_cen']
-        B0 = self.index.iloc[i]['B0']
-        L0 = self.index.iloc[i]['L0']
+        B0 = meta.get('B0', self.index.iloc[i]['B0'])
+        L0 = meta.get('L0', self.index.iloc[i]['L0'])
         if meta.get('P', 0) != 0:
             mask = rotate_at_center(mask, meta["P"], center=(meta['j_cen'], meta['i_cen']))
         mask_ij = np.vstack(np.where(mask)).T
@@ -949,6 +1042,90 @@ class HelioBatch():
         plt.xlim([0, img.shape[1]])
         plt.ylim([img.shape[0], 0])
         plt.show()
+
+    def show_sun(self, src, i, figsize=None, ax=None, c='blue', c2='red', c3='green',#pylint:disable=too-many-arguments,too-many-statements,too-many-branches
+                 grid=True, grid_lw=0.5, deg=True):
+        """Show active regions on the solar disk.
+
+        Parameters
+        ----------
+        src : str
+            Data source.
+        i : int
+            Integer data index.
+        figsize : tuple, optional
+            Size of figure.
+        kwargs : misc
+            Additional imshow keywords.
+        """
+        p0 = self.meta[src][i].get('P', 0)
+        if deg:
+            p0 = np.deg2rad(p0)
+        if 'L0' in self.meta[src][i]:
+            L0 = self.meta[src][i]['L0']
+        elif 'L0' in self.index:
+            L0 = self.index.iloc[i]['L0']
+        else:
+            print('L0 angle is not specified in metadata and is set to zero.')
+            L0 = 0
+        try:
+            ndim = self.data[src][i].ndim
+        except AttributeError:
+            ndim = 1
+        if ndim == 1: #data is a list of contours
+            if ax is None:
+                _, ax = plt.subplots(1, figsize=figsize)
+                ax.add_patch(plt.Circle((0, 0), 1, color='#f5ed76'))
+            for k, arr in enumerate(self.data[src][i]):
+                if isinstance(arr, SphericalPolygon):
+                    arr = np.stack([arr.lons, arr.lats]).T #TODO: check for degrees
+                    p, v = sp_to_xy(arr - np.array([L0, 0]), deg=True)
+                    if not v.all():
+                        print('Invalid coordinates at object {}.'.format(k))
+                    ax.plot(*p.T, c=c)
+                elif isinstance(arr, PlanePolygon):
+                    i_cen = self.meta[src][i]['i_cen']
+                    j_cen = self.meta[src][i]['j_cen']
+                    r = self.meta[src][i]['r']
+                    x = (arr.x - j_cen) / r
+                    y = (-arr.y + i_cen) / r
+                    ax.plot(x, y, c=c)
+        else:
+            i_cen = self.meta[src][i]['i_cen']
+            j_cen = self.meta[src][i]['j_cen']
+            r = self.meta[src][i]['r']
+            if ax is None:
+                _, ax = plt.subplots(1, figsize=figsize)
+                ax.add_patch(plt.Circle((0, 0), 1, color='#f5ed76'))
+            if ndim == 2: #data is a 2d binary mask
+                arr = self.data[src][i][i_cen-r:i_cen + r + 1, j_cen-r:j_cen + r + 1]
+                c = matplotlib.colors.colorConverter.to_rgba(c)
+                cmap = matplotlib.colors.LinearSegmentedColormap.from_list('ar', [(0, 0, 0, 0), c], 2)
+                ax.imshow(arr, extent=[-1, 1, -1, 1], interpolation='none',
+                          vmin=0, vmax=1, cmap=cmap, zorder=2)
+            if ndim == 3: #data is a 3d binary mask (spots, cores, pores, ...)
+                arr = self.data[src][i][i_cen-r:i_cen + r+1, j_cen-r:j_cen + r+1]
+                c = matplotlib.colors.colorConverter.to_rgba(c)
+                cmap = matplotlib.colors.LinearSegmentedColormap.from_list('ar', [(0, 0, 0, 0), c], 2)
+                ax.imshow(arr[..., 0], extent=[-1, 1, -1, 1], interpolation='none',
+                          vmin=0, vmax=1, cmap=cmap, zorder=2)
+                c2 = matplotlib.colors.colorConverter.to_rgba(c2)
+                cmap2 = matplotlib.colors.LinearSegmentedColormap.from_list('ar2', [(0, 0, 0, 0), c2], 2)
+                ax.imshow(arr[..., 1], extent=[-1, 1, -1, 1], interpolation='none',
+                          vmin=0, vmax=1, cmap=cmap2, zorder=2)
+                c3 = matplotlib.colors.colorConverter.to_rgba(c3)
+                cmap3 = matplotlib.colors.LinearSegmentedColormap.from_list('ar3', [(0, 0, 0, 0), c3], 2)
+                ax.imshow(arr[..., 2], extent=[-1, 1, -1, 1], interpolation='none',
+                          vmin=0, vmax=1, cmap=cmap3, zorder=2)
+        if grid:
+            ax.plot([-np.sin(p0), np.sin(p0)], [-np.cos(p0), np.cos(p0)], c='k', lw=grid_lw)
+            ax.plot([np.cos(p0), -np.cos(p0)], [-np.sin(p0), np.sin(p0)], c='k', lw=grid_lw)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.axis('off')
+        ax.axis('equal')
+        plt.show()
+        return ax
 
     @execute(how='threads')
     def flip(self, i, src, axis, dst=None, p=True, update_meta=False):

@@ -3,6 +3,7 @@ import os
 import warnings
 from string import Template
 import datetime
+import json
 import numpy as np
 import pandas as pd
 from astropy.io import fits
@@ -10,6 +11,7 @@ import sunpy
 from sunpy.coordinates.sun import B0
 from skimage.measure import label
 
+from .polygon import SphericalPolygon, PlanePolygon
 from .utils import detect_edges
 from .templates import CH_XML
 
@@ -22,8 +24,8 @@ def load_fits(path, verify='fix', unit=0, as_smap=False):
     hdul.verify(verify)
     return hdul[unit].data
 
-def load_abp_mask(path, shape=None, sunspot_observation=False, group_label=False):
-    """Builds segmentation mask from `abp` file.
+def load_abp_mask(path, shape=None, spot_layers=False, group_layer=False):
+    """Builds mask from `abp` file.
 
     Parameters
     ----------
@@ -31,12 +33,12 @@ def load_abp_mask(path, shape=None, sunspot_observation=False, group_label=False
         Path to abp file.
     shape : tuple, optional
         Shape of the source image.
-    sunspot_observation : bool
+    spot_layers : bool
         If False, all active regions will be put in a single mask.
         If True, active regions will be separated into sunspots, cores and
         pores and put into separate masks. Default False.
-    group_label : bool
-        If True, return a mask with group numbers. Default False.
+    group_layer : bool
+        If True, create a mask with group numbers. Default False.
 
     Returns
     -------
@@ -55,24 +57,24 @@ def load_abp_mask(path, shape=None, sunspot_observation=False, group_label=False
         n_skip = int(fread[1].split()[0])
         num_objects = (n_lines - 3 - n_skip) // 2
         obj_meta = np.array([fread[3 + n_skip + 2 * i].split() for i in range(num_objects)]).astype(int)
-        data = [np.array(fread[4 + n_skip +  2 * i].split()).astype(int) for i in range(num_objects)]
+        data = [np.array(fread[4 + n_skip + 2 * i].split()).astype(int) for i in range(num_objects)]
 
         df = pd.DataFrame(columns=['obj_num', 'core_num', 'pts'])
         if num_objects:
             df['group_num'] = obj_meta[:, 2]
             df['obj_num'] = obj_meta[:, -2]
             df['core_num'] = obj_meta[:, -1]
-            df['pts'] = [arr.reshape((-1, 3))[:, [1, 0]].astype('int') for arr in data]
+            df['pts'] = [arr.reshape((-1, 3))[:, [1, 0]].astype(int) for arr in data]
 
-    if group_label:
+    if group_layer:
         group_mask = np.zeros(shape, dtype='int')
         for _, row in df.iterrows():
             pts = row['pts']
             group_mask[pts[:, 0], pts[:, 1]] = row['group_num'] #assume positive group numbers
-        if sunspot_observation is False:
+        if spot_layers is False:
             return group_mask
 
-    if sunspot_observation:
+    if spot_layers:
         mask = np.zeros(shape + (3,), dtype='bool')
         if df.empty:
             return mask
@@ -93,7 +95,7 @@ def load_abp_mask(path, shape=None, sunspot_observation=False, group_label=False
         if not pts.empty:
             pts = np.vstack(pts)
             mask[pts[:, 0], pts[:, 1], 2] = True
-        if group_label:
+        if group_layer:
             return np.concatenate([mask, group_mask[..., np.newaxis]], axis=-1)
         return mask
 
@@ -103,6 +105,35 @@ def load_abp_mask(path, shape=None, sunspot_observation=False, group_label=False
     pts = np.vstack(df['pts'])
     mask[pts[:, 0], pts[:, 1]] = True
     return mask
+
+def load_cnt(path, shape=None):
+    """Builds segmentation mask from `abp` file.
+
+    Parameters
+    ----------
+    path : str
+        Path to abp file.
+    shape : tuple, optional
+        Shape of the source image.
+
+    Returns
+    -------
+    mask : ndarray
+        Segmentation mask.
+    """
+    with open(path, 'r') as fin:
+        fread = fin.readlines()
+        n_lines = len(fread)
+        if shape is None:
+            header = np.array(fread[0].split())
+            i_cen = int(header[1])
+            j_cen = int(header[0])
+            r = int(header[2])
+            shape = (i_cen + r + 1, j_cen + r + 1)
+        num_objects = (n_lines - 2) // 2
+        data = [np.array(fread[3 + 2 * i].split()).astype(float).reshape(-1, 2) for i in range(num_objects)]
+        data = [SphericalPolygon(arr, deg=True) for arr in data]
+    return data
 
 def write_fits(fname, data, index, meta, kind=None, **kwargs):
     """Write data to FITS file."""
@@ -306,3 +337,35 @@ def write_xml(path, data, index, kind, basename, **kwargs):
             warnings.warn('Missed values for ' + ', '.join([k[1] for k in missing]))
         with open(os.path.join(path, ivorn + '.xml'), 'w') as f:
             f.writelines(xml)
+
+def write_json(path, data, index, decimals=2):
+    """Write polygons to json file."""
+    def round_floats(x):
+        if isinstance(x, float):
+            return np.round(x, decimals=decimals)
+        if isinstance(x, dict):
+            return {k: round_floats(v) for k, v in x.items()}
+        if isinstance(x, (list, tuple)):
+            return [round_floats(i) for i in x]
+        return x
+    out = {'data': []}
+    for poly in data:
+        out['data'].append(round_floats(poly.summary))
+    with open(os.path.join(path, index.iloc[0].name + '.json'), 'w') as f:
+        json.dump(out, f)
+
+def load_json(path):
+    """Load polygons from a json file."""
+    with open(path) as f:
+        data = json.load(f)['data']
+    polygons = []
+    for arr in data:
+        if arr['type'] == 'SphericalPolygon':
+            poly = SphericalPolygon(arr['vertices'], deg=arr['deg'])
+        elif arr['type'] == 'PlanePolygon':
+            poly = PlanePolygon(arr['vertices'])
+        else:
+            raise NotImplementedError('Unknown polygon type {}'.format(arr['type']))
+        polygons.append(poly)
+    return polygons
+ 
