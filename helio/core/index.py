@@ -106,14 +106,14 @@ class FilesIndex(BaseIndex): #pylint: disable=abstract-method,too-many-ancestors
             index = pd.Index([Path(f).stem for f in files], name=self.__class__.__name__)
             super().__init__(pd.DataFrame({name: files}, index=index))
 
-    def parse_datetime(self, regex=None, fmt=None, **kwargs):
+    def parse_datetime(self, regex=None, format=None, **kwargs): #pylint:disable=redefined-builtin
         """Extract date and time from index.
 
         Parameters
         ----------
         regex : str, optional
             Datetime pattern to search in index.
-        fmt : str, optional
+        format : str, optional
             The strftime to parse time.
         kwargs : dict
             Additional keywords for pandas.to_datetime if format is not None.
@@ -124,7 +124,7 @@ class FilesIndex(BaseIndex): #pylint: disable=abstract-method,too-many-ancestors
             FilesIndex with a column DateTime added.
         """
         if format is not None:
-            dt = pd.to_datetime(self.index, format=fmt, **kwargs)
+            dt = pd.to_datetime(self.index, format=format, **kwargs)
         else:
             if regex is None:
                 dt = [dparser.parse(i, fuzzy=True) for i in self.index]

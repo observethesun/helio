@@ -115,11 +115,17 @@ class SphericalPolygon(BasePolygon):
     @property
     def area(self):
         """Polygon area in millionth of the solar hemisphere."""
+        def long_diff(a, b):
+            diff = a - b
+            diff[diff > np.pi] -= 2*np.pi
+            diff[diff < -np.pi] += 2*np.pi
+            return diff
+
         lats = np.deg2rad(self.lats) if self.deg else self.lats
         lons = np.deg2rad(self.lons) if self.deg else self.lons
         a = np.hstack((lons[-2], lons[:-2]))
         b = lons[1:]
-        area = abs(sum((a - b) * np.sin(lats[:-1]))) / 2
+        area = abs(sum(long_diff(a, b) * np.sin(lats[:-1]))) / 2
         return area * 1e6 / 2 / np.pi
 
     @property
@@ -129,7 +135,7 @@ class SphericalPolygon(BasePolygon):
         a = np.deg2rad(self.lats) if self.deg else self.lats
         b = np.deg2rad(self.lons) if self.deg else self.lons
         for i in range(self.size):
-            res += haversine_distances([a[i], a[i+1]], [b[i], b[i+1]])[0, 1]
+            res += haversine_distances([[a[i], b[i]]], [[a[i+1], b[i+1]]])[0, 0]
         return res
 
     @property
@@ -140,6 +146,19 @@ class SphericalPolygon(BasePolygon):
         if l_max - l_min > (180 if self.deg else np.pi):
             l_min, l_max = l_max, l_min
         return (self.lats.min(), l_min, self.lats.max(), l_max)
+
+    @property
+    def dlon(self):
+        """Longitudinal extent."""
+        d = np.ptp(self.lons)
+        if d > (180 if self.deg else np.pi):
+            return (360 if self.deg else 2*np.pi) - d
+        return d
+
+    @property
+    def dlat(self):
+        """Latitudinal extent."""
+        return np.ptp(self.lats)
 
     @property
     def summary(self):

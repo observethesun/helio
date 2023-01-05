@@ -3,33 +3,6 @@ import numpy as np
 from scipy.linalg import expm
 from skimage.transform import rotate
 
-def spherical_polygon_area(lats, lons, deg=True):
-    """Compute area of a polygon on a unit sphere.
-
-    Parameters
-    ----------
-    lats : ndarray
-        Array of latitudes.
-    lons : ndarray
-        Array of longitudes.
-    deg : bool
-        True if angles are in dergees.
-
-    Returs
-    ------
-    area : scalar
-        Area of a polygon on a unit sphere.
-    """
-    if (lats[0] == lats[-1]) and (lons[0] == lons[-1]):
-        lats = lats[:-1]
-        lons = lons[:-1]
-    if deg:
-        lats = np.deg2rad(lats)
-        lons = np.deg2rad(lons)
-    a = np.hstack((lons[-1], lons[:-1]))
-    b = np.hstack((lons[1:], lons[0]))
-    return abs(sum((a - b) * np.sin(lats))) / 2
-
 def xy_to_xyz(xy, rad):
     """Map points from plane onto sphere.
     |
