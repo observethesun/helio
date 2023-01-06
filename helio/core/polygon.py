@@ -81,12 +81,32 @@ class PlanePolygon(BasePolygon):
         return (self.x.min(), self.y.min(), self.x.max(), self.y.max())
 
     @property
+    def bbox_center(self):
+        """Returns a tuple (x_cen, y_cen)."""
+        return ((self.x.min() + self.x.max()) / 2,
+                (self.y.min() + self.y.max()) / 2)
+
+    @property
+    def dx(self):
+        """Entent in x-direction."""
+        return np.ptp(self.x)
+
+    @property
+    def dy(self):
+        """Entent in y-direction."""
+        return np.ptp(self.y)
+
+    @property
     def summary(self):
         """Summary properties."""
         return dict(vertices=[list(x) for x in self.vertices],
                     area=self.area,
                     area_units=self.area_units,
                     bbox=list(self.bbox),
+                    bbox_center=list(self.bbox_center),
+                    dx=self.dx,
+                    dy=self.dy,
+                    perimeter=self.perimeter,
                     type=self.__class__.__name__)
 
 
@@ -148,6 +168,18 @@ class SphericalPolygon(BasePolygon):
         return (self.lats.min(), l_min, self.lats.max(), l_max)
 
     @property
+    def bbox_center(self):
+        """Returns a tuple (lat_cen, lon_cen)."""
+        l_min = self.lons.min()
+        l_max = self.lons.max()
+        dlon = self.dlon
+        if l_max - l_min > (180 if self.deg else np.pi):
+            lon_cen = (l_max + dlon / 2) % (360 if self.deg else 2*np.pi)
+        else:
+            lon_cen = (l_min + dlon / 2) % (360 if self.deg else 2*np.pi)
+        return ((self.lats.min() + self.lats.max()) / 2, lon_cen)
+
+    @property
     def dlon(self):
         """Longitudinal extent."""
         d = np.ptp(self.lons)
@@ -167,5 +199,9 @@ class SphericalPolygon(BasePolygon):
                     area=self.area,
                     area_units=self.area_units,
                     bbox=list(self.bbox),
+                    bbox_center=list(self.bbox_center),
+                    perimeter=self.perimeter,
+                    dlat=self.dlat,
+                    dlon=self.dlon,
                     deg=self.deg,
                     type=self.__class__.__name__)

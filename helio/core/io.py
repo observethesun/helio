@@ -2,6 +2,7 @@
 import os
 import warnings
 from string import Template
+import urllib.request
 import datetime
 import json
 import numpy as np
@@ -45,7 +46,7 @@ def load_abp_mask(path, shape=None, spot_layers=False, group_layer=False):
     mask : ndarray
         Segmentation mask.
     """
-    with open(path, 'r') as fin:
+    with open(path, 'r') if os.path.exists(path) else urllib.request.urlopen(path) as fin:
         fread = fin.readlines()
         n_lines = len(fread)
         if shape is None:
@@ -121,7 +122,7 @@ def load_cnt(path, shape=None):
     mask : ndarray
         Segmentation mask.
     """
-    with open(path, 'r') as fin:
+    with open(path, 'r') if os.path.exists(path) else urllib.request.urlopen(path) as fin:
         fread = fin.readlines()
         n_lines = len(fread)
         if shape is None:
@@ -356,7 +357,7 @@ def write_json(path, data, index, decimals=2):
 
 def load_json(path):
     """Load polygons from a json file."""
-    with open(path) as f:
+    with open(path) if os.path.exists(path) else urllib.request.urlopen(path) as f:
         data = json.load(f)['data']
     polygons = []
     for arr in data:

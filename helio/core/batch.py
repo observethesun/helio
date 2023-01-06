@@ -213,7 +213,7 @@ class HelioBatch():
         path = self.index.iloc[i, self.index.columns.get_loc(src)]
         fmt = Path(path).suffix.lower()[1:]
         if fmt in ['abp', 'cnt']:
-            with open(path, 'r') as fin:
+            with open(path, 'r') if os.path.exists(path) else urllib.request.urlopen(path) as fin:
                 fread = fin.readlines()
                 header = np.array(fread[0].split())
                 #i_cen enumerates rows, j_cen enumerates columns
