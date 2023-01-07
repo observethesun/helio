@@ -2,6 +2,13 @@
 import numpy as np
 from sklearn.metrics.pairwise import haversine_distances
 
+def long_diff(a, b, deg):
+    """Difference in longitudes."""
+    diff = np.asarray(a) - np.asarray(b)
+    pi = 180 if deg else np.pi
+    diff[diff > pi] -= 2*pi
+    diff[diff < -pi] += 2*pi
+    return diff
 
 class BasePolygon:
     """Base polygon class."""
@@ -135,17 +142,11 @@ class SphericalPolygon(BasePolygon):
     @property
     def area(self):
         """Polygon area in millionth of the solar hemisphere."""
-        def long_diff(a, b):
-            diff = a - b
-            diff[diff > np.pi] -= 2*np.pi
-            diff[diff < -np.pi] += 2*np.pi
-            return diff
-
         lats = np.deg2rad(self.lats) if self.deg else self.lats
         lons = np.deg2rad(self.lons) if self.deg else self.lons
         a = np.hstack((lons[-2], lons[:-2]))
         b = lons[1:]
-        area = abs(sum(long_diff(a, b) * np.sin(lats[:-1]))) / 2
+        area = abs(sum(long_diff(a, b, deg=False) * np.sin(lats[:-1]))) / 2
         return area * 1e6 / 2 / np.pi
 
     @property
@@ -161,31 +162,23 @@ class SphericalPolygon(BasePolygon):
     @property
     def bbox(self):
         """Returns a tuple (min lat, min lon, max lat, max lon)."""
-        l_min = self.lons.min()
-        l_max = self.lons.max()
-        if l_max - l_min > (180 if self.deg else np.pi):
-            l_min, l_max = l_max, l_min
+        diffs = long_diff(self.lons, self.lons[0], deg=self.deg)
+        l_min = (self.lons[0] + diffs.min()) % (360 if self.deg else 2*np.pi)
+        l_max = (self.lons[0] + diffs.max()) % (360 if self.deg else 2*np.pi)
         return (self.lats.min(), l_min, self.lats.max(), l_max)
 
     @property
     def bbox_center(self):
         """Returns a tuple (lat_cen, lon_cen)."""
-        l_min = self.lons.min()
-        l_max = self.lons.max()
-        dlon = self.dlon
-        if l_max - l_min > (180 if self.deg else np.pi):
-            lon_cen = (l_max + dlon / 2) % (360 if self.deg else 2*np.pi)
-        else:
-            lon_cen = (l_min + dlon / 2) % (360 if self.deg else 2*np.pi)
-        return ((self.lats.min() + self.lats.max()) / 2, lon_cen)
+        lat_min, lon_min, lat_max, lon_max = self.bbox
+        lon_cen = (lon_min + long_diff([lon_max], [lon_min], deg=self.deg)[0] / 2)
+        lon_cen = lon_cen % (360 if self.deg else 2*np.pi)
+        return ((lat_min + lat_max) / 2, lon_cen)
 
     @property
     def dlon(self):
         """Longitudinal extent."""
-        d = np.ptp(self.lons)
-        if d > (180 if self.deg else np.pi):
-            return (360 if self.deg else 2*np.pi) - d
-        return d
+        return np.ptp(long_diff(self.lons, self.lons[0], deg=self.deg))
 
     @property
     def dlat(self):

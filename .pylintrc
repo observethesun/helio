@@ -7,7 +7,7 @@ max-line-length=120
 max-attributes=8
 max-args=10
 max-locals=25
-good-names=a,ax,b,B0,c,c2,c3,d,dx,dy,dz,d0,d1,d2,df,dt,i,ik,f,fn,j,jk,k,L0,lr,mu,n,nx,ny,nz,p,p0,p2,q,q2,r,s,s0,s1,s2,t,up,v,v1,v2,v3,x,x2,xc,xy,x0,y,yc,y0,z,z0
+good-names=a,ax,b,B0,c,c2,c3,d,dx,dy,dz,d0,d1,d2,df,dt,i,ik,f,fn,j,jk,k,L0,lr,mu,n,nx,ny,nz,p,pi,p0,p2,q,q2,r,s,s0,s1,s2,t,up,v,v1,v2,v3,x,x2,xc,xy,x0,y,yc,y0,z,z0
 
 [MESSAGE CONTROL]
 disable=no-value-for-parameter,no-self-use,too-few-public-methods,unsubscriptable-object,no-method-argument,no-member,arguments-differ,len-as-condition,keyword-arg-before-vararg,too-many-locals,comparison-with-callable,not-an-iterable,unnecessary-lambda,anomalous-backslash-in-string,consider-using-f-string,unspecified-encoding,too-many-public-methods
