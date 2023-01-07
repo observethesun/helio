@@ -3,16 +3,16 @@
 
 # helio
 
-Machine learning framework for solar data processing.
+A framework for solar data processing.
 
 Key features:
-* a variety of supported file formats (image files, fits, npz, txt)
-* ndimage processing (resize, rotate, ``skimage.transforms``, etc)
-* solar image processing (e.g. construction of synoptic maps)
 * batch-by-batch processing of large datasets
-* implemented neural networks modules and architectures
+* a variety of supported file formats
+* downloading data from data archives
+* standard image processing tools (resize, rotate, ``skimage.transforms``)
+* specific methods for processing of solar images (e.g. construction of synoptic maps)
 
-For more features see API [documentation](http://observethesun.github.io/helio/).
+For more features see the [documentation](http://observethesun.github.io/helio/).
 
 ## Installation
 
@@ -20,29 +20,26 @@ Clone the repository
 ```
 git clone https://github.com/observethesun/helio.git
 ```
-or install it using pip
-```
-pip install git+https://github.com/observethesun/helio.git@master
-```
+or download the ZIP [archive](https://github.com/observethesun/helio/archive/refs/heads/master.zip).
 
 ## Quick start
 
 Index files to be processed:
 
 ```python
-index = FilesIndex(images='../aia193/*.fits')
+index = FilesIndex(path='./data/*.fits', name='img')
 ```
 
 Load all data at once (for small datasets):
 
 ```python
-batch = HelioBatch(index).load('images')
+batch = HelioBatch(index).load('img')
 ```
 
 Make some processing:
 
 ```python
-batch.resize(src='images', dst='resized', output_shape=(256, 256), preserve_range=True)
+batch.resize(src='img', dst='resized', output_shape=(256, 256))
 ```
 
 Organize batch-by-batch processing of large datasets:
@@ -51,12 +48,9 @@ Organize batch-by-batch processing of large datasets:
 batch_sampler = BatchSampler(index, batch_size=10)
 
 for ids in batch_sampler:
-    (HelioBatch(ids).load('images')
-     .resize(src='images', output_shape=(256, 256), preserve_range=True))
+    (HelioBatch(ids).load('img')
+     .resize(src='img', output_shape=(256, 256))
+     .dump(src='img', path='./processed', format='jpg', cmap='gray'))
 ```
 
-For more examples see [tutorials](./tutorials).
-
-### Acknowledgments
-
-Project is supported by the RFB grant 20-72-00106. 
+For more examples see [tutorials](./tutorials). 
