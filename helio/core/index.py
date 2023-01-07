@@ -18,7 +18,7 @@ EXT_LIST = dict(ch='cnt', spot='abp', fil='abp', ca='abp')
 def list_files(url, ext=''):
     """Get list of remote files with given extension.
     """
-    page = requests.get(url).text
+    page = requests.get(url).text #pylint:disable=missing-timeout
     soup = BeautifulSoup(page, 'html.parser')
     return [url + '/' + node.get('href') for node in soup.find_all('a') if
             node.get('href').endswith(ext)]
@@ -197,8 +197,9 @@ class KislovodskFilesIndex(RemoteFilesIndex): #pylint:disable=too-many-ancestors
                 elif series in ['ch', 'spot']:
                     index = index.parse_datetime()
                 elif series == 'fil':
-                    dt = pd.to_datetime(index.index.map(lambda x: re.sub("[^0-9]", "", x)),
-                                        format='%Y%m%d%H%M%S', errors='coerce')
+                    index['DateTime'] = index.index.map(lambda x: re.sub("[^0-9]", "", x))
+                    index = index.loc[index.DateTime.map(len) == 14]
+                    dt = pd.to_datetime(index.DateTime, format='%Y%m%d%H%M%S', errors='coerce')
                     index['DateTime'] = dt
                 ids.append(index)
             index = pd.concat(ids)
