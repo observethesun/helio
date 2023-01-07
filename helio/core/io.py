@@ -261,7 +261,7 @@ def write_simple_fits(fname, data, index, meta, **headers):
     hdul = fits.HDUList([hdu])
     hdul.writeto(fname, overwrite=True)
 
-def write_abp_file(fname, binary_mask, neighbors=None, meta=None):
+def write_abp_file(fname, binary_mask, connectivity=None, meta=None):
     """Write binary map to `abp` file."""
     binary_mask = binary_mask.astype(int)
     if 'r' in meta:
@@ -271,7 +271,7 @@ def write_abp_file(fname, binary_mask, neighbors=None, meta=None):
         header = [shape[1] // 2, shape[0] // 2, np.min(shape) // 2, 0, 0, 0, 1,
                   shape[1], shape[0], 0, shape[1], 0, shape[0], 'Syn_map']
 
-    labeled, num = label(binary_mask, neighbors=neighbors, background=0, return_num=True)
+    labeled, num = label(binary_mask, connectivity=connectivity, background=0, return_num=True)
     edges = detect_edges(binary_mask)
 
     labeled_with_edges = 2 * labeled + edges

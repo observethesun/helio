@@ -72,36 +72,28 @@ class BatchSampler: #pylint: disable=too-many-instance-attributes
         return self.reset()
 
     def __next__(self):
-        if (self._n_epochs is not None) and (self._on_epoch >= self._n_epochs):
+        if (self._n_epochs is not None) and (self._on_epoch == self._n_epochs):
             raise StopIteration
-        if self._batch_size + self._batch_start <= len(self.indices):
-            a, b = self._batch_start, self._batch_start + self._batch_size
-        else:
-            if (self._n_epochs is not None) and (self._on_epoch == self._n_epochs - 1):
+        a, b = self._batch_start, self._batch_start + self._batch_size
+        if b <= len(self.indices):
+            next_items = self._order[a: b].copy()
+            if b == len(self.indices):
+                self._batch_start = 0
                 self._on_epoch += 1
-                if self._drop_incomplete:
-                    return next(self)
-                a, b = self._batch_start, len(self.indices)
-            else:
-                if self._drop_incomplete:
-                    self._on_epoch += 1
-                    self._batch_start = 0
-                    if self._shuffle:
-                        np.random.shuffle(self._order)
-                    return next(self)
-                self._on_epoch += 1
-                a, b = self._batch_start, (self._batch_start + self._batch_size) % len(self.indices)
-                next_items = np.hstack([self._order[a:], self._order[:b]])
-                self._batch_start = b
                 if self._shuffle:
                     np.random.shuffle(self._order)
-                return self._index.loc[next_items]
-        next_items = self._order[a: b]
-        if b == len(self.indices):
-            self._batch_start = 0
+            else:
+                self._batch_start = b
+            return self._index.loc[next_items]
+        if self._drop_incomplete:
             self._on_epoch += 1
+            self._batch_start = 0
             if self._shuffle:
                 np.random.shuffle(self._order)
-        else:
-            self._batch_start = b
+            return next(self)
+        next_items = self._order[a:].copy()
+        self._batch_start = 0
+        self._on_epoch += 1
+        if self._shuffle:
+            np.random.shuffle(self._order)
         return self._index.loc[next_items]

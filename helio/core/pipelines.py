@@ -1,4 +1,5 @@
 """Pipelines."""
+import os
 from tqdm import tqdm
 
 from .batch_sampler import BatchSampler
@@ -27,6 +28,8 @@ def get_kislovodsk_data(series, start_date, end_date, path,
     progress_bar : bool, optional
         Show the progress bar. Default True.
     """
+    if not os.path.exists(path):
+        raise ValueError("Path {} does not exists.".format(path))
     series = series.upper()
     index = KislovodskFilesIndex(series=series, start_date=start_date, end_date=end_date)
     if rename:

@@ -168,10 +168,7 @@ class HelioBatch():
             Batch with loaded data.
         """
         self._load_data(src=src, dtype=dtype, **kwargs)
-        if meta is None:
-            return self
-        src = np.atleast_1d(src)
-        self._load_meta(src=[meta]*len(src), dst=src, **kwargs)
+        self._load_meta(src=(src if meta is None else meta), dst=src, **kwargs)
         return self
 
     @execute(how='threads')
@@ -236,8 +233,7 @@ class HelioBatch():
             if 'R_SUN' in meta:
                 meta['r'] = int(meta['R_SUN'])
         else:
-            raise NotImplementedError('Format {} is not supported.'.format(fmt))
-
+            meta = {}
         self.meta[dst][i] = meta
         return self
 
@@ -998,17 +994,20 @@ class HelioBatch():
         self.data[dst][i] = mask
         return self
 
-    def show(self, i, image, mask=None, figsize=None, cmap=None, s=None, color=None, **kwargs):
+    def imshow(self, src, i, mask=None, ax=None, figsize=None,
+               cmap=None, s=None, color=None, **kwargs):
         """Show image data with optional mask countours overlayed.
 
         Parameters
         ----------
+        src : str
+            Image data source.
         i : int
             Integer data index.
-        image : str
-            Image data source.
         mask : str, optional
             Mask to be overlayed.
+        ax : matplotlib axes, optional
+            Axes to plot in.
         figsize : tuple, optional
             Size of figure.
         cmap : cmap
@@ -1020,28 +1019,19 @@ class HelioBatch():
         kwargs : misc
             Additional imshow keywords.
         """
-        plt.figure(figsize=figsize)
-        img = self.data[image][i]
-        plt.imshow(img, cmap=cmap, extent=(0, img.shape[1], img.shape[0], 0), **kwargs)
+        if ax is None:
+            _, ax = plt.subplots(figsize=figsize)
+        img = self.data[src][i]
+        ax.imshow(img, cmap=cmap, extent=(0, img.shape[1], img.shape[0], 0), **kwargs)
         if mask is not None:
-            mask = np.atleast_1d(mask)
-            s = np.atleast_1d(s)
-            if len(s) < len(mask):
-                assert len(s) == 1
-                s = np.full(len(mask), s[0])
-            color = np.atleast_1d(color)
-            if len(color) < len(mask):
-                assert len(color) == 1
-                color = np.full(len(mask), color[0])
-            for src, size, c in zip(mask, s, color):
-                binary = np.rint(self.data[src][i]) == 1
-                if binary.shape != img.shape:
-                    raise ValueError('Image and mask should have equal shape.')
-                cnt = np.where(detect_edges(binary))
-                plt.scatter(cnt[1], cnt[0], s=size, color=c)
-        plt.xlim([0, img.shape[1]])
-        plt.ylim([img.shape[0], 0])
-        plt.show()
+            binary = self.data[mask][i]
+            if binary.shape != img.shape:
+                raise ValueError('Image and mask should have equal shape.')
+            cnt = np.where(detect_edges(binary))
+            plt.scatter(cnt[1], cnt[0], s=s, color=color)
+        ax.set_xlim([0, img.shape[1]])
+        ax.set_ylim([img.shape[0], 0])
+        return ax
 
     def show_sun(self, src, i, figsize=None, ax=None, c='blue', c2='red', c3='green',#pylint:disable=too-many-arguments,too-many-statements,too-many-branches
                  grid=True, grid_lw=0.5, deg=True):
@@ -1050,7 +1040,7 @@ class HelioBatch():
         Parameters
         ----------
         src : str
-            Data source.
+            Data source. Binary mask or contours.
         i : int
             Integer data index.
         figsize : tuple, optional
@@ -1058,9 +1048,6 @@ class HelioBatch():
         kwargs : misc
             Additional imshow keywords.
         """
-        p0 = self.meta[src][i].get('P', 0)
-        if deg:
-            p0 = np.deg2rad(p0)
         if 'L0' in self.meta[src][i]:
             L0 = self.meta[src][i]['L0']
         elif 'L0' in self.index:
@@ -1118,13 +1105,15 @@ class HelioBatch():
                 ax.imshow(arr[..., 2], extent=[-1, 1, -1, 1], interpolation='none',
                           vmin=0, vmax=1, cmap=cmap3, zorder=2)
         if grid:
+            p0 = self.meta[src][i].get('P', 0)
+            if deg:
+                p0 = np.deg2rad(p0)
             ax.plot([-np.sin(p0), np.sin(p0)], [-np.cos(p0), np.cos(p0)], c='k', lw=grid_lw)
             ax.plot([np.cos(p0), -np.cos(p0)], [-np.sin(p0), np.sin(p0)], c='k', lw=grid_lw)
         ax.set_xticks([])
         ax.set_yticks([])
         ax.axis('off')
         ax.axis('equal')
-        plt.show()
         return ax
 
     @execute(how='threads')
