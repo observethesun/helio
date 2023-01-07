@@ -186,7 +186,7 @@ def xy_to_carr(xy, rad, B0, L0, deg=True):
     Returns
     -------
     carr : ndarray
-        Carrington coordinates.
+        Carrington coordinates (Long, Lat).
     """
     xyz = xy_to_xyz(xy, rad=rad)
     xyz = rotate_B0(xyz, B0, deg=deg)
@@ -223,7 +223,7 @@ def rotate_sphere_L0(coords, L0, deg=True): #pylint: disable=invalid-name
     Parameters
     ----------
     coords : ndarray
-        Long and lat coordinates. Both in (-pi/2 to pi/2).
+        Long and lat coordinates. Both in (-pi/2 to pi/2) or (-90, 90).
         Latitude is positive to the North.
     L0 : scalar
         Carringon longitude of central meridian.
