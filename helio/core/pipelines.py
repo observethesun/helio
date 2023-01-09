@@ -10,7 +10,7 @@ def get_kislovodsk_data(series, start_date, end_date, path,
                         batch_size=10, rename=True, progress_bar=True):
     """Get countours of active regions from archive of the Kislovodsk Mountain Astronomical Station.
 
-    Paramerets:
+    Parameters
     ----------
     series : str
         Type of active regions. Possible options are 'CA' for plages,
@@ -27,9 +27,12 @@ def get_kislovodsk_data(series, start_date, end_date, path,
         If True, files will be renamed uniformely. Otherwise, keep original filenames. Default True.
     progress_bar : bool, optional
         Show the progress bar. Default True.
+
+    Returns
+    -------
     """
     if not os.path.exists(path):
-        raise ValueError("Path {} does not exists.".format(path))
+        raise ValueError("Path {} does not exists. Create the directory first.".format(path))
     series = series.upper()
     index = KislovodskFilesIndex(series=series, start_date=start_date, end_date=end_date)
     if rename:

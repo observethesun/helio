@@ -51,7 +51,7 @@ class BaseIndex(pd.DataFrame): #pylint: disable=abstract-method
 
         Returns
         -------
-        train, test : BaseIndexer
+        (train, test) : tuple
             Train and test indices.
         """
         indices = self.index.unique().values
@@ -91,7 +91,7 @@ class FilesIndex(BaseIndex): #pylint: disable=abstract-method,too-many-ancestors
 
     Builds a DataFrame containing file paths and indexed by filnames.
 
-    Paramerers
+    Parameters
     ----------
     path : str
         Path to files that should be indexed. Path can contain shell-style wildcards.
@@ -150,9 +150,9 @@ class FilesIndex(BaseIndex): #pylint: disable=abstract-method,too-many-ancestors
 class RemoteFilesIndex(FilesIndex): #pylint:disable=too-many-ancestors
     """Index of remote files.
 
-    Builds a DataFrame containing with file paths and indexed by filnames.
+    Builds a DataFrame containing urls and indexed by filnames.
 
-    Paramerers
+    Parameters
     ----------
     url : str
         URL where remote files are located.
@@ -171,7 +171,21 @@ class RemoteFilesIndex(FilesIndex): #pylint:disable=too-many-ancestors
 
 
 class KislovodskFilesIndex(RemoteFilesIndex): #pylint:disable=too-many-ancestors
-    """Index for the archive of the Kislovodsk Mountain Astonomical Station."""
+    """Index for the archive of the Kislovodsk Mountain Astonomical Station.
+
+    Builds a DataFrame containing urls and indexed by filnames.
+
+    Parameters
+    ----------
+    series : str
+        Data series. 'spot' for sunspots, 'ca' for plages, 'fil' for filaments, 'ch' for coronal holes.
+    start_date : str
+        Start date, YYYY-MM-DD.
+    end_date : str
+        End date, YYYY-MM-DD.
+    ext : str, optional
+        Files extention.
+    """
     def __init__(self, *args, series=None, start_date=None, end_date=None, ext=None):
         if series is None:
             super().__init__(*args)

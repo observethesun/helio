@@ -55,7 +55,13 @@ class BasePolygon:
 
 
 class PlanePolygon(BasePolygon):
-    """Plane polygon class."""
+    """Plane polygon class.
+
+    Parameters
+    ----------
+    vertices : array of shape (n, 2)
+        Coordinates (x, y) of the vertices.
+    """
     def __init__(self, vertices):
         super().__init__(vertices)
         self._area_units = 'dxdy'
@@ -118,7 +124,15 @@ class PlanePolygon(BasePolygon):
 
 
 class SphericalPolygon(BasePolygon):
-    """Spherical polygon class."""
+    """Spherical polygon class.
+
+    Parameters
+    ----------
+    vertices : array of shape (n, 2)
+        Coordinates (lat, long) of the vertices.
+    deg : bool
+        True if coordinates are in degrees. False for radians.
+    """
     def __init__(self, vertices, deg=True):
         super().__init__(vertices)
         self._deg = deg
@@ -126,12 +140,12 @@ class SphericalPolygon(BasePolygon):
 
     @property
     def lats(self):
-        """Latitudes of the vertices."""
+        """Latitude of the vertices."""
         return self.vertices[:, 0]
 
     @property
     def lons(self):
-        """Carrington longitudes of the vertices."""
+        """Longitude of the vertices."""
         return self.vertices[:, 1]
 
     @property
