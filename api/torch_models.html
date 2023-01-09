@@ -171,13 +171,13 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>in_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Input channels size.</p></li>
-<li><p><strong>layout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – Layout of layers. Can contain “c” for convolution, “a” for activation, “n” for batchnorm,
+<li><p><strong>in_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Input channels size.</p></li>
+<li><p><strong>layout</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Layout of layers. Can contain “c” for convolution, “a” for activation, “n” for batchnorm,
 “p” for maxpooling, “d” for dropout. E.g. of layout: “ccnapd”.</p></li>
-<li><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.10)"><em>None</em></a>) – Number of filters for convolutions. Can be a single number (all convolutions will
+<li><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><em>None</em></a>) – Number of filters for convolutions. Can be a single number (all convolutions will
 have the same number of filters), a list of the same length as a count of letters “c”
 in the layout, or None if the layout contains no “c”.</p></li>
-<li><p><strong>rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>) – Dropout rate parameter. Default to 0.1.</p></li>
+<li><p><strong>rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – Dropout rate parameter. Default to 0.1.</p></li>
 <li><p><strong>activation</strong> (<em>function</em>) – Activation function. If not specified activation is tf.nn.elu.</p></li>
 </ul>
 </dd>
@@ -202,10 +202,10 @@ in the layout, or None if the layout contains no “c”.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>in_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Input channels size.</p></li>
-<li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Depth of the U-net.</p></li>
-<li><p><strong>init_filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of filters in the first conv block.</p></li>
-<li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Output conv block config.</p></li>
+<li><p><strong>in_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Input channels size.</p></li>
+<li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Depth of the U-net.</p></li>
+<li><p><strong>init_filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Number of filters in the first conv block.</p></li>
+<li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Output conv block config.</p></li>
 </ul>
 </dd>
 </dl>
@@ -224,18 +224,19 @@ in the layout, or None if the layout contains no “c”.</p></li>
 
 <dl class="class">
 <dt id="helio.models.VAE">
-<em class="property">class </em><code class="sig-name descname">VAE</code><span class="sig-paren">(</span><em class="sig-param">in_channels</em>, <em class="sig-param">filters_enc</em>, <em class="sig-param">filters_dec</em>, <em class="sig-param">z_dim</em>, <em class="sig-param">output</em>, <em class="sig-param">kernel_size=3</em>, <em class="sig-param">norm=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/models/torch_models.html#VAE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.models.VAE" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">VAE</code><span class="sig-paren">(</span><em class="sig-param">in_channels</em>, <em class="sig-param">filters_enc</em>, <em class="sig-param">filters_dec</em>, <em class="sig-param">z_dim</em>, <em class="sig-param">output</em>, <em class="sig-param">kernel_size=3</em>, <em class="sig-param">norm=True</em>, <em class="sig-param">variational=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/models/torch_models.html#VAE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.models.VAE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convolutional VAE model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>in_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Input channels size.</p></li>
+<li><p><strong>in_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Input channels size.</p></li>
 <li><p><strong>filters_enc</strong> (<em>array</em>) – Sequence of filters for encoder.</p></li>
 <li><p><strong>filters_enc</strong> – Sequence of filters for decoder.</p></li>
-<li><p><strong>z_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Number of filters in the latent space.</p></li>
-<li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – Output conv block config for decoder.</p></li>
-<li><p><strong>kernel_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Kernel size in convolution layers. Default 3.</p></li>
-<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – Include normalization layers. Default True.</p></li>
+<li><p><strong>z_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Number of filters in the latent space.</p></li>
+<li><p><strong>output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – Output conv block config for decoder.</p></li>
+<li><p><strong>kernel_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Kernel size in convolution layers. Default 3.</p></li>
+<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – Include normalization layers. Default True.</p></li>
+<li><p><strong>variational</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – If False, implemnt ordinary AE scheme. Default True.</p></li>
 </ul>
 </dd>
 </dl>

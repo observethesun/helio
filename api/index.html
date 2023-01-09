@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>FilesIndex &mdash; helio  documentation</title>
+  <title>Index &mdash; helio  documentation</title>
   
 
   
@@ -85,14 +85,16 @@
 <li class="toctree-l1 current"><a class="reference internal" href="helio.html">API</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="core.html">Core</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="helio_batch.html">HelioBatch</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">FilesIndex</a><ul class="simple">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Index</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="batch_sampler.html">BatchSampler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="polygons.html">Polygons</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sampler.html">Randomizer</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipelines.html">Pipelines</a></li>
 </ul>
 </li>
 </ul>
@@ -144,7 +146,7 @@
         
           <li><a href="core.html">Core</a> &raquo;</li>
         
-      <li>FilesIndex</li>
+      <li>Index</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -163,19 +165,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="filesindex">
-<h1>FilesIndex<a class="headerlink" href="#filesindex" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="index">
+<h1>Index<a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <dl class="class">
 <dt id="helio.core.FilesIndex">
-<em class="property">class </em><code class="sig-name descname">FilesIndex</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/index.html#FilesIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.FilesIndex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Index of files.</p>
-<p>Builds a DataFrame containing path to files in columns. By default
-the DataFrame is indexed by filnames.</p>
-<dl class="simple">
-<dt>kwargs<span class="classifier">dict of type {name: path}</span></dt><dd><p>Path to files that should be indexed and reference name for files collection.
-Path can contain shell-style wildcards.</p>
+<em class="property">class </em><code class="sig-name descname">FilesIndex</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">path=None</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/index.html#FilesIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.FilesIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index of local files.</p>
+<p>Builds a DataFrame containing file paths and indexed by filnames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Path to files that should be indexed. Path can contain shell-style wildcards.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Name for files collection.</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="method">
@@ -196,7 +200,7 @@ Path can contain shell-style wildcards.</p>
 <dd><p>Randomly shuffle indices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Seed for the random number generator.</p>
+<dd class="field-odd"><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Seed for the random number generator.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>index</strong> – BaseIndex with shuffled indices.</p>
@@ -214,17 +218,152 @@ Path can contain shell-style wildcards.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>train_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a><em>, </em><em>in</em><em> [</em><em>0</em><em>, </em><em>1</em><em>]</em>) – Ratio of the train subset to the whole dataset. Default to 0.8.</p></li>
-<li><p><strong>shuffle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – If True, index will be shuffled before splitting into train and test.
+<li><p><strong>train_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>in</em><em> [</em><em>0</em><em>, </em><em>1</em><em>]</em>) – Ratio of the train subset to the whole dataset. Default to 0.8.</p></li>
+<li><p><strong>shuffle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – If True, index will be shuffled before splitting into train and test.
 Default to True.</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – Seed for the random number generator.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Seed for the random number generator.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>train, test</strong> – Train and test indices.</p>
+<dd class="field-even"><p><strong>(train, test)</strong> – Train and test indices.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>BaseIndexer</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="helio.core.RemoteFilesIndex">
+<em class="property">class </em><code class="sig-name descname">RemoteFilesIndex</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">url=None</em>, <em class="sig-param">ext=None</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/index.html#RemoteFilesIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.RemoteFilesIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index of remote files.</p>
+<p>Builds a DataFrame containing urls and indexed by filnames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – URL where remote files are located.</p></li>
+<li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Files extention.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Name for files collection.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="helio.core.RemoteFilesIndex.index_merge">
+<code class="sig-name descname">index_merge</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.RemoteFilesIndex.index_merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge on left and right indexes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.RemoteFilesIndex.indices">
+<em class="property">property </em><code class="sig-name descname">indices</code><a class="headerlink" href="#helio.core.RemoteFilesIndex.indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unique indices.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.RemoteFilesIndex.shuffle">
+<code class="sig-name descname">shuffle</code><span class="sig-paren">(</span><em class="sig-param">seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.RemoteFilesIndex.shuffle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly shuffle indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Seed for the random number generator.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>index</strong> – BaseIndex with shuffled indices.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>BaseIndex</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.RemoteFilesIndex.train_test_split">
+<code class="sig-name descname">train_test_split</code><span class="sig-paren">(</span><em class="sig-param">train_ratio=0.8</em>, <em class="sig-param">shuffle=True</em>, <em class="sig-param">seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.RemoteFilesIndex.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits index into train and test subsets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>in</em><em> [</em><em>0</em><em>, </em><em>1</em><em>]</em>) – Ratio of the train subset to the whole dataset. Default to 0.8.</p></li>
+<li><p><strong>shuffle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – If True, index will be shuffled before splitting into train and test.
+Default to True.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Seed for the random number generator.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>(train, test)</strong> – Train and test indices.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)">tuple</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="helio.core.KislovodskFilesIndex">
+<em class="property">class </em><code class="sig-name descname">KislovodskFilesIndex</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">series=None</em>, <em class="sig-param">start_date=None</em>, <em class="sig-param">end_date=None</em>, <em class="sig-param">ext=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/index.html#KislovodskFilesIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.KislovodskFilesIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Index for the archive of the Kislovodsk Mountain Astonomical Station.</p>
+<p>Builds a DataFrame containing urls and indexed by filnames.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>series</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Data series. ‘spot’ for sunspots, ‘ca’ for plages, ‘fil’ for filaments, ‘ch’ for coronal holes.</p></li>
+<li><p><strong>start_date</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Start date, YYYY-MM-DD.</p></li>
+<li><p><strong>end_date</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – End date, YYYY-MM-DD.</p></li>
+<li><p><strong>ext</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – Files extention.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="helio.core.KislovodskFilesIndex.index_merge">
+<code class="sig-name descname">index_merge</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.KislovodskFilesIndex.index_merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge on left and right indexes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.KislovodskFilesIndex.indices">
+<em class="property">property </em><code class="sig-name descname">indices</code><a class="headerlink" href="#helio.core.KislovodskFilesIndex.indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unique indices.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.KislovodskFilesIndex.shuffle">
+<code class="sig-name descname">shuffle</code><span class="sig-paren">(</span><em class="sig-param">seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.KislovodskFilesIndex.shuffle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly shuffle indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Seed for the random number generator.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>index</strong> – BaseIndex with shuffled indices.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>BaseIndex</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="helio.core.KislovodskFilesIndex.train_test_split">
+<code class="sig-name descname">train_test_split</code><span class="sig-paren">(</span><em class="sig-param">train_ratio=0.8</em>, <em class="sig-param">shuffle=True</em>, <em class="sig-param">seed=None</em><span class="sig-paren">)</span><a class="headerlink" href="#helio.core.KislovodskFilesIndex.train_test_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits index into train and test subsets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><em>in</em><em> [</em><em>0</em><em>, </em><em>1</em><em>]</em>) – Ratio of the train subset to the whole dataset. Default to 0.8.</p></li>
+<li><p><strong>shuffle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – If True, index will be shuffled before splitting into train and test.
+Default to True.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Seed for the random number generator.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>(train, test)</strong> – Train and test indices.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)">tuple</a></p>
 </dd>
 </dl>
 </dd></dl>

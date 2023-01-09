@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Core &mdash; helio  documentation</title>
+  <title>Pipelines &mdash; helio  documentation</title>
   
 
   
@@ -36,8 +36,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="HelioBatch" href="helio_batch.html" />
-    <link rel="prev" title="API" href="helio.html" /> 
+    <link rel="prev" title="Pytorch models" href="torch_models.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -83,16 +82,11 @@
             
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="helio.html">API</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Core</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="helio_batch.html">HelioBatch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="index.html">Index</a></li>
-<li class="toctree-l3"><a class="reference internal" href="batch_sampler.html">BatchSampler</a></li>
-<li class="toctree-l3"><a class="reference internal" href="polygons.html">Polygons</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sampler.html">Randomizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core.html">Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html">Models</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Pipelines</a><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="models.html">Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipelines.html">Pipelines</a></li>
 </ul>
 </li>
 </ul>
@@ -142,13 +136,13 @@
         
           <li><a href="helio.html">API</a> &raquo;</li>
         
-      <li>Core</li>
+      <li>Pipelines</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/api/core.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/api/pipelines.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -161,27 +155,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="core">
-<h1>Core<a class="headerlink" href="#core" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="pipelines">
+<h1>Pipelines<a class="headerlink" href="#pipelines" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="helio_batch.html">HelioBatch</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="index.html">Index</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="batch_sampler.html">BatchSampler</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="polygons.html">Polygons</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="sampler.html">Randomizer</a><ul class="simple">
-</ul>
-</li>
-</ul>
 </div>
+<dl class="function">
+<dt id="helio.core.pipelines.get_kislovodsk_data">
+<code class="sig-name descname">get_kislovodsk_data</code><span class="sig-paren">(</span><em class="sig-param">series</em>, <em class="sig-param">start_date</em>, <em class="sig-param">end_date</em>, <em class="sig-param">path</em>, <em class="sig-param">batch_size=10</em>, <em class="sig-param">rename=True</em>, <em class="sig-param">progress_bar=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helio/core/pipelines.html#get_kislovodsk_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helio.core.pipelines.get_kislovodsk_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get countours of active regions from archive of the Kislovodsk Mountain Astronomical Station.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>series</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Type of active regions. Possible options are ‘CA’ for plages,
+‘CH’ for coronal holes, ‘FIL’ for filaments, ‘SPOT’ for sunspots.</p></li>
+<li><p><strong>start_date</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – First date of the time series, for example, ‘2022-01-01’.</p></li>
+<li><p><strong>end_date</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Last date (included) of the time series, for example, ‘2022-12-31’.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – Path to the local directory where to save the files.</p></li>
+<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – Number of files processed in parallel. Default 10.</p></li>
+<li><p><strong>rename</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, files will be renamed uniformely. Otherwise, keep original filenames. Default True.</p></li>
+<li><p><strong>progress_bar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Show the progress bar. Default True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
@@ -192,10 +189,8 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="helio_batch.html" class="btn btn-neutral float-right" title="HelioBatch" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="helio.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="torch_models.html" class="btn btn-neutral float-left" title="Pytorch models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

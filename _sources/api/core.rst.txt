@@ -8,4 +8,5 @@ Core
    helio_batch
    index
    batch_sampler
+   polygons
    sampler
