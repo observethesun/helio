@@ -39,7 +39,7 @@ def get_kislovodsk_data(series, start_date, end_date, path,
     sampler = BatchSampler(index, batch_size=batch_size)
     for ids in (tqdm(sampler) if progress_bar else sampler):
         batch = HelioBatch(ids)
-        batch.load(src=series, meta=series)
+        batch.load(src=series, meta=series, raise_errors=False)
         if series != 'CH':
             batch.get_polygons(src=series, dst=series, coords='hgc')
         batch.dump(src=series, path=path, format='json')

@@ -25,7 +25,7 @@ def load_fits(path, verify='fix', unit=0, as_smap=False):
     hdul.verify(verify)
     return hdul[unit].data
 
-def load_abp_mask(path, shape=None, spot_layers=False, group_layer=False):
+def load_abp_mask(path, shape=None, spot_layers=False, group_numbers=False, raise_errors=True):
     """Builds mask from `abp` file.
 
     Parameters
@@ -38,8 +38,8 @@ def load_abp_mask(path, shape=None, spot_layers=False, group_layer=False):
         If False, all active regions will be put in a single mask.
         If True, active regions will be separated into sunspots, cores and
         pores and put into separate masks. Default False.
-    group_layer : bool
-        If True, create a mask with group numbers. Default False.
+    group_numbers : bool
+        If True, mask is filled with group numbers. Default False.
 
     Returns
     -------
@@ -55,56 +55,44 @@ def load_abp_mask(path, shape=None, spot_layers=False, group_layer=False):
             j_cen = int(header[0])
             r = int(header[2])
             shape = (i_cen + r + 1, j_cen + r + 1)
+        mask = np.zeros(shape + (3,) if spot_layers else shape,
+                        dtype='int' if group_numbers else 'bool')
         n_skip = int(fread[1].split()[0])
         num_objects = (n_lines - 3 - n_skip) // 2
+        if num_objects == 0:
+            return mask
         obj_meta = np.array([fread[3 + n_skip + 2 * i].split() for i in range(num_objects)]).astype(int)
         data = [np.array(fread[4 + n_skip + 2 * i].split()).astype(int) for i in range(num_objects)]
 
-        df = pd.DataFrame(columns=['obj_num', 'core_num', 'pts'])
-        if num_objects:
-            df['group_num'] = obj_meta[:, 2]
-            df['obj_num'] = obj_meta[:, -2]
-            df['core_num'] = obj_meta[:, -1]
-            df['pts'] = [arr.reshape((-1, 3))[:, [1, 0]].astype(int) for arr in data]
+    df = pd.DataFrame(columns=['counts', 'group_num', 'obj_num', 'core_num', 'pts'])
+    df['counts'] = obj_meta[:, 1]
+    df['group_num'] = obj_meta[:, 2]
+    df['obj_num'] = obj_meta[:, -2]
+    df['core_num'] = obj_meta[:, -1]
+    df['pts'] = data
 
-    if group_layer:
-        group_mask = np.zeros(shape, dtype='int')
-        for _, row in df.iterrows():
-            pts = row['pts']
-            group_mask[pts[:, 0], pts[:, 1]] = row['group_num'] #assume positive group numbers
-        if spot_layers is False:
-            return group_mask
+    lens = df['pts'].apply(len)
+    invalid = lens != 3*df['counts']
+    if invalid.any() and raise_errors:
+        raise ValueError('Expected number of points does not match the length of the read array.')
+    df = df.loc[(~invalid) & (lens > 0)]
 
     if spot_layers:
-        mask = np.zeros(shape + (3,), dtype='bool')
-        if df.empty:
-            return mask
-        #spots
-        tdf = df.groupby('obj_num').filter(lambda x: len(x) > 1)
-        pts = tdf.loc[tdf['core_num'] == 0, 'pts']
-        if not pts.empty:
-            pts = np.vstack(pts)
-            mask[pts[:, 0], pts[:, 1], 0] = True
-        #cores
-        tdf = df.groupby('obj_num').filter(lambda x: len(x) > 1)
-        pts = tdf.loc[tdf['core_num'] > 0, 'pts']
-        if not pts.empty:
-            pts = np.vstack(pts)
-            mask[pts[:, 0], pts[:, 1], 1] = True
+        #spots & cores
+        tdf = df.groupby(['group_num', 'obj_num']).filter(lambda x: len(x) > 1)
+        for _, row in tdf.iterrows():
+            level = min(row['core_num'], 1)
+            value = row['group_num'] if group_numbers else True
+            mask[row['pts'][1::3], row['pts'][::3], level] = value
         #pores
-        pts = df.groupby('obj_num').filter(lambda x: len(x) == 1)['pts']
-        if not pts.empty:
-            pts = np.vstack(pts)
-            mask[pts[:, 0], pts[:, 1], 2] = True
-        if group_layer:
-            return np.concatenate([mask, group_mask[..., np.newaxis]], axis=-1)
-        return mask
-
-    mask = np.zeros(shape, dtype='bool')
-    if df.empty:
-        return mask
-    pts = np.vstack(df['pts'])
-    mask[pts[:, 0], pts[:, 1]] = True
+        tdf = df.groupby(['group_num', 'obj_num']).filter(lambda x: len(x) == 1)
+        for _, row in tdf.iterrows():
+            value = row['group_num'] if group_numbers else True
+            mask[row['pts'][1::3], row['pts'][::3], 2] = value
+    else:
+        for _, row in df.iterrows():
+            value = row['group_num'] if group_numbers else True
+            mask[row['pts'][1::3], row['pts'][::3]] = value
     return mask
 
 def load_cnt(path, shape=None):
@@ -133,8 +121,7 @@ def load_cnt(path, shape=None):
             shape = (i_cen + r + 1, j_cen + r + 1)
         num_objects = (n_lines - 2) // 2
         data = [np.array(fread[3 + 2 * i].split()).astype(float).reshape(-1, 2) for i in range(num_objects)]
-        data = [SphericalPolygon(arr, deg=True) for arr in data]
-    return data
+    return [SphericalPolygon(arr, deg=True) for arr in data]
 
 def write_fits(fname, data, index, meta, kind=None, **kwargs):
     """Write data to FITS file."""
