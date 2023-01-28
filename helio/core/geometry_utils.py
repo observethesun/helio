@@ -25,7 +25,13 @@ def xy_to_xyz(xy, rad):
     xy = xy / rad
     y = xy[:, 0]
     z = xy[:, 1]
-    x = np.sqrt(1 - y*y - z*z)
+    squared = (y*y + z*z)
+    bad = squared > 1
+    if bad.any():
+        y[bad] /= np.sqrt(squared[bad])
+        z[bad] /= np.sqrt(squared[bad])
+        squared[bad] = 1
+    x = np.sqrt(1 - squared)
     return np.array([x, y, z]).T
 
 def xyz_to_sp(xyz, deg=True):
