@@ -14,7 +14,7 @@ class BasePolygon:
     """Base polygon class."""
     def __init__(self, vertices):
         if not np.isclose(vertices[0], vertices[-1]).all():
-            vertices = np.vstack((vertices, vertices[[0]]))
+            vertices = np.vstack((vertices, vertices[0]))
         self._vertices = np.asarray(vertices)
         self._area_units = ''
 
