@@ -59,7 +59,7 @@ def execute(how):
     def decorator(method):
         """Returned decorator."""
         @wraps(method)
-        def wrapper(self, *args, src=None, dst=None, **kwargs):#pylint:disable=too-many-branches
+        def wrapper(self, *args, src=None, dst=None, raise_errors=True, **kwargs):#pylint:disable=too-many-branches
             """Method wrapper."""
             if src is not None:
                 src = np.atleast_1d(src)
@@ -93,10 +93,15 @@ def execute(how):
                             futures.append(res)
                     cf.wait(futures, timeout=None, return_when=cf.ALL_COMPLETED)
 
-                results = [f.result() for f in futures]
-                if any(isinstance(res, Exception) for res in results):
-                    errors = [error for error in results if isinstance(error, Exception)]
-                    print(errors)
+                for i, f in enumerate(futures):
+                    try:
+                        res = f.result()
+                    except Exception as err: #pylint: disable=broad-except
+                        if raise_errors:
+                            raise err
+                        print(self.index.indices[i], err)
+                        res = None
+                    results.append(res)
 
             elif how == 'loop':
                 for s, d in zip(src, dst):

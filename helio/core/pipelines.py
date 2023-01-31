@@ -36,6 +36,7 @@ def get_kislovodsk_data(series, start_date, end_date, path,
     series = series.upper()
     index = KislovodskFilesIndex(series=series, start_date=start_date, end_date=end_date)
     if rename:
+        index = index.loc[~index.DateTime.duplicated()]
         fmt = '%Y-%m-%dT%H%M%S'
         new_ids = series + '_' + index['DateTime'].apply(lambda x: x.strftime(fmt))
         index.set_index(new_ids, inplace=True)
@@ -43,6 +44,7 @@ def get_kislovodsk_data(series, start_date, end_date, path,
     for ids in (tqdm(sampler) if progress_bar else sampler):
         batch = HelioBatch(ids)
         batch.load(src=series, meta=series, raise_errors=False)
+        batch.drop(src=series, condition=lambda x: x is None)
         if series != 'CH':
             batch.get_polygons(src=series, dst=series, coords='hgc')
         batch.dump(src=series, path=path, format='json')
