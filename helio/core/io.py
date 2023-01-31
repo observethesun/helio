@@ -25,7 +25,7 @@ def load_fits(path, verify='fix', unit=0, as_smap=False):
     hdul.verify(verify)
     return hdul[unit].data
 
-def load_abp_mask(path, shape=None, spot_layers=False, group_numbers=False, raise_errors=True):
+def load_abp_mask(path, shape=None, spot_layers=False, group_numbers=False):
     """Builds mask from `abp` file.
 
     Parameters
@@ -73,9 +73,9 @@ def load_abp_mask(path, shape=None, spot_layers=False, group_numbers=False, rais
 
     lens = df['pts'].apply(len)
     invalid = lens != 3*df['counts']
-    if invalid.any() and raise_errors:
+    if invalid.any():
         raise ValueError('Expected number of points does not match the length of the read array.')
-    df = df.loc[(~invalid) & (lens > 0)]
+    df = df.loc[lens > 0]
 
     if spot_layers:
         #spots & cores

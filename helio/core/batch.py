@@ -548,6 +548,29 @@ class HelioBatch():
         self.data[dst][i] = img
         return self
 
+    def drop(self, src, condition):
+        """Drop batch items by contidion.
+
+        Parameters
+        ----------
+        src : str
+            A source to check condition.
+        condition : callable
+            A funtion that implements the condition.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch without items that satisfy the condition.
+        """
+        valid = [not condition(x) for x in self.data[src]]
+        self._index = self.index.loc[valid]
+        for k, v in self.data.items():
+            self.data[k] = v[valid]
+        for k, v in self.meta.items():
+            self.meta[k] = v[valid]
+        return self
+
     def drop_empty_days(self, mask):
         """Drop batch items without active regions.
 
@@ -561,13 +584,7 @@ class HelioBatch():
         batch : HelioBatch
             Batch without empty observations.
         """
-        valid = [np.any(x) for x in self.data[mask]]
-        self.index = self.index.loc[valid]
-        for k, v in self.data.items():
-            self.data[k] = v[valid]
-        for k, v in self.meta.items():
-            self.meta[k] = v[valid]
-        return self
+        return self.drop(mask, lambda x: ~np.any(x))
 
     @execute(how='threads')
     def get_radius(self, i, src, dst, hough_radii, sigma=2, raise_limits=False, logger=None):
