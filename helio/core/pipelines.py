@@ -46,5 +46,7 @@ def get_kislovodsk_data(series, start_date, end_date, path,
         batch.load(src=series, meta=series, raise_errors=False)
         batch.drop(src=series, condition=lambda x: x is None)
         if series != 'CH':
-            batch.get_polygons(src=series, dst=series, coords='hgc')
+            batch.mask_disk(src=series, dst=series, fill_value=False)
+            batch.get_polygons(src=series, dst=series)
+            batch.poly2hgc(src=series, dst=series)
         batch.dump(src=series, path=path, format='json')

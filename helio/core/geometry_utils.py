@@ -25,7 +25,7 @@ def xy_to_xyz(xy, rad):
     xy = xy / rad
     y = xy[:, 0]
     z = xy[:, 1]
-    squared = (y*y + z*z)
+    squared = y*y + z*z
     bad = squared > 1
     if bad.any():
         y[bad] /= np.sqrt(squared[bad])
