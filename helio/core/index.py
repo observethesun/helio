@@ -223,5 +223,7 @@ class KislovodskFilesIndex(RemoteFilesIndex): #pylint:disable=too-many-ancestors
                 ids.append(index)
             index = pd.concat(ids)
             index.index.name = self.__class__.__name__
-            index = index.loc[(index.DateTime.dt.date >= start_date) & (index.DateTime.dt.date <= end_date)]
+            if not index.empty:
+                index = index.loc[(index.DateTime.dt.date >= start_date) &
+                                  (index.DateTime.dt.date <= end_date)]
             super().__init__(index)

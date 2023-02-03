@@ -17,7 +17,7 @@ from scipy.ndimage.morphology import binary_fill_holes
 from skimage.io import imread
 import skimage
 import skimage.transform
-from skimage.measure import label, regionprops, find_contours, approximate_polygon
+from skimage.measure import label, find_contours
 from skimage.transform import resize, rescale, hough_circle, hough_circle_peaks
 from skimage.feature import canny
 from sklearn.metrics.pairwise import haversine_distances
@@ -546,6 +546,7 @@ class HelioBatch():
         outer = np.where(np.linalg.norm(ind - np.array([meta['i_cen'], meta['j_cen']]), axis=-1) > meta['r'])
         img[outer] = fill_value
         self.data[dst][i] = img
+        self.meta[dst][i] = meta.copy()
         return self
 
     def drop(self, src, condition):
@@ -762,87 +763,65 @@ class HelioBatch():
                                   'r': int(rad * scale + 0.5)})
         return self
 
-    @execute(how='threads')
-    def get_region_props(self, i, src, dst, level=0.5, tolerance=3, cache=True):
-        """Get region properties.
+    def poly2hpc(self, i, src, dst, resolution):
+        """Map polygons in i,j coordinates to HPC (Helioprojective-Cartesian) coordinates.
 
         Parameters
         ----------
         src : str
-            A source for binary mask.
+            A source for polygons.
         dst : str
-            A destination for props.
-        level : float
-            Value along which to find contours in the array. Default 0.5.
-        tolerance : int, optional
-            A tolerance for contour approximation. Default 3.
-        cache : bool, optional
-            Use cache in regionprops.
-
-        Returns
-        -------
-        batch : HelioBatch
-            Batch with props calculated.
-        """
-        mask = binary_fill_holes(self.data[src][i])
-        labeled, num = label(mask, background=0, return_num=True)
-        if not num:
-            self.data[dst][i] = []
-            return self
-        props = regionprops(labeled, cache=cache)
-        for prop in props:
-            cnt = find_contours(labeled == prop.label, level=level, fully_connected='high')[0]
-            prop.contour = cnt
-            prop.approx_contour = approximate_polygon(cnt, tolerance=tolerance)
-        self.data[dst][i] = props
-        self.meta[dst][i] = self.meta[src][i].copy()
-        return self
-
-    def props2hgc(self, src, meta):
-        """Map props in i,j coordinates to HGC (Heliographic-Carrington) coordinates.
-
-        Parameters
-        ----------
-        src : str
-            A source for props.
-        meta : str
-            A source for disk meta information.
-
-        Returns
-        -------
-        batch : HelioBatch
-            Batch with props calculated.
-        """
-        return self._props_mapping(src=src, meta=meta, name='HGC')
-
-    def props2hpc(self, src, meta, resolution):
-        """Map props in i,j coordinates to HPC (Helioprojective-Cartesian) coordinates.
-
-        Parameters
-        ----------
-        src : str
-            A source for props.
-        meta : str
-            A source for disk meta information.
+            A destination for polygons.
         resolution : float
             Pixel resolution in arcsec.
 
         Returns
         -------
         batch : HelioBatch
-            Batch with props calculated.
+            Batch with HPC calculated.
         """
-        return self._props_mapping(src=src, meta=meta, name='HPC', resolution=resolution)
-
-    @execute(how='threads')
-    def _props_mapping(self, i, src, dst, meta, name, resolution=None, get_areas=True):
-        """Props mapping."""
-        _ = dst
-        props = self.data[src][i]
-        meta = self.meta[meta][i]
-        rad = meta['r']
+        data = self.data[src][i]
+        meta = self.meta[src][i]
         i_cen = meta['i_cen']
         j_cen = meta['j_cen']
+        P = np.deg2rad(meta.get('P', 0))
+        rot_m = np.array([[np.cos(P), -np.sin(P)], [np.sin(P), np.cos(P)]])
+
+        res = []
+        cnt = np.array([i_cen, j_cen])
+        for poly in data:
+            arr = poly.vertices
+            if P != 0:
+                arr = cnt + (arr - cnt) @ rot_m.T
+            xy = np.array([arr[:, 1] - j_cen, -arr[:, 0] + i_cen]).T * resolution
+            res.append(PlanePolygon(xy))
+
+        self.data[dst][i] = res
+        self.meta[dst][i] = meta.copy()
+        self.meta[dst][i]['P'] = 0
+        return self
+
+    @execute(how='threads')
+    def poly2hgc(self, i, src, dst):
+        """Map polygons from (row, column) frame to HGC (Heliographic-Carrington) coordinates.
+
+        Parameters
+        ----------
+        src : str
+            A source for polygons.
+        dst : str
+            A destination for polygons.
+
+        Returns
+        -------
+        batch : HelioBatch
+            Batch with HGC calculated.
+        """
+        data = self.data[src][i]
+        meta = self.meta[src][i]
+        i_cen = meta['i_cen']
+        j_cen = meta['j_cen']
+        rad = meta['r']
         if 'B0' in meta:
             B0 = meta['B0']
         elif 'B0' in self.index:
@@ -855,51 +834,27 @@ class HelioBatch():
             L0 = self.index.iloc[i]['L0']
         else:
             raise ValueError('L0 is missing.')
-        if meta.get('P', 0) != 0:
-            raise ValueError('P angle is not zero.')
+        P = np.deg2rad(meta.get('P', 0))
+        rot_m = np.array([[np.cos(P), -np.sin(P)], [np.sin(P), np.cos(P)]])
 
-        def map2hpc(ij_arr):
-            '''Cartesian x, y in arcsec.'''
-            ij_arr = np.atleast_2d(ij_arr)
-            xy = np.array([ij_arr[:, 1] - j_cen, -ij_arr[:, 0] + i_cen]).T
-            return xy * resolution
-
-        def map2hgc(ij_arr):
-            '''Carrington lat and long.'''
-            ij_arr = np.atleast_2d(ij_arr)
-            xy = np.array([ij_arr[:, 1] - j_cen, -ij_arr[:, 0] + i_cen]).T
+        res = []
+        cnt = np.array([i_cen, j_cen])
+        for poly in data:
+            arr = poly.vertices
+            if P != 0:
+                arr = cnt + (arr - cnt) @ rot_m.T
+            xy = np.array([arr[:, 1] - j_cen, -arr[:, 0] + i_cen]).T
             carr = xy_to_carr(xy, rad, B0=B0, L0=L0, deg=True)
-            return carr[:, ::-1] #lat, long
+            res.append(SphericalPolygon(carr[:, ::-1], deg=True)) #lat, long
 
-        def pixel_areas(ij_arr):
-            '''Pixel areas in MSH.'''
-            ij_arr = np.atleast_2d(ij_arr)
-            xy = np.array([ij_arr[:, 1] - j_cen, -ij_arr[:, 0] + i_cen]).T
-            spp = xyz_to_sp(xy_to_xyz(xy, rad=rad), deg=False)
-            dist = haversine_distances(spp[:, ::-1], np.zeros((1, 2))).ravel()
-            return 10**6 / (2 * np.cos(dist) * np.pi * rad**2)
-
-        for prop in props:
-            if name.lower() == 'hpc':
-                bbox = map2hpc(np.array(prop.bbox).reshape(2, 2))
-                bbox = np.hstack([bbox.min(axis=0), bbox.max(axis=0)])
-                setattr(prop, 'bbox_hpc', bbox)
-                setattr(prop, 'centroid_hpc', map2hpc(prop.centroid).ravel())
-                setattr(prop, 'coords_hpc', map2hpc(prop.coords))
-                setattr(prop, 'contour_hpc', map2hgc(prop.contour))
-                setattr(prop, 'approx_contour_hpc', map2hpc(prop.approx_contour))
-            elif name.lower() == 'hgc':
-                setattr(prop, 'coords_hgc', map2hgc(prop.coords))
-                setattr(prop, 'contour_hgc', map2hgc(prop.contour))
-                setattr(prop, 'approx_contour_hgc', map2hgc(prop.approx_contour))
-            if get_areas:
-                areas = pixel_areas(prop.coords)
-                setattr(prop, 'pixel_area_msh', areas)
-                setattr(prop, 'area_msh', areas.sum())
+        self.data[dst][i] = res
+        self.meta[dst][i] = meta.copy()
+        self.meta[dst][i]['P'] = 0
         return self
 
-    def get_polygons(self, src, dst, coords='hgc', tolerance=3, cache=True, ):
-        """Get polygons from binary mask.
+    @execute(how='threads')
+    def get_polygons(self, i, src, dst, level=0.5, fully_connected='high'):
+        """Get polygons in (row, column) frame from binary mask.
 
         Parameters
         ----------
@@ -907,28 +862,26 @@ class HelioBatch():
             A source for binary masks.
         dst : str
             A destination for polygons.
-        coords : str
-            Coordinates for polygons: 'hgc' for Carrington heliographic, 'plane' for pixel coordinates.
+        level : str
+            Value along which to find contours in the array.
+        fully_connected : str
+            See `skimage.measure.find_contours` for description.
 
         Returns
         -------
         batch : HelioBatch
             Batch with polygons calculated.
         """
-        self.rotate_p_angle(src=src)
-        self.get_region_props(src=src, dst=dst, tolerance=tolerance, cache=cache)
-        if coords == 'hgc':
-            self.props2hgc(src=dst, meta=src)
-        self._get_polygons(src=dst, dst=dst, coords=coords)
-        return self
+        mask = binary_fill_holes(self.data[src][i])
+        labeled, num = label(mask, background=0, return_num=True)
+        res = []
+        for n in range(1, num+1):
+            cnt = find_contours(labeled == n, level=level, fully_connected=fully_connected)[0]
+            poly = PlanePolygon(cnt)
+            res.append(poly)
 
-    @execute(how='threads')
-    def _get_polygons(self, i, src, dst, coords):
-        data = self.data[src][i]
-        if coords == 'plane':
-            self.data[dst][i] = [PlanePolygon(arr.contour[:, ::-1]) for arr in data]
-        elif coords == 'hgc':
-            self.data[dst][i] = [SphericalPolygon(arr.contour_hgc, deg=True) for arr in data]
+        self.data[dst][i] = res
+        self.meta[dst][i] = self.meta[src][i].copy()
         return self
 
     @execute(how='threads')
