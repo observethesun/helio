@@ -185,7 +185,7 @@ class SphericalPolygon(BasePolygon):
     def bbox_center(self):
         """Returns a tuple (lat_cen, lon_cen)."""
         lat_min, lon_min, lat_max, lon_max = self.bbox
-        lon_cen = (lon_min + long_diff([lon_max], [lon_min], deg=self.deg)[0] / 2)
+        lon_cen = lon_min + long_diff([lon_max], [lon_min], deg=self.deg)[0] / 2
         lon_cen = lon_cen % (360 if self.deg else 2*np.pi)
         return ((lat_min + lat_max) / 2, lon_cen)
 
