@@ -206,8 +206,11 @@ class KislovodskFilesIndex(RemoteFilesIndex): #pylint:disable=too-many-ancestors
                                          ext=EXT_LIST[series] if ext is None else ext,
                                          name=series.upper())
                 if series == 'ca':
-                    index = index.parse_datetime(format='%Y%m%d%H%M' if year < 2000
-                                                 else '%y%m%d%H%M', errors='coerce')
+                    index['DateTime'] = index.index.map(lambda x: re.sub("[^0-9]", "", x))
+                    dt = pd.to_datetime(index.DateTime,
+                                        format='%Y%m%d%H%M' if year < 2000 else '%y%m%d%H%M',
+                                        errors='coerce')
+                    index['DateTime'] = dt
                 elif series == 'ch':
                     index = index.parse_datetime()
                 if series == 'spot':
