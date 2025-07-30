@@ -252,7 +252,13 @@ def write_abp_file(fname, binary_mask, connectivity=None, meta=None):
     """Write binary map to `abp` file."""
     binary_mask = binary_mask.astype(int)
     if 'r' in meta:
-        header = [meta['j_cen'], meta['i_cen'], meta['r'], 0, 0, 0, 0]
+        header = [meta['j_cen'],
+                  meta['i_cen'],
+                  meta['r'],
+                  meta['P'] if 'P' in meta else 0,
+                  meta['B0'] if 'B0' in meta else 0,
+                  meta['L0'] if 'L0' in meta else 0,
+                  0]
     else:
         shape = binary_mask.shape[:2]
         header = [shape[1] // 2, shape[0] // 2, np.min(shape) // 2, 0, 0, 0, 1,

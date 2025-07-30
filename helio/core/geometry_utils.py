@@ -165,7 +165,7 @@ def rotate_at_center(data, angle, center=None, deg=True, labels=False, backgroun
             mask = rotate(mask, angle, center=center, preserve_range=True, **kwargs) > 0.5
             res[mask] = lbl
         return res
-    is_bool = data.dtype == np.bool
+    is_bool = data.dtype == bool
     data = rotate(data, angle, center=center, preserve_range=True, **kwargs)
     return data > 0.5 if is_bool else data
 
