@@ -191,7 +191,7 @@ class HelioBatch():
             data = load_cnt(path, **kwargs)
         elif fmt == 'json':
             data = load_json(path, **kwargs)
-        elif fmt in ['fts', 'fits']:
+        elif fmt in ['fts', 'fits', 'fit']:
             data = load_fits(path, **kwargs)
         else:
             data = imread(path, **kwargs)
@@ -220,6 +220,18 @@ class HelioBatch():
                             P=float(header[3]),
                             B0=float(header[4]),
                             L0=float(header[5]))
+        elif fmt in ['bp', 'bp2']:
+            with open(path, 'r') if os.path.exists(path) else urllib.request.urlopen(path) as fin:
+                fread = fin.readlines()
+                header = np.array(fread[1].split())
+                params = {row[0].strip(':'): row[1] for row in header.reshape(-1, 2)}
+                #i_cen enumerates rows, j_cen enumerates columns
+                meta = dict(i_cen=int(params['yc']),
+                            j_cen=int(params['xc']),
+                            r=int(params['R']),
+                            P=float(params['P']),
+                            B0=float(params['D']),
+                            L0=float(params['L0']))
         elif fmt in ['fts', 'fits']:
             hdul = fits.open(path)
             hdul.verify(verify)
@@ -907,8 +919,8 @@ class HelioBatch():
         rad = meta['r']
         i_cen = meta['i_cen']
         j_cen = meta['j_cen']
-        B0 = meta.get('B0', self.index.iloc[i]['B0'])
-        L0 = meta.get('L0', self.index.iloc[i]['L0'])
+        B0 = meta['B0'] if 'B0' in meta else self.index.iloc[i]['B0']
+        L0 = meta['L0'] if 'L0' in meta else self.index.iloc[i]['L0']
         if meta.get('P', 0) != 0:
             mask = rotate_at_center(mask, meta["P"], center=(meta['j_cen'], meta['i_cen']))
         mask_ij = np.vstack(np.where(mask)).T
@@ -1198,7 +1210,7 @@ class HelioBatch():
         batch = self.__class__(BaseIndex(index))
         group_ids = [np.where(df.index.values == i)[0] for i in batch.indices]
         for k, v in self.data.items():
-            data = np.array([np.stack(v[ids]) for ids in group_ids] + [None])[:-1]
+            data = np.array([np.stack(v[ids]) for ids in group_ids] + [None], dtype=object)[:-1]
             batch.data[k] = data
             batch.meta[k] = np.array([None] * len(data))
         return batch

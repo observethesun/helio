@@ -142,8 +142,8 @@ class FilesIndex(BaseIndex): #pylint: disable=abstract-method,too-many-ancestors
             FilesIndex with columns L0, B0, CR added.
         """
         t = self['DateTime']
-        self['L0'] = L0(t)
-        self['B0'] = B0(t)
+        self['L0'] = L0(t).deg
+        self['B0'] = B0(t).deg
         self['CR'] = carrington_rotation_number(t).astype(int)
         return self
 
@@ -227,6 +227,6 @@ class KislovodskFilesIndex(RemoteFilesIndex): #pylint:disable=too-many-ancestors
             index = pd.concat(ids)
             index.index.name = self.__class__.__name__
             if not index.empty:
-                index = index.loc[(index.DateTime.dt.date >= start_date) &
-                                  (index.DateTime.dt.date <= end_date)]
+                index = index.loc[(index.DateTime.dt.date >= start_date.date()) &
+                                  (index.DateTime.dt.date <= end_date.date())]
             super().__init__(index)
