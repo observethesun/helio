@@ -120,7 +120,8 @@ def extract_actions(module, first_arg):
     from a module."""
     actions_dict = {}
     arg = None
-    for (k, v) in module.__dict__.items():
+    for k in dir(module):
+        v = getattr(module, k)
         if callable(v):
             try:
                 arg = inspect.getfullargspec(v).args[0]
